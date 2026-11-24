@@ -741,9 +741,22 @@ const firebaseConfig = {
   measurementId: "G-4HLH7ZBS6E"
 };
 
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
+let auth = null;
+let db = null;
+let cloudOk = false;
+let localMode = false;
+
+try {
+  if (typeof firebase === "undefined") throw new Error("Firebase SDK failed to load (need internet).");
+  firebase.initializeApp(firebaseConfig);
+  auth = firebase.auth();
+  db = firebase.firestore();
+  cloudOk = true;
+} catch (e) {
+  console.warn("Firebase unavailable, using local mode:", e);
+  cloudOk = false;
+  localMode = true;
+}
 
 /* ============================================================
    CONSTANTS & HELPERS
@@ -1003,22 +1016,62 @@ let authForm = { email: "", pass: "", pass2: "" }; // keep values across re-rend
 let chatDraft = ""; // keep chat text while messages update live
 let friendCodeDraft = ""; // keep friend-code field across friend-list updates
 
-auth.onAuthStateChanged(async user => {
+function startLocalMode(msg) {
+  localMode = true;
   authReady = true;
-  if (!user) {
-    S.uid = null;
-    S.p = null;
-    S.code = null;
-    S.h = [];
-    S.friends = [];
-    if (friendsUnsub) { friendsUnsub(); friendsUnsub = null; }
-    if (chatUnsub) { chatUnsub(); chatUnsub = null; }
-    render();
-    return;
-  }
-  S.uid = user.uid;
-  await loadProfile();
-});
+  // Local guest session so the UI is usable when shared as a file
+  S.uid = S.uid || ("local_" + Math.random().toString(36).slice(2, 10));
+  try {
+    const raw = localStorage.getItem("liftlog_local");
+    if (raw) {
+      const data = JSON.parse(raw);
+      if (data.profile) S.p = data.profile;
+      if (data.code) S.code = data.code;
+      if (data.history) S.h = data.history;
+    }
+  } catch (_) {}
+  if (msg) statusMsg = msg;
+  if (msg) statusType = "info";
+  render();
+}
+
+function saveLocal() {
+  try {
+    localStorage.setItem("liftlog_local", JSON.stringify({
+      profile: S.p,
+      code: S.code,
+      history: S.h || []
+    }));
+  } catch (_) {}
+}
+
+if (cloudOk && auth) {
+  // Timeout: if auth never responds (common on file://), fall back to local
+  const authTimer = setTimeout(() => {
+    if (!authReady) startLocalMode("Opened offline / as a file — using local mode on this device. Cloud login needs the app hosted (not a shared file).");
+  }, 4000);
+
+  auth.onAuthStateChanged(async user => {
+    clearTimeout(authTimer);
+    authReady = true;
+    if (!user) {
+      S.uid = null;
+      S.p = null;
+      S.code = null;
+      S.h = [];
+      S.friends = [];
+      if (friendsUnsub) { friendsUnsub(); friendsUnsub = null; }
+      if (chatUnsub) { chatUnsub(); chatUnsub = null; }
+      render();
+      return;
+    }
+    localMode = false;
+    S.uid = user.uid;
+    await loadProfile();
+  });
+} else {
+  startLocalMode("Cloud services unavailable. Running in local mode — data stays on this device.");
+}
 
 async function loadProfile() {
   try {
@@ -1125,17 +1178,18 @@ async function doLogout() {
 }
 
 async function doGuestLogin() {
+  if (!cloudOk || !auth || location.protocol === "file:") {
+    startLocalMode("Local guest mode — data stays on this phone. For cloud sync, host the app (not share as a file).");
+    return;
+  }
   try {
     setStatus("Starting guest session…", "info");
     const cred = await auth.signInAnonymously();
     await cred.user.getIdToken(true);
   } catch (e) {
     console.error(e);
-    let msg = e.message || "Guest login failed";
-    if (e.code === "auth/admin-restricted-operation" || e.code === "auth/operation-not-allowed") {
-      msg = "Guest login is turned off. Firebase → Authentication → Sign-in method → enable Anonymous (and Email/Password for email).";
-    }
-    setStatus(msg, "err");
+    // Fall back so the app is never blank / stuck
+    startLocalMode("Cloud guest login failed — using local mode on this device.");
   }
 }
 
@@ -1167,13 +1221,15 @@ function authUI() {
     </div>
     ${statusMsg ? `<div class="status ${statusType}">${esc(statusMsg)}</div>` : ""}
     <div class="c">
+      <b>Sharing this file?</b>
+      <div class="nt">
+        Opening a shared <b>.html</b> file works in <b>local mode</b> (tap Continue as guest). Cloud login, friends, and team chat need the app hosted on a website — a shared file alone stays on each phone separately.
+      </div>
+    </div>
+    <div class="c">
       <b>Seeing “restricted to administrators only”?</b>
       <div class="nt">
-        That is a Firebase project setting, not an app bug. Do all of these:<br><br>
-        1. Authentication → Sign-in method → enable <b>Email/Password</b> AND <b>Anonymous</b> → Save<br>
-        2. Google Cloud Console (same project) → APIs &amp; Services → enable <b>Identity Toolkit API</b><br>
-        3. Identity Platform (if used) → Settings → allow account creation from the client SDK<br>
-        4. Open the app at <b>http://localhost</b> (run <code>npx serve .</code>), not as a file
+        Firebase project setting. Enable Email/Password + Anonymous under Authentication → Sign-in method, and open via a real URL (not only a file).
       </div>
     </div>
   `;
@@ -1181,6 +1237,10 @@ function authUI() {
 
 async function saveProfile() {
   if (!S.uid || !S.p) return;
+  if (localMode || !cloudOk || !db) {
+    saveLocal();
+    return;
+  }
   try {
     await db.collection("users").doc(S.uid).set({
       profile: S.p,
@@ -1193,7 +1253,8 @@ async function saveProfile() {
     }, {merge: true});
   } catch (e) {
     console.error(e);
-    setStatus("Save failed: " + e.message, "err");
+    saveLocal();
+    setStatus("Cloud save failed — saved locally on this device.", "info");
   }
 }
 
@@ -1219,7 +1280,7 @@ async function finishSetup() {
     alert("Pick at least one football position.");
     return;
   }
-  if (!city) {
+  if (!city && !localMode) {
     alert("Enter your city so we can show nearby schools.");
     return;
   }
@@ -1234,19 +1295,30 @@ async function finishSetup() {
       alert("Enter a school name.");
       return;
     }
-    // Create new school with city so others nearby can find it
-    const ref = await db.collection("schools").add({
-      name: schoolName,
-      city: schoolCity,
-      createdBy: S.uid,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    schoolId = ref.id;
+    if (cloudOk && db && !localMode) {
+      try {
+        const ref = await db.collection("schools").add({
+          name: schoolName,
+          city: schoolCity,
+          createdBy: S.uid,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        schoolId = ref.id;
+      } catch (e) {
+        schoolId = "local_school_" + Date.now();
+      }
+    } else {
+      schoolId = "local_school_" + Date.now();
+    }
     schoolList.push({id: schoolId, name: schoolName, city: schoolCity});
   } else if (schoolId) {
     const found = schoolList.find(s => s.id === schoolId);
     schoolName = found ? found.name : "";
     schoolCity = found && found.city ? found.city : city;
+  } else if (localMode || !cloudOk) {
+    // Local mode: school optional-ish — use city as name if needed
+    schoolId = "local_school";
+    schoolName = city;
   } else {
     alert("Select or create a school.");
     return;
@@ -1256,14 +1328,24 @@ async function finishSetup() {
   let code, exists = true, tries = 0;
   while (exists && tries < 30) {
     code = generateCode();
-    const check = await db.collection("codes").doc(code).get();
-    exists = check.exists;
+    if (localMode || !cloudOk || !db) {
+      exists = false;
+    } else {
+      try {
+        const check = await db.collection("codes").doc(code).get();
+        exists = check.exists;
+      } catch (_) {
+        exists = false;
+      }
+    }
     tries++;
   }
   if (exists) {
     alert("Could not generate a unique code. Try again.");
     return;
   }
+
+  if (!S.uid) S.uid = "local_" + Math.random().toString(36).slice(2, 10);
 
   S.p = {
     id: code,
@@ -1284,26 +1366,33 @@ async function finishSetup() {
   S.code = code;
   savedSchedule = null;
 
-  // Write user + code mapping
-  await db.collection("users").doc(S.uid).set({
-    profile: S.p,
-    code,
-    history: [],
-    prs: {},
-    teamKeys: teamKeys(S.p),
-    schoolId,
-    city,
-    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-  });
-  await db.collection("codes").doc(code).set({uid: S.uid, name: n});
-
-  // Use the name they typed as their Firebase display name (guest + email accounts)
-  try {
-    if (auth.currentUser) {
-      await auth.currentUser.updateProfile({ displayName: n });
+  if (cloudOk && db && !localMode) {
+    try {
+      await db.collection("users").doc(S.uid).set({
+        profile: S.p,
+        code,
+        history: [],
+        prs: {},
+        teamKeys: teamKeys(S.p),
+        schoolId,
+        city,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      await db.collection("codes").doc(code).set({uid: S.uid, name: n});
+      try {
+        if (auth && auth.currentUser) {
+          await auth.currentUser.updateProfile({ displayName: n });
+        }
+      } catch (e) {
+        console.warn("Could not update displayName", e);
+      }
+    } catch (e) {
+      console.warn(e);
+      localMode = true;
+      saveLocal();
     }
-  } catch (e) {
-    console.warn("Could not update displayName", e);
+  } else {
+    saveLocal();
   }
 
   setStatus("Profile created! Your friend code is " + code, "ok");
@@ -1314,6 +1403,7 @@ async function finishSetup() {
    FRIENDS
    ============================================================ */
 async function loadFriends() {
+  if (localMode || !db || !S.uid) return;
   if (friendsUnsub) friendsUnsub();
   friendsUnsub = db.collection("users").doc(S.uid).collection("friends")
     .onSnapshot(snap => {
@@ -1616,6 +1706,7 @@ function normCity(c) {
 }
 
 async function loadSchools() {
+  if (localMode || !db) { schoolList = []; return; }
   try {
     const snap = await db.collection("schools").orderBy("name").get();
     schoolList = [];
@@ -2372,7 +2463,7 @@ render();
 // Updates friends / PRs / history without a visible "page reload".
 // Chat already updates live via onSnapshot, so we only refresh other data.
 setInterval(async () => {
-  if (!S.uid || !S.p) return;
+  if (!S.uid || !S.p || localMode || !db) return;
   try {
     // Soft-refresh own profile + history (in case another device updated)
     const snap = await db.collection("users").doc(S.uid).get();
