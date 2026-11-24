@@ -1,63 +1,680 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
-<meta name="theme-color" content="#07090d">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<title>Lift Log</title>
-<style>
-:root{--a:#c6ff00;--p:#0f1319;--p2:#161b23;--l:#222a35;--m:#8d98a8;--t:#f5f7fa}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html{background:#07090d;overscroll-behavior:none}
-body{margin:0;background:radial-gradient(120% 60% at 50% -10%,#1b2a0a,#07090d 55%) fixed #07090d;color:var(--t);font:16px system-ui,-apple-system,sans-serif;padding:env(safe-area-inset-top) 12px 0;overscroll-behavior:none}
-.w{max-width:520px;margin:0 auto;padding-bottom:120px}
-h1,h2,h3,.big,.tab,.pri{font-family:Impact,"Arial Narrow Bold",system-ui,sans-serif;text-transform:uppercase;letter-spacing:.04em;font-weight:400}
-h1{font-size:46px;font-style:italic;margin:16px 0 0;line-height:1;text-shadow:0 0 24px rgba(198,255,0,.35)}
-h2{font-size:24px;margin:0 0 6px}h3{font-size:20px;margin:0}
-.sub,.m{color:var(--m)}.sub{font-size:11px;letter-spacing:.12em;text-transform:uppercase;margin:6px 0 12px}
-.c{background:linear-gradient(180deg,#121720,#0d1117);border:1px solid var(--l);border-radius:18px;padding:14px;margin-top:12px}
-.ex{border-left:4px solid var(--a)}
-label{display:block;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--m);margin:10px 0 4px}
-input,select,textarea{width:100%;background:#0a0d12;color:var(--t);border:1px solid var(--l);border-radius:12px;padding:12px;min-height:50px;font:600 17px system-ui}
-textarea{font-size:14px;min-height:70px}
-input:focus,select:focus,textarea:focus{outline:0;border-color:var(--a)}
-button{border:0;border-radius:12px;min-height:48px;padding:10px 14px;font:700 15px system-ui;background:#1a212b;color:var(--t);border:1px solid #2c3644;cursor:pointer}
-button:active{transform:scale(.96)}
-.pri{background:var(--a);color:#0b0f00;font-size:18px;border:0;box-shadow:0 0 22px rgba(198,255,0,.35);width:100%;margin-top:12px}
-.dn{background:#2a1214;color:#ff8d8d;border-color:#5b2932}
-.row{display:flex;gap:8px;align-items:center}.row>*{flex:1}
-.set{background:#0a0d12;border:1px solid var(--l);border-radius:14px;padding:12px;margin-top:8px}
-.rc{display:flex;gap:10px;align-items:center;margin-top:4px}.rc button{min-width:56px;min-height:56px;font-size:24px;flex:0}
-.big{font-size:42px;min-width:56px;text-align:center}
-.rc .plus{flex:1;background:var(--a);color:#0b0f00;border:0;font-size:18px}
-.sug{background:rgba(198,255,0,.08);border:1px solid rgba(198,255,0,.4);color:#e4ff8a;border-radius:12px;padding:9px 11px;font-size:13px;margin:8px 0;line-height:1.4}
-.pr{background:rgba(255,106,0,.1);border:1px solid #ff6a00;color:#ffb27a}
-.mode{display:grid;gap:10px;margin-top:10px}.mode button{min-height:64px;font:400 24px Impact,sans-serif;text-transform:uppercase;letter-spacing:.05em}
-.mode button.on{border-color:var(--a);color:var(--a);box-shadow:0 0 16px rgba(198,255,0,.25)}
-.hide{display:none!important}
-.pb{border-radius:50%;aspect-ratio:1;min-height:0;padding:0;font:400 22px Impact,sans-serif;color:#fff;border:3px solid rgba(255,255,255,.3)}
-.nav{position:fixed;left:0;right:0;bottom:0;margin:auto;max-width:560px;z-index:9;display:flex;gap:4px;padding:8px 8px calc(10px + env(safe-area-inset-bottom));background:rgba(7,9,13,.9);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--l)}
-.tab{flex:1;min-height:48px;padding:8px 1px;font-size:12px;background:0;border:1px solid transparent;color:var(--m)}
-.tab.on{color:var(--a);border-color:var(--a);background:rgba(198,255,0,.12)}
-.nt{font-size:12px;color:var(--m);line-height:1.5;margin-top:10px}
-.ln{display:flex;justify-content:space-between;gap:8px;margin-top:6px;font-size:14px}.ln b{color:var(--a)}
-.msg{background:#0a0d12;border-radius:12px;padding:10px 12px;margin-top:8px}
-.msg .who{font-size:12px;color:var(--a);margin-bottom:2px}
-.msg .ts{font-size:11px;color:var(--m)}
-.chatbox{display:flex;gap:8px;margin-top:10px}
-.chatbox input{flex:1;min-height:48px}
-.chatbox button{flex:0;min-width:70px}
-.status{font-size:12px;padding:6px 10px;border-radius:8px;margin-top:8px}
-.status.ok{background:rgba(198,255,0,.12);color:#e4ff8a}
-.status.err{background:rgba(255,80,80,.12);color:#ff8d8d}
-.status.info{background:rgba(100,150,255,.12);color:#a0c0ff}
+430px;
+  margin: 0 auto;
+  padding: 0 16px 120px;
+}
+
+/* ===== HEADER ===== */
+.topbar {
+  padding: 16px 0 8px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.brand {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.brand-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.brand-mark {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: linear-gradient(145deg, #ff6a1a, #ff4d00 50%, #cc3a00);
+  display: grid;
+  place-items: center;
+  font-size: 20px;
+  box-shadow: 0 0 24px var(--a-glow), inset 0 1px 0 rgba(255,255,255,.25);
+}
+.brand h1 {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+}
+.sub {
+  color: var(--muted);
+  font-size: 12.5px;
+  font-weight: 500;
+  margin-top: 2px;
+  max-width: 260px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ===== TYPE ===== */
+h2 {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0 0 10px;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+h2::before {
+  content: "";
+  width: 4px;
+  height: 14px;
+  border-radius: 2px;
+  background: var(--a);
+  flex-shrink: 0;
+}
+h3 {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+.m { color: var(--muted); font-size: 13px; }
+.big {
+  font-size: 40px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  min-width: 52px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+
+/* ===== CARDS ===== */
+.c {
+  background: var(--surface);
+  border: 1px solid var(--stroke);
+  border-radius: var(--r);
+  padding: 18px;
+  margin-top: 14px;
+  position: relative;
+  overflow: hidden;
+}
+.c::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.08), transparent);
+  pointer-events: none;
+}
+.ex {
+  border: 1px solid var(--stroke);
+  background:
+    linear-gradient(135deg, var(--a-soft), transparent 50%),
+    var(--surface);
+  border-left: 3px solid var(--a);
+}
+.set {
+  background: var(--surface2);
+  border: 1px solid var(--stroke);
+  border-radius: var(--r-sm);
+  padding: 14px;
+  margin-top: 10px;
+}
+
+/* ===== FORMS ===== */
+label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 14px 0 6px;
+}
+input, select, textarea {
+  width: 100%;
+  background: var(--bg);
+  color: var(--text);
+  border: 1.5px solid var(--stroke);
+  border-radius: 12px;
+  padding: 14px 14px;
+  min-height: 50px;
+  font: 600 16px/1.25 -apple-system, system-ui, sans-serif;
+  transition: border-color .15s, box-shadow .15s;
+  appearance: none;
+  -webkit-appearance: none;
+}
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23888888' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+}
+textarea { font-size: 15px; min-height: 72px; font-weight: 500; }
+input:focus, select:focus, textarea:focus {
+  outline: 0;
+  border-color: var(--a);
+  box-shadow: 0 0 0 3px var(--a-soft);
+}
+
+/* ===== BUTTONS ===== */
+button {
+  border: 0;
+  border-radius: 12px;
+  min-height: 48px;
+  padding: 12px 16px;
+  font: 650 15px/1 -apple-system, system-ui, sans-serif;
+  background: var(--surface2);
+  color: var(--text);
+  border: 1.5px solid var(--stroke);
+  cursor: pointer;
+  transition: transform .12s, background .15s, border-color .15s, box-shadow .15s;
+}
+button:active { transform: scale(.97); }
+.pri {
+  background: linear-gradient(180deg, #ff6a1a, #ff4d00);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 750;
+  border: 0;
+  box-shadow: 0 6px 24px var(--a-glow), inset 0 1px 0 rgba(255,255,255,.2);
+  width: 100%;
+  margin-top: 14px;
+  letter-spacing: -0.01em;
+}
+.pri:active { box-shadow: 0 3px 12px var(--a-glow); }
+.dn {
+  background: var(--danger-bg);
+  color: var(--danger);
+  border-color: #3a1818;
+}
+.row { display: flex; gap: 10px; align-items: center; }
+.row > * { flex: 1; }
+
+/* ===== REPS ===== */
+.rc { display: flex; gap: 10px; align-items: center; margin-top: 8px; }
+.rc button {
+  min-width: 54px;
+  min-height: 54px;
+  font-size: 24px;
+  font-weight: 600;
+  flex: 0;
+  border-radius: 16px;
+  background: var(--surface3);
+}
+.rc .plus {
+  flex: 1;
+  background: linear-gradient(180deg, #ff6a1a, #ff4d00);
+  color: #fff;
+  border: 0;
+  font-size: 15px;
+  font-weight: 750;
+  box-shadow: 0 4px 16px var(--a-glow);
+}
+
+/* ===== CHIPS / SUGGESTIONS ===== */
+.sug {
+  background: var(--a-soft);
+  border: 1px solid rgba(255,77,0,.35);
+  color: #ffb48a;
+  border-radius: 12px;
+  padding: 11px 13px;
+  font-size: 13px;
+  font-weight: 550;
+  margin: 10px 0;
+  line-height: 1.45;
+}
+.pr {
+  background: rgba(255,176,32,.1);
+  border: 1px solid rgba(255,176,32,.35);
+  color: #ffc86a;
+}
+
+/* ===== MODE PICKER ===== */
+.mode { display: grid; gap: 10px; margin-top: 12px; }
+.mode button {
+  min-height: 58px;
+  font-size: 16px;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+  border-radius: 14px;
+  background: var(--surface2);
+}
+.mode button.on {
+  border-color: var(--a);
+  color: #fff;
+  background: var(--a-soft);
+  box-shadow: 0 0 0 1px rgba(255,77,0,.4), inset 0 0 24px rgba(255,77,0,.08);
+}
+
+.hide { display: none !important; }
+
+/* ===== PLATES ===== */
+.pb {
+  border-radius: 50%;
+  aspect-ratio: 1;
+  min-height: 0;
+  padding: 0;
+  font: 750 17px/1 -apple-system, system-ui, sans-serif;
+  color: #fff;
+  border: 2.5px solid rgba(255,255,255,.2);
+  box-shadow: 0 4px 14px rgba(0,0,0,.45);
+}
+
+/* ===== FLOATING PILL NAV ===== */
+.nav {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: calc(10px + env(safe-area-inset-bottom));
+  margin: auto;
+  max-width: 400px;
+  z-index: 30;
+  display: flex;
+  gap: 4px;
+  padding: 6px;
+  background: rgba(18,18,18,.92);
+  backdrop-filter: blur(24px) saturate(1.6);
+  -webkit-backdrop-filter: blur(24px) saturate(1.6);
+  border: 1px solid var(--stroke);
+  border-radius: 22px;
+  box-shadow: 0 12px 40px rgba(0,0,0,.55);
+}
+.tab {
+  flex: 1;
+  min-height: 46px;
+  padding: 6px 2px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  background: transparent;
+  border: 0;
+  border-radius: 16px;
+  color: var(--muted);
+  transition: color .15s, background .15s, box-shadow .15s;
+}
+.tab.on {
+  color: #fff;
+  background: linear-gradient(180deg, #ff6a1a, #ff4d00);
+  box-shadow: 0 4px 16px var(--a-glow);
+}
+
+/* ===== MISC ===== */
+.nt { font-size: 12.5px; color: var(--muted); line-height: 1.5; margin-top: 10px; }
+.ln {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-top: 2px;
+  padding: 11px 0;
+  font-size: 14px;
+  border-bottom: 1px solid var(--stroke);
+}
+.ln:last-child { border-bottom: 0; }
+.ln b {
+  color: var(--a);
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ===== CHAT ===== */
+.msg {
+  background: var(--surface2);
+  border: 1px solid var(--stroke);
+  border-radius: 14px;
+  padding: 12px 14px;
+  margin-top: 8px;
+}
+.msg .who { font-size: 12px; font-weight: 700; color: var(--a); margin-bottom: 3px; }
+.msg .ts { font-size: 11px; color: var(--muted); margin-top: 5px; }
+.chatbox { display: flex; gap: 8px; margin-top: 12px; }
+.chatbox input { flex: 1; min-height: 48px; }
+.chatbox button { flex: 0; min-width: 72px; margin-top: 0; }
+
+/* ===== STATUS ===== */
+.status {
+  font-size: 13px;
+  font-weight: 600;
+  padding: 11px 13px;
+  border-radius: 12px;
+  margin-top: 10px;
+}
+.status.ok { background: rgba(61,255,154,.1); color: #3dff9a; border: 1px solid rgba(61,255,154,.25); }
+.status.err { background: rgba(255,92,92,.1); color: #ff8a8a; border: 1px solid rgba(255,92,92,.25); }
+.status.info { background: rgba(100,150,255,.1); color: #a0bfff; border: 1px solid rgba(100,150,255,.25); }
+
+a { color: var(--a); font-weight: 650; text-decoration: none; }
+
+/* Day chips on plan */
+.day-chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--surface2);
+  border: 1px solid var(--stroke);
+  border-radius: 14px;
+  margin-top: 8px;
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+}
+.day-chip:active { border-color: var(--a); background: var(--a-soft); }
+.day-chip .dname {
+  font-size: 16px;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+}
+.day-chip .dmeta { font-size: 13px; color: var(--muted); margin-top: 2px; }
+.day-chip .badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: var(--a-soft);
+  color: #ffb48a;
+  border: 1px solid rgba(255,77,0,.3);
+  white-space: nowrap;
+}
+.day-chip .badge.rest {
+  background: rgba(255,255,255,.06);
+  color: var(--muted);
+  border-color: var(--stroke);
+}
+
+/* ===== LAYOUT REORG ===== */
+.page-hero {
+  padding: 8px 0 4px;
+}
+.page-hero .title {
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.15;
+}
+.page-hero .meta {
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 4px;
+}
+.day-strip {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 4px 0 8px;
+  margin: 0 -4px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.day-strip::-webkit-scrollbar { display: none; }
+.day-pill {
+  flex: 0 0 auto;
+  min-width: 52px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: var(--surface2);
+  border: 1.5px solid var(--stroke);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color .15s, background .15s, color .15s;
+}
+.day-pill .abbr {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.day-pill .full { display: none; }
+.day-pill.on {
+  background: var(--a-soft);
+  border-color: var(--a);
+  box-shadow: 0 0 0 1px rgba(255,77,0,.35);
+}
+.day-pill.on .abbr { color: var(--a); }
+.day-pill.rest-pill { opacity: 0.65; }
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 10px;
+}
+.stat-card {
+  background: var(--surface2);
+  border: 1px solid var(--stroke);
+  border-radius: 14px;
+  padding: 14px;
+}
+.stat-card .label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.stat-card .value {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-top: 4px;
+  font-variant-numeric: tabular-nums;
+}
+.stat-card .value.accent { color: var(--a); }
+
+.set-row {
+  display: grid;
+  grid-template-columns: 44px 1fr 1fr;
+  gap: 8px;
+  align-items: end;
+  margin-top: 10px;
+}
+.set-row .set-num {
+  font-size: 13px;
+  font-weight: 750;
+  color: var(--a);
+  padding-bottom: 14px;
+}
+.set-row label { margin: 0 0 4px; font-size: 10px; }
+.set-row input { min-height: 44px; padding: 10px; text-align: center; }
+
+.sticky-save {
+  position: sticky;
+  bottom: 90px;
+  z-index: 5;
+  padding-top: 8px;
+  background: linear-gradient(transparent, var(--bg) 30%);
+}
+.sticky-save .pri { margin-top: 0; }
+
+.week-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 8px;
+}
+.week-cell {
+  background: var(--surface2);
+  border: 1px solid var(--stroke);
+  border-radius: 14px;
+  padding: 12px;
+  cursor: pointer;
+  min-height: 72px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: border-color .15s, background .15s;
+}
+.week-cell:active { border-color: var(--a); background: var(--a-soft); }
+.week-cell .wd {
+  font-size: 13px;
+  font-weight: 750;
+  letter-spacing: -0.01em;
+}
+.week-cell .wt {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 4px;
+  line-height: 1.3;
+}
+.week-cell .tag {
+  align-self: flex-start;
+  margin-top: 8px;
+  font-size: 10px;
+  font-weight: 750;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--a-soft);
+  color: #ffb48a;
+  border: 1px solid rgba(255,77,0,.3);
+}
+.week-cell .tag.rest {
+  background: rgba(255,255,255,.06);
+  color: var(--muted);
+  border-color: var(--stroke);
+}
+
+.pr-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--stroke);
+}
+.pr-row:last-child { border-bottom: 0; }
+.pr-rank {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--surface3);
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+.pr-rank.top { background: var(--a-soft); color: var(--a); }
+.pr-info { flex: 1; min-width: 0; }
+.pr-info .name { font-weight: 700; font-size: 14px; }
+.pr-info .sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.pr-nums {
+  text-align: right;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--a);
+  font-size: 15px;
+}
+
+.code-hero {
+  text-align: center;
+  padding: 20px 12px;
+  background: linear-gradient(180deg, var(--a-soft), transparent);
+  border-radius: 16px;
+  border: 1px solid rgba(255,77,0,.25);
+  margin-top: 4px;
+}
+.code-hero .code {
+  font-size: 42px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: var(--a);
+  font-variant-numeric: tabular-nums;
+}
+.code-hero .hint {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 6px;
+}
+
+.friend-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.friend-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: linear-gradient(145deg, #ff6a1a, #cc3a00);
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 16px;
+  color: #fff;
+  flex-shrink: 0;
+}
+.friend-meta { flex: 1; min-width: 0; }
+.friend-meta .nm { font-weight: 750; font-size: 15px; }
+.friend-meta .sp { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+.hist-item {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--stroke);
+}
+.hist-item:last-child { border-bottom: 0; }
+.hist-item .when {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--a);
+  letter-spacing: 0.02em;
+}
+.hist-item .what {
+  font-weight: 700;
+  margin-top: 2px;
+}
+.hist-item .lifts {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 6px;
+  line-height: 1.55;
+}
+
+.plate-total {
+  text-align: center;
+  padding: 12px 0 4px;
+}
+.plate-total .num {
+  font-size: 64px;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  color: var(--a);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.plate-total .unit {
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 600;
+  margin-top: 4px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sec-label {
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 18px 0 8px;
+}
+
 </style>
 </head>
 <body>
 <div class="w">
-  <h1>🏋️ Lift Log</h1>
-  <div class="sub" id="sub">Log every set, rep and pound</div>
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-row">
+        <div class="brand-mark">â¡</div>
+        <h1>Lift Log</h1>
+      </div>
+      <div class="sub" id="sub">Log every set, rep and pound</div>
+    </div>
+  </div>
   <div id="setup" class="hide"></div>
   <div id="app" class="hide"><div id="v"></div></div>
 </div>
@@ -70,7 +687,7 @@ button:active{transform:scale(.96)}
 
 <script>
 /* ============================================================
-   FIREBASE CONFIG – REPLACE WITH YOUR PROJECT VALUES
+   FIREBASE CONFIG â REPLACE WITH YOUR PROJECT VALUES
    ============================================================ */
 const firebaseConfig = {
   apiKey: "AIzaSyBr6KkPC6WL9TDuRsPnHlaJH-TWkdMaQWQ",
@@ -128,48 +745,99 @@ function posList(p) {
   return [];
 }
 
-function plan() {
+// Default: MonâFri training, Sat + Sun rest.
+// Schedule maps day name â template key (or missing/null = rest).
+const DEFAULT_SCHEDULE = {
+  Monday: "upper",
+  Tuesday: "optional",
+  Wednesday: "lower",
+  Thursday: "back",
+  Friday: "optional"
+};
+
+function getTemplates() {
+  if (!S.p) return {};
   const fb = !!S.p.fb;
   const positions = posList(S.p);
   const isOL = positions.some(i => i <= 3); // LT, RT, Guard, Center
   const isDL = positions.some(i => i === 4 || i === 5); // DT, DE
   const isSkill = positions.some(i => i === 6 || i === 7); // TE, LB
-  const sat = fb
+  const optional = fb
     ? {title:"Optional football drills",ex:["Football position drills","Short acceleration work"]}
     : {title:"Optional accessories & mobility",ex:["Face Pulls","Plank","Hip & thoracic mobility"]};
 
-  // Position-based weekly plan
   if (fb && isOL) {
     return {
-      Monday:{title:"Upper power (OL)",ex:["Bench Press","Close-Grip Bench Press","Overhead Press"]},
-      Wednesday:{title:"Lower power (OL)",ex:["Squat","Deadlift","Romanian Deadlift"]},
-      Friday:{title:"Back & core (OL)",ex:["Barbell Row","Pull-Ups","Plank"]},
-      Saturday:sat
+      upper: {title:"Upper power (OL)",ex:["Bench Press","Close-Grip Bench Press","Overhead Press"]},
+      lower: {title:"Lower power (OL)",ex:["Squat","Deadlift","Romanian Deadlift"]},
+      back: {title:"Back & core (OL)",ex:["Barbell Row","Pull-Ups","Plank"]},
+      optional
     };
   }
   if (fb && isDL) {
     return {
-      Monday:{title:"Upper strength (DL)",ex:["Bench Press","Overhead Press","Barbell Row"]},
-      Wednesday:{title:"Lower strength (DL)",ex:["Squat","Deadlift","Romanian Deadlift"]},
-      Friday:{title:"Power & back (DL)",ex:["Close-Grip Bench Press","Pull-Ups","Face Pulls"]},
-      Saturday:sat
+      upper: {title:"Upper strength (DL)",ex:["Bench Press","Overhead Press","Barbell Row"]},
+      lower: {title:"Lower strength (DL)",ex:["Squat","Deadlift","Romanian Deadlift"]},
+      back: {title:"Power & back (DL)",ex:["Close-Grip Bench Press","Pull-Ups","Face Pulls"]},
+      optional
     };
   }
   if (fb && isSkill) {
     return {
-      Monday:{title:"Upper + explosiveness",ex:["Bench Press","Overhead Press","Pull-Ups"]},
-      Wednesday:{title:"Legs + power",ex:["Squat","Romanian Deadlift","Short acceleration work"]},
-      Friday:{title:"Back & athleticism",ex:["Barbell Row","Face Pulls","Plank"]},
-      Saturday:sat
+      upper: {title:"Upper + explosiveness",ex:["Bench Press","Overhead Press","Pull-Ups"]},
+      lower: {title:"Legs + power",ex:["Squat","Romanian Deadlift","Short acceleration work"]},
+      back: {title:"Back & athleticism",ex:["Barbell Row","Face Pulls","Plank"]},
+      optional
     };
   }
   // Default / powerlifting / own
   return {
-    Monday:{title:"Chest, shoulders & triceps",ex:["Bench Press","Overhead Press","Close-Grip Bench Press"]},
-    Wednesday:{title:"Legs",ex:["Squat","Deadlift","Romanian Deadlift"]},
-    Friday:{title:"Back",ex:["Barbell Row","Pull-Ups"]},
-    Saturday:sat
+    upper: {title:"Chest, shoulders & triceps",ex:["Bench Press","Overhead Press","Close-Grip Bench Press"]},
+    lower: {title:"Legs",ex:["Squat","Deadlift","Romanian Deadlift"]},
+    back: {title:"Back",ex:["Barbell Row","Pull-Ups"]},
+    optional
   };
+}
+
+function plan() {
+  if (!S.p) return {};
+  const templates = getTemplates();
+  const sched = S.p.schedule || DEFAULT_SCHEDULE;
+  const result = {};
+  // Support both new (day â slot) and old (slot â day) shapes so existing profiles still work
+  const firstKey = Object.keys(sched)[0];
+  const isDayKeyed = firstKey && DAYS.includes(firstKey);
+  if (isDayKeyed) {
+    Object.entries(sched).forEach(([day, slot]) => {
+      if (templates[slot] && DAYS.includes(day)) result[day] = templates[slot];
+    });
+  } else {
+    Object.entries(sched).forEach(([slot, day]) => {
+      if (templates[slot] && day && DAYS.includes(day)) result[day] = templates[slot];
+    });
+  }
+  return result;
+}
+
+function setDaySlot(day, slot) {
+  if (!S.p || !DAYS.includes(day)) return;
+  if (!S.p.schedule) S.p.schedule = { ...DEFAULT_SCHEDULE };
+  // Migrate old slotâday shape if needed
+  const firstKey = Object.keys(S.p.schedule)[0];
+  if (firstKey && !DAYS.includes(firstKey)) {
+    S.p.schedule = { ...DEFAULT_SCHEDULE };
+  }
+  if (slot) S.p.schedule[day] = slot;
+  else delete S.p.schedule[day];
+  saveProfile();
+  render();
+}
+
+function resetSchedule() {
+  if (!S.p) return;
+  S.p.schedule = { ...DEFAULT_SCHEDULE };
+  saveProfile();
+  render();
 }
 
 const rnd = (x,s) => Math.round(x/s)*s;
@@ -228,8 +896,8 @@ function modeName(p) {
 function specText(p) {
   if (!(p.fb || p.pl)) return p.own;
   const posNames = posList(p).map(i => POS[i]).filter(Boolean);
-  const fbPart = p.fb ? (posNames.length ? posNames.join(", ") : "Football") + " · " + FBT[p.fb.t] : null;
-  const plPart = p.pl ? WCS[p.pl.w] + " lb · Grade " + p.pl.g : null;
+  const fbPart = p.fb ? (posNames.length ? posNames.join(", ") : "Football") + " Â· " + FBT[p.fb.t] : null;
+  const plPart = p.pl ? WCS[p.pl.w] + " lb Â· Grade " + p.pl.g : null;
   return [fbPart, plPart].filter(Boolean).join(" | ");
 }
 function teamKeys(p) {
@@ -240,9 +908,9 @@ function teamKeys(p) {
 }
 function tname(k) {
   if (!k) return "";
-  if (k[0] === "F") return "Football · " + FBT[+k.slice(1)];
+  if (k[0] === "F") return "Football Â· " + FBT[+k.slice(1)];
   const parts = k.slice(1).split("-");
-  return "Powerlifting · " + WCS[+parts[0]] + " lb · Grade " + parts[1];
+  return "Powerlifting Â· " + WCS[+parts[0]] + " lb Â· Grade " + parts[1];
 }
 
 /* ============================================================
@@ -269,6 +937,7 @@ let chatUnsub = null;
 let friendsUnsub = null;
 let statusMsg = "";
 let statusType = "info";
+let savedSchedule = null; // preserves schedule when editing profile
 
 function setStatus(msg, type = "info") {
   statusMsg = msg;
@@ -320,14 +989,14 @@ async function loadProfile() {
       await loadFriends();
       render();
     } else {
-      // Signed in but no profile yet → show setup
+      // Signed in but no profile yet â show setup
       S.p = null;
       render();
     }
   } catch (e) {
     console.error(e);
     const hint = (e.code === "permission-denied")
-      ? " Firestore rules are blocking this. In Firebase Console → Firestore → Rules, publish rules that allow read/write when request.auth != null (or temporarily if true for testing)."
+      ? " Firestore rules are blocking this. In Firebase Console â Firestore â Rules, publish rules that allow read/write when request.auth != null (or temporarily if true for testing)."
       : "";
     setStatus("Error loading profile: " + e.message + hint, "err");
     render();
@@ -349,7 +1018,7 @@ async function doLogin() {
     return;
   }
   try {
-    setStatus("Signing in…", "info");
+    setStatus("Signing inâ¦", "info");
     const cred = await auth.signInWithEmailAndPassword(email.trim(), pass);
     await cred.user.getIdToken(true);
   } catch (e) {
@@ -359,7 +1028,7 @@ async function doLogin() {
     if (e.code === "auth/wrong-password") msg = "Wrong password.";
     if (e.code === "auth/invalid-email") msg = "Invalid email address.";
     if (e.code === "auth/invalid-credential") msg = "Wrong email or password.";
-    if (e.code === "auth/admin-restricted-operation") msg = "Email/Password sign-in is not enabled. In Firebase Console → Authentication → Sign-in method → enable Email/Password.";
+    if (e.code === "auth/admin-restricted-operation") msg = "Email/Password sign-in is not enabled. In Firebase Console â Authentication â Sign-in method â enable Email/Password.";
     setStatus(msg, "err");
   }
 }
@@ -382,7 +1051,7 @@ async function doSignup() {
     return;
   }
   try {
-    setStatus("Creating account…", "info");
+    setStatus("Creating accountâ¦", "info");
     const cred = await auth.createUserWithEmailAndPassword(email.trim(), pass);
     await cred.user.getIdToken(true);
   } catch (e) {
@@ -391,7 +1060,7 @@ async function doSignup() {
     if (e.code === "auth/email-already-in-use") msg = "That email is already registered. Log in instead.";
     if (e.code === "auth/weak-password") msg = "Password is too weak (min 6 characters).";
     if (e.code === "auth/invalid-email") msg = "Invalid email address.";
-    if (e.code === "auth/admin-restricted-operation") msg = "Email/Password sign-in is not enabled. In Firebase Console → Authentication → Sign-in method → enable Email/Password.";
+    if (e.code === "auth/admin-restricted-operation") msg = "Email/Password sign-in is not enabled. In Firebase Console â Authentication â Sign-in method â enable Email/Password.";
     setStatus(msg, "err");
   }
 }
@@ -408,14 +1077,14 @@ async function doLogout() {
 
 async function doGuestLogin() {
   try {
-    setStatus("Starting guest session…", "info");
+    setStatus("Starting guest sessionâ¦", "info");
     const cred = await auth.signInAnonymously();
     await cred.user.getIdToken(true);
   } catch (e) {
     console.error(e);
     let msg = e.message || "Guest login failed";
     if (e.code === "auth/admin-restricted-operation" || e.code === "auth/operation-not-allowed") {
-      msg = "Guest login is turned off. Firebase → Authentication → Sign-in method → enable Anonymous (and Email/Password for email).";
+      msg = "Guest login is turned off. Firebase â Authentication â Sign-in method â enable Anonymous (and Email/Password for email).";
     }
     setStatus(msg, "err");
   }
@@ -430,11 +1099,11 @@ function authUI() {
       <input id="authEmail" type="email" inputmode="email" autocomplete="email" placeholder="you@school.edu"
         value="${esc(authForm.email)}" oninput="authForm.email=this.value">
       <label>Password</label>
-      <input id="authPass" type="password" autocomplete="${authMode === "login" ? "current-password" : "new-password"}" placeholder="••••••••"
+      <input id="authPass" type="password" autocomplete="${authMode === "login" ? "current-password" : "new-password"}" placeholder="â¢â¢â¢â¢â¢â¢â¢â¢"
         value="${esc(authForm.pass)}" oninput="authForm.pass=this.value">
       ${authMode === "signup" ? `
         <label>Confirm password</label>
-        <input id="authPass2" type="password" autocomplete="new-password" placeholder="••••••••"
+        <input id="authPass2" type="password" autocomplete="new-password" placeholder="â¢â¢â¢â¢â¢â¢â¢â¢"
           value="${esc(authForm.pass2)}" oninput="authForm.pass2=this.value">
       ` : ""}
       <button class="pri" onclick="${authMode === "login" ? "doLogin()" : "doSignup()"}">
@@ -449,12 +1118,12 @@ function authUI() {
     </div>
     ${statusMsg ? `<div class="status ${statusType}">${esc(statusMsg)}</div>` : ""}
     <div class="c">
-      <b>Seeing “restricted to administrators only”?</b>
+      <b>Seeing ârestricted to administrators onlyâ?</b>
       <div class="nt">
         That is a Firebase project setting, not an app bug. Do all of these:<br><br>
-        1. Authentication → Sign-in method → enable <b>Email/Password</b> AND <b>Anonymous</b> → Save<br>
-        2. Google Cloud Console (same project) → APIs &amp; Services → enable <b>Identity Toolkit API</b><br>
-        3. Identity Platform (if used) → Settings → allow account creation from the client SDK<br>
+        1. Authentication â Sign-in method â enable <b>Email/Password</b> AND <b>Anonymous</b> â Save<br>
+        2. Google Cloud Console (same project) â APIs &amp; Services â enable <b>Identity Toolkit API</b><br>
+        3. Identity Platform (if used) â Settings â allow account creation from the client SDK<br>
         4. Open the app at <b>http://localhost</b> (run <code>npx serve .</code>), not as a file
       </div>
     </div>
@@ -494,7 +1163,7 @@ async function finishSetup() {
   const city = (su.city || "").trim();
   if ($("sschool")) su.school = $("sschool").value;
   if (!n || !(+su.w >= 50) || (su.own && !su.s.trim())) {
-    alert("Enter your name, a body weight (≥50), and what you're training for.");
+    alert("Enter your name, a body weight (â¥50), and what you're training for.");
     return;
   }
   if (su.fb && (!Array.isArray(su.fp) || !su.fp.length)) {
@@ -558,11 +1227,13 @@ async function finishSetup() {
     own: su.own ? su.s.trim() : "",
     schoolId,
     schoolName,
-    city
+    city,
+    schedule: savedSchedule ? { ...savedSchedule } : { ...DEFAULT_SCHEDULE }
   };
   S.p.mode = modeName(S.p);
   S.p.spec = specText(S.p);
   S.code = code;
+  savedSchedule = null;
 
   // Write user + code mapping
   await db.collection("users").doc(S.uid).set({
@@ -623,7 +1294,7 @@ async function loadFriends() {
 async function addFriendByCode(code) {
   code = code.trim().toUpperCase();
   if (!/^[A-Z0-9]{5,7}$/.test(code)) {
-    setStatus("Enter a valid 5–7 character friend code (letters and numbers).", "err");
+    setStatus("Enter a valid 5â7 character friend code (letters and numbers).", "err");
     return;
   }
   if (code === S.code) {
@@ -780,7 +1451,7 @@ function loadChat(target) {
         });
       });
       S.messages.reverse();
-      // Only update the messages list — never touch the input (keeps keyboard open)
+      // Only update the messages list â never touch the input (keeps keyboard open)
       const box = $("chatmsgs");
       if (box) {
         const atBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 80;
@@ -886,7 +1557,7 @@ async function finish() {
 }
 
 /* ============================================================
-   UI – SETUP
+   UI â SETUP
    ============================================================ */
 let su = {fb:0, pl:0, own:0, fp:[], ft:2, pw:5, pg:10, n:"", w:"", s:"", school:"", newSchool:"", city:""};
 let schoolList = []; // [{id, name, city}]
@@ -953,7 +1624,7 @@ function keep() {
 }
 
 function togglePos(i) {
-  // Only update the array — do NOT rebuild the form (keeps name/weight)
+  // Only update the array â do NOT rebuild the form (keeps name/weight)
   i = +i;
   if (!Array.isArray(su.fp)) su.fp = [];
   if (su.fp.includes(i)) su.fp = su.fp.filter(x => x !== i);
@@ -965,22 +1636,22 @@ function schoolOptionsHtml() {
   let schoolOpts = "";
   if (near.length) {
     schoolOpts += `<optgroup label="Near ${esc(su.city) || "you"}">`;
-    schoolOpts += near.map(s => `<option value="${esc(s.id)}" ${su.school===s.id?"selected":""}>${esc(s.name)}${s.city ? " · " + esc(s.city) : ""}</option>`).join("");
+    schoolOpts += near.map(s => `<option value="${esc(s.id)}" ${su.school===s.id?"selected":""}>${esc(s.name)}${s.city ? " Â· " + esc(s.city) : ""}</option>`).join("");
     schoolOpts += `</optgroup>`;
   }
   if (other.length) {
     schoolOpts += `<optgroup label="${near.length ? "Other schools" : "All schools"}">`;
-    schoolOpts += other.map(s => `<option value="${esc(s.id)}" ${su.school===s.id?"selected":""}>${esc(s.name)}${s.city ? " · " + esc(s.city) : ""}</option>`).join("");
+    schoolOpts += other.map(s => `<option value="${esc(s.id)}" ${su.school===s.id?"selected":""}>${esc(s.name)}${s.city ? " Â· " + esc(s.city) : ""}</option>`).join("");
     schoolOpts += `</optgroup>`;
   }
   if (!schoolList.length) {
-    schoolOpts = `<option value="" disabled>No schools yet — create one</option>`;
+    schoolOpts = `<option value="" disabled>No schools yet â create one</option>`;
   }
   return schoolOpts;
 }
 
 function onSchoolChange() {
-  // Save name/weight, update school, only toggle the "new school" field — no full form wipe
+  // Save name/weight, update school, only toggle the "new school" field â no full form wipe
   if ($("sn")) su.n = $("sn").value;
   if ($("sw")) su.w = $("sw").value;
   if ($("scity")) su.city = $("scity").value;
@@ -1003,7 +1674,7 @@ function onCityBlur() {
   const sel = $("sschool");
   if (!sel) return;
   const current = su.school;
-  sel.innerHTML = `<option value="">— Select a school —</option>${schoolOptionsHtml()}<option value="__new__" ${current==="__new__"?"selected":""}>+ Create new school</option>`;
+  sel.innerHTML = `<option value="">â Select a school â</option>${schoolOptionsHtml()}<option value="__new__" ${current==="__new__"?"selected":""}>+ Create new school</option>`;
   // restore selection if still valid
   if (current && current !== "__new__") {
     const stillThere = [...sel.options].some(o => o.value === current);
@@ -1014,7 +1685,7 @@ function onCityBlur() {
 }
 
 async function setupUI() {
-  // Only full rebuild when switching Football / Powerlifting / Own — not on school pick
+  // Only full rebuild when switching Football / Powerlifting / Own â not on school pick
   if ($("sn")) su.n = $("sn").value;
   if ($("sw")) su.w = $("sw").value;
   if ($("scity")) su.city = $("scity").value;
@@ -1051,11 +1722,11 @@ async function setupUI() {
         <input id="scity" placeholder="e.g. Austin" value="${esc(su.city)}"
           oninput="su.city=this.value"
           onblur="onCityBlur()">
-        <div class="nt">Type your city, then tap outside the box — nearby schools appear at the top.</div>
+        <div class="nt">Type your city, then tap outside the box â nearby schools appear at the top.</div>
 
         <label>School</label>
         <select id="sschool" onchange="onSchoolChange()">
-          <option value="">— Select a school —</option>
+          <option value="">â Select a school â</option>
           ${schoolOptionsHtml()}
           <option value="__new__" ${su.school==="__new__"?"selected":""}>+ Create new school</option>
         </select>
@@ -1066,7 +1737,7 @@ async function setupUI() {
         </div>
 
         ${su.fb ? `
-          <label>Football position(s) — pick all that apply</label>
+          <label>Football position(s) â pick all that apply</label>
           <div class="set" style="margin-top:4px">${posChecks}</div>
           <div class="nt">Your workout plan changes based on these positions.</div>
           <label>Football team</label>
@@ -1086,7 +1757,7 @@ async function setupUI() {
         <select id="sg">${GOALS.map(x => `<option>${x}</option>`).join("")}</select>
         <label>Lifting level</label>
         <select id="sl">${["Beginner","Intermediate","Advanced"].map(x => `<option>${x}</option>`).join("")}</select>
-        <button class="pri" onclick="finishSetup()">Start lifting →</button>
+        <button class="pri" onclick="finishSetup()">Start lifting â</button>
       ` : ""}
     </div>
     ${statusMsg ? `<div class="status ${statusType}">${esc(statusMsg)}</div>` : ""}
@@ -1096,6 +1767,7 @@ async function setupUI() {
 function editProfile() {
   const p = S.p;
   const positions = posList(p);
+  savedSchedule = p.schedule ? { ...p.schedule } : null;
   su = {
     fb: p.fb ? 1 : 0,
     pl: p.pl ? 1 : 0,
@@ -1116,7 +1788,7 @@ function editProfile() {
 }
 
 /* ============================================================
-   UI – VIEWS
+   UI â VIEWS
    ============================================================ */
 const TABS = () => [
   ["workout","Workout"],
@@ -1128,16 +1800,16 @@ const TABS = () => [
 ];
 
 function render() {
-  // Not signed in → login / signup
+  // Not signed in â login / signup
   if (!S.uid) {
     $("setup").classList.remove("hide");
     $("app").classList.add("hide");
     $("nav").classList.add("hide");
     $("sub").textContent = "Log in to track lifts & chat";
-    $("setup").innerHTML = authReady ? authUI() : `<div class="c"><div class="nt">Connecting…</div></div>`;
+    $("setup").innerHTML = authReady ? authUI() : `<div class="c"><div class="nt">Connectingâ¦</div></div>`;
     return;
   }
-  // Signed in but no profile → training setup
+  // Signed in but no profile â training setup
   if (!S.p) {
     $("setup").classList.remove("hide");
     $("app").classList.add("hide");
@@ -1149,7 +1821,7 @@ function render() {
   $("setup").classList.add("hide");
   $("app").classList.remove("hide");
   $("nav").classList.remove("hide");
-  $("sub").textContent = `${S.p.name} · ${S.code}${S.p.schoolName ? " · " + S.p.schoolName : ""} · ${S.p.fb || S.p.pl ? specText(S.p) : S.p.own}`;
+  $("sub").textContent = `${S.p.name} Â· ${S.code}${S.p.schoolName ? " Â· " + S.p.schoolName : ""} Â· ${S.p.fb || S.p.pl ? specText(S.p) : S.p.own}`;
 
   if (!TABS().some(t => t[0] === tab)) tab = "workout";
   $("nav").innerHTML = TABS().map(([k,n]) =>
@@ -1167,71 +1839,156 @@ function render() {
 }
 
 function vWork() {
-  const d = plan()[day];
-  const head = `
-    <div class="c">
-      <h2>${day}</h2>
-      <div class="m">${d ? d.title : "Rest day"}</div>
-      <label>Day</label>
-      <select onchange="day=this.value;render()">${DAYS.map(x => `<option ${x===day?"selected":""}>${x}</option>`).join("")}</select>
-      <label>Workout date</label>
-      <input type="date" id="wd" value="${today()}">
-    </div>`;
+  const P = plan();
+  const d = P[day];
+  const abbr = {Monday:"Mon",Tuesday:"Tue",Wednesday:"Wed",Thursday:"Thu",Friday:"Fri",Saturday:"Sat",Sunday:"Sun"};
+
   if (nextMsg) {
     return `
+      <div class="page-hero">
+        <div class="title">Workout saved</div>
+        <div class="meta">Hereâs what to aim for next time</div>
+      </div>
       <div class="c">
-        <h2>Saved! 💪</h2>
-        <div class="m">Try this next time:</div>
         ${nextMsg.map(x => `<div class="sug"><b>${esc(x[0])}</b><br>${esc(x[1])}</div>`).join("")}
-        <button class="pri" onclick="nextMsg=null;render()">Done</button>
+        <button class="pri" onclick="nextMsg=null;render()">Back to workout</button>
       </div>`;
   }
-  if (!d) return head + '<div class="c m">Recovery day. Rest, hydrate and do light mobility if it feels good.</div>';
+
+  const strip = `
+    <div class="day-strip">
+      ${DAYS.map(x => `
+        <div class="day-pill ${x===day?"on":""} ${P[x]?"":"rest-pill"}" onclick="day='${x}';render()">
+          <div class="abbr">${abbr[x]}</div>
+        </div>`).join("")}
+    </div>`;
+
+  const head = `
+    <div class="page-hero">
+      <div class="title">${day}</div>
+      <div class="meta">${d ? esc(d.title) : "Rest day Â· recover & hydrate"}</div>
+    </div>
+    ${strip}
+    <div class="c" style="margin-top:4px">
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="label">Date</div>
+          <input type="date" id="wd" value="${today()}" style="min-height:40px;margin-top:6px;padding:8px 10px;font-size:14px">
+        </div>
+        <div class="stat-card">
+          <div class="label">Focus</div>
+          <div class="value" style="font-size:15px;margin-top:8px">${d ? esc(d.title.split(" ")[0]) : "Rest"}</div>
+        </div>
+      </div>
+    </div>`;
+
+  if (!d) {
+    return head + `
+      <div class="c">
+        <h2>Recovery</h2>
+        <div class="m">No lifts scheduled. Sleep, eat, light mobility if it feels good. Strength is built on rest days too.</div>
+      </div>`;
+  }
 
   const pr = prs();
-  return head + d.ex.map(n => {
+  const exercises = d.ex.map(n => {
     const g = suggest(n);
     const D = S.d[n] || (S.d[n] = {s:"", sets:[{w:"",r:0}]});
     const [ts,tr] = tgt(n);
     return `
       <div class="c ex">
-        <h3>${n}</h3>
-        <div class="m" style="font-size:12px">Target: ${ts} × ${tr}</div>
-        ${pr[n] ? `<div class="sug pr">🏆 PR: <b>${pr[n].w} lb × ${pr[n].r}</b></div>` : ""}
-        ${g ? `<div class="sug">📈 ${esc(g.t)}</div>` : ""}
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
+          <div>
+            <h3>${esc(n)}</h3>
+            <div class="m" style="margin-top:3px">Target ${ts} Ã ${tr}</div>
+          </div>
+          ${pr[n] ? `<div class="badge" style="flex-shrink:0">PR ${pr[n].w}Ã${pr[n].r}</div>` : ""}
+        </div>
+        ${g ? `<div class="sug" style="margin-top:10px">${esc(g.t)}</div>` : ""}
         <label>Starting weight (lb)</label>
-        <input type="number" inputmode="decimal" value="${D.s}" oninput="S.d['${n}'].s=this.value">
+        <input type="number" inputmode="decimal" value="${D.s}" oninput="S.d['${n}'].s=this.value" placeholder="0">
         ${D.sets.map((s,i) => `
           <div class="set">
-            <b class="big" style="font-size:18px;color:var(--a)">Set ${i+1}</b>
-            <label>Weight (lb)</label>
-            <input type="number" inputmode="decimal" value="${s.w}" oninput="S.d['${n}'].sets[${i}].w=this.value">
-            <label>Reps</label>
-            <div class="rc">
-              <button onclick="rep('${n}',${i},-1)">−</button>
-              <span class="big">${s.r}</span>
+            <div class="set-row">
+              <div class="set-num">#${i+1}</div>
+              <div>
+                <label>Weight</label>
+                <input type="number" inputmode="decimal" value="${s.w}" oninput="S.d['${n}'].sets[${i}].w=this.value" placeholder="lb">
+              </div>
+              <div>
+                <label>Reps</label>
+                <input type="number" inputmode="numeric" value="${s.r||""}" oninput="S.d['${n}'].sets[${i}].r=+this.value||0" placeholder="0">
+              </div>
+            </div>
+            <div class="rc" style="margin-top:10px">
+              <button onclick="rep('${n}',${i},-1)">â</button>
+              <span class="big" style="font-size:28px">${s.r}</span>
               <button class="plus" onclick="rep('${n}',${i},1)">+ Rep</button>
             </div>
-            ${i ? `<button class="dn" style="margin-top:8px" onclick="S.d['${n}'].sets.splice(${i},1);render()">Remove set</button>` : ""}
+            ${i ? `<button class="dn" style="width:100%;margin-top:8px" onclick="S.d['${n}'].sets.splice(${i},1);render()">Remove set</button>` : ""}
           </div>`).join("")}
         <button style="width:100%;margin-top:10px" onclick="S.d['${n}'].sets.push({w:S.d['${n}'].s||'',r:0});render()">+ Add set</button>
       </div>`;
-  }).join("") + `<button class="pri" onclick="finish()">Save workout</button>`;
+  }).join("");
+
+  return head + exercises + `
+    <div class="sticky-save">
+      <button class="pri" onclick="finish()">Save workout</button>
+    </div>`;
 }
 
 function vPlan() {
   const P = plan();
+  const templates = getTemplates();
+  let sched = S.p.schedule || DEFAULT_SCHEDULE;
+  const firstKey = Object.keys(sched)[0];
+  if (firstKey && !DAYS.includes(firstKey)) {
+    sched = { ...DEFAULT_SCHEDULE };
+  }
+  const trainCount = DAYS.filter(d => P[d]).length;
   return `
-    <div class="c">
-      <h2>Weekly plan</h2>
-      ${DAYS.map(x => `
-        <div class="set" onclick="day='${x}';tab='workout';render()">
-          <b class="big" style="font-size:20px">${x}</b>
-          <div class="m">${P[x] ? P[x].title : "Rest day"}</div>
-        </div>`).join("")}
-      <div class="nt">Adjust around practices and games. Rest days build strength.</div>
+    <div class="page-hero">
+      <div class="title">Plan</div>
+      <div class="meta">${trainCount} training days Â· ${7 - trainCount} rest</div>
     </div>
+
     <div class="c">
+      <h2>This week</h2>
+      <div class="week-grid">
+        ${DAYS.map(x => `
+          <div class="week-cell" onclick="day='${x}';tab='workout';render()">
+            <div>
+              <div class="wd">${x.slice(0,3)}</div>
+              <div class="wt">${P[x] ? esc(P[x].title) : "Rest"}</div>
+            </div>
+            <div class="tag ${P[x] ? "" : "rest"}">${P[x] ? "Train" : "Rest"}</div>
+          </div>`).join("")}
+      </div>
+      <div class="nt">Tap any day to jump into that workout.</div>
+    </div>
+
+    <div class="c">
+      <h2>Edit schedule</h2>
+      <div class="nt" style="margin-top:0;margin-bottom:8px">Default is MonâFri train Â· Sat/Sun rest. Change any day below.</div>
+      ${DAYS.map(d => {
+        const cur = sched[d] || "";
+        return `
+          <label>${d}</label>
+          <select onchange="setDaySlot('${d}', this.value)">
+            <option value="">â Rest â</option>
+            ${Object.keys(templates).map(k => {
+              const t = templates[k];
+              return `<option value="${k}" ${cur === k ? "selected" : ""}>${esc(t.title)}</option>`;
+            }).join("")}
+          </select>
+          ${cur && templates[cur] ? `<div class="m" style="font-size:12px;margin:4px 0 6px">${esc(templates[cur].ex.join(" Â· "))}</div>` : ""}
+        `;
+      }).join("")}
+      <button class="pri" onclick="resetSchedule()">Reset to MonâFri default</button>
+    </div>
+
+    <div class="sec-label">Account</div>
+    <div class="c" style="margin-top:0">
       <button style="width:100%" onclick="editProfile()">Edit profile</button>
       <button class="dn" style="width:100%;margin-top:8px" onclick="doLogout()">Log out</button>
     </div>`;
@@ -1241,30 +1998,40 @@ function vHist() {
   const pr = prs();
   const names = Object.keys(pr);
   return `
-    <div class="c">
-      <h2>Best lifts & next targets</h2>
-      ${names.map(n => {
-        const g = suggest(n);
-        return `<div class="set">
-          <b>${esc(n)}</b>
-          <div class="m">🏆 ${pr[n].w} lb × ${pr[n].r}</div>
-          ${g ? `<div class="m" style="color:#e4ff8a">Next: ${esc(g.t)}</div>` : ""}
-        </div>`;
-      }).join("") || '<div class="m">Save a workout to see your bests.</div>'}
+    <div class="page-hero">
+      <div class="title">Progress</div>
+      <div class="meta">${names.length ? names.length + " lifts tracked" : "Log a workout to start"}</div>
     </div>
+
+    <div class="c">
+      <h2>Personal records</h2>
+      ${names.length ? names.map((n, i) => {
+        const g = suggest(n);
+        return `
+          <div class="pr-row">
+            <div class="pr-rank ${i < 3 ? "top" : ""}">${i + 1}</div>
+            <div class="pr-info">
+              <div class="name">${esc(n)}</div>
+              <div class="sub">${g ? esc(g.t) : "Keep training"}</div>
+            </div>
+            <div class="pr-nums">${pr[n].w}<span style="font-size:12px;font-weight:600;color:var(--muted)"> Ã ${pr[n].r}</span></div>
+          </div>`;
+      }).join("") : '<div class="m">No PRs yet. Save a workout first.</div>'}
+    </div>
+
     <div class="c">
       <h2>History</h2>
-      ${S.h.map(h => `
-        <div class="set">
-          <b>${esc(h.day)} · ${esc(h.date)}</b>
-          <div class="m">${esc(h.title)}</div>
-          <div style="margin-top:6px;line-height:1.6">
-            ${h.items.map(i => esc(i.name) + ": " + i.sets.map(s => s.w + " lb × " + s.r).join(", ")).join("<br>")}
+      ${S.h.length ? S.h.map(h => `
+        <div class="hist-item">
+          <div class="when">${esc(h.day)} Â· ${esc(h.date)}</div>
+          <div class="what">${esc(h.title)}</div>
+          <div class="lifts">
+            ${h.items.map(i => esc(i.name) + ": " + i.sets.map(s => s.w + " lb Ã " + s.r).join(", ")).join("<br>")}
           </div>
-        </div>`).join("") || '<div class="m">No workouts saved yet.</div>'}
-      <div class="row" style="margin-top:12px">
-        <button onclick="exp()">Export data</button>
-        <button class="dn" onclick="if(confirm('Delete all saved history on this device and in the cloud?')){S.h=[];saveProfile();render()}">Clear history</button>
+        </div>`).join("") : '<div class="m">No workouts saved yet.</div>'}
+      <div class="row" style="margin-top:14px">
+        <button onclick="exp()">Export</button>
+        <button class="dn" onclick="if(confirm('Delete all saved history on this device and in the cloud?')){S.h=[];saveProfile();render()}">Clear</button>
       </div>
     </div>`;
 }
@@ -1280,11 +2047,16 @@ function exp() {
 function vTeam() {
   const myKeys = teamKeys(S.p);
   if (!myKeys.length) {
-    return `<div class="c"><h2>Team</h2><div class="m">You need Football or Powerlifting selected in your profile to have a team.</div></div>`;
+    return `
+      <div class="page-hero">
+        <div class="title">Team</div>
+        <div class="meta">Football or Powerlifting required</div>
+      </div>
+      <div class="c"><div class="m">Select Football or Powerlifting in your profile to unlock team PRs and chat.</div>
+      <button class="pri" onclick="editProfile()">Edit profile</button></div>`;
   }
   if (!curTeam || !myKeys.includes(curTeam)) curTeam = myKeys[0];
 
-  // For the PR board we currently show accepted friends (they share stats)
   const members = [{id:S.code, name:S.p.name, prs:prs(), uid:S.uid}, ...S.friends.filter(f => f.status === "accepted")];
   const allLifts = [...new Set(members.flatMap(m => Object.keys(m.prs || {})))];
   if (!lift || !allLifts.includes(lift)) lift = allLifts[0] || "";
@@ -1293,39 +2065,45 @@ function vTeam() {
     .filter(m => m.prs && m.prs[lift])
     .sort((a,b) => b.prs[lift].w - a.prs[lift].w);
 
-  // Load chat for current team
-  if (chatUnsub === null || true) loadChat(curTeam); // simple: always (re)attach
+  if (chatUnsub === null || true) loadChat(curTeam);
 
   return `
+    <div class="page-hero">
+      <div class="title">Team</div>
+      <div class="meta">${esc(tname(curTeam))} Â· ${esc(S.p.schoolName || "your school")}</div>
+    </div>
+
     <div class="c">
-      <h2>${esc(tname(curTeam))}</h2>
       ${myKeys.length > 1 ? `
         <label>Switch team</label>
         <select onchange="curTeam=this.value;loadChat(curTeam);render()">
           ${myKeys.map(k => `<option value="${k}" ${k===curTeam?"selected":""}>${esc(tname(k))}</option>`).join("")}
-        </select>` : ""}
-      <div class="nt">Team chat and PRs are scoped to your school (${esc(S.p.schoolName || "your school")}). Only people at the same school see the same team chat. Friends from any school can still message you privately.</div>
+        </select>` : `<div class="m" style="margin-bottom:4px">${esc(tname(curTeam))}</div>`}
+      <div class="nt">PRs & chat are school-scoped. Private friend chat works across schools.</div>
     </div>
 
     <div class="c">
-      <h2>Team PRs</h2>
+      <h2>Leaderboard</h2>
       ${allLifts.length ? `
         <label>Lift</label>
         <select onchange="lift=this.value;render()">
           ${allLifts.map(x => `<option ${x===lift?"selected":""}>${x}</option>`).join("")}
         </select>
         ${rows.map((o,i) => `
-          <div class="ln">
-            <span>${i+1}. ${esc(o.name)} #${esc(o.id)}${o.uid===S.uid?" (you)":""}</span>
-            <b>${o.prs[lift].w} lb × ${o.prs[lift].r}</b>
-          </div>`).join("")}
+          <div class="pr-row">
+            <div class="pr-rank ${i < 3 ? "top" : ""}">${i+1}</div>
+            <div class="pr-info">
+              <div class="name">${esc(o.name)}${o.uid===S.uid?" Â· you":""}</div>
+              <div class="sub">#${esc(o.id)}</div>
+            </div>
+            <div class="pr-nums">${o.prs[lift].w}<span style="font-size:12px;font-weight:600;color:var(--muted)"> Ã ${o.prs[lift].r}</span></div>
+          </div>`).join("") || '<div class="m" style="margin-top:10px">No numbers for this lift yet.</div>'}
       ` : '<div class="m">Log a lift and add friends to start the board.</div>'}
     </div>
 
     <div class="c">
-      <h2>Team Chat</h2>
-      <div class="nt">Everyone on this team can see messages here.</div>
-      <div id="chatmsgs" style="max-height:260px;overflow-y:auto;margin-top:8px">
+      <h2>Team chat</h2>
+      <div id="chatmsgs" style="max-height:240px;overflow-y:auto">
         ${S.messages.length ? S.messages.map(m => `
           <div class="msg">
             <div class="who">${esc(m.name)}${m.from===S.uid?" (you)":""}</div>
@@ -1334,34 +2112,28 @@ function vTeam() {
           </div>`).join("") : '<div class="m">No messages yet. Say hi!</div>'}
       </div>
       <div class="chatbox">
-        <input id="chatinput" placeholder="Type a message..." value="${esc(chatDraft)}"
+        <input id="chatinput" placeholder="Message the team..." value="${esc(chatDraft)}"
           oninput="chatDraft=this.value"
           onkeydown="if(event.key==='Enter'){sendChat(curTeam,chatDraft);chatDraft='';this.value=''}">
         <button class="pri" style="margin:0" onclick="sendChat(curTeam,chatDraft);chatDraft='';if($('chatinput'))$('chatinput').value=''">Send</button>
       </div>
     </div>
-
     ${statusMsg ? `<div class="status ${statusType}">${esc(statusMsg)}</div>` : ""}
   `;
 }
 
 function vFriends() {
-  // If a private chat is open, show the chat UI instead of the friend list
   if (chatWith) {
     const friend = S.friends.find(f => f.uid === chatWith);
     const friendName = friend ? friend.name : "Friend";
     return `
-      <div class="c">
-        <div class="row" style="align-items:center;margin-bottom:8px">
-          <button onclick="closeFriendChat()" style="flex:0;min-width:60px">← Back</button>
-          <h2 style="margin:0;flex:1;text-align:center">${esc(friendName)}</h2>
-          <div style="width:60px"></div>
-        </div>
-        <div class="nt">Private chat – only you two can see these messages.</div>
+      <div class="page-hero">
+        <div class="title">${esc(friendName)}</div>
+        <div class="meta">Private chat Â· only you two</div>
       </div>
-
       <div class="c">
-        <div id="chatmsgs" style="max-height:340px;overflow-y:auto">
+        <button onclick="closeFriendChat()" style="width:auto;min-width:80px;margin-bottom:10px">â Back</button>
+        <div id="chatmsgs" style="max-height:360px;overflow-y:auto">
           ${S.messages.length ? S.messages.map(m => `
             <div class="msg">
               <div class="who">${esc(m.name)}${m.from===S.uid?" (you)":""}</div>
@@ -1373,7 +2145,7 @@ function vFriends() {
           <input id="chatinput" placeholder="Type a message..." value="${esc(chatDraft)}"
             oninput="chatDraft=this.value"
             onkeydown="if(event.key==='Enter'){sendChat(chatWith,chatDraft);chatDraft='';this.value=''}">
-          <button class="pri" style="margin:0" 
+          <button class="pri" style="margin:0"
             onclick="sendChat(chatWith,chatDraft);chatDraft='';if($('chatinput'))$('chatinput').value=''">Send</button>
         </div>
       </div>
@@ -1384,59 +2156,88 @@ function vFriends() {
   const pending = S.friends.filter(f => f.status === "pending");
   const sent = S.friends.filter(f => f.status === "sent");
   const accepted = S.friends.filter(f => f.status === "accepted");
+  const initial = (n) => (n || "?").trim().charAt(0).toUpperCase();
 
   return `
-    <div class="c">
-      <h2>Friends</h2>
-      <div class="m">Your friend code</div>
-      <div class="big" style="font-size:48px;text-align:center;color:var(--a);letter-spacing:0.08em">${S.code}</div>
-      <div class="nt">Give this code to friends. They enter it below to send you a request.</div>
+    <div class="page-hero">
+      <div class="title">Friends</div>
+      <div class="meta">${accepted.length} connected Â· ${pending.length} requests</div>
     </div>
 
     <div class="c">
-      <b>Add a friend</b>
-      <label>Enter their friend code</label>
+      <h2>Your code</h2>
+      <div class="code-hero">
+        <div class="code">${S.code}</div>
+        <div class="hint">Share this so friends can add you</div>
+      </div>
+    </div>
+
+    <div class="c">
+      <h2>Add friend</h2>
+      <label>Their friend code</label>
       <input id="friendcode" maxlength="7" placeholder="e.g. K7M2X9" style="text-transform:uppercase"
         value="${esc(friendCodeDraft)}" oninput="friendCodeDraft=this.value">
       <button class="pri" onclick="addFriendByCode(friendCodeDraft)">Send request</button>
       ${statusMsg ? `<div class="status ${statusType}">${esc(statusMsg)}</div>` : ""}
     </div>
 
+    ${pending.length ? `<div class="sec-label">Requests</div>` : ""}
     ${pending.map(f => `
-      <div class="c">
-        <b>${esc(f.name)} #${esc(f.id)}</b>
-        <div class="m">wants to be friends</div>
-        <div class="row" style="margin-top:8px">
-          <button class="pri" style="margin:0" onclick="acceptFriend('${f.uid}')">Accept</button>
-          <button class="dn" onclick="declineFriend('${f.uid}')">Decline</button>
+      <div class="c" style="margin-top:8px">
+        <div class="friend-card">
+          <div class="friend-head">
+            <div class="avatar">${initial(f.name)}</div>
+            <div class="friend-meta">
+              <div class="nm">${esc(f.name)} Â· #${esc(f.id)}</div>
+              <div class="sp">Wants to be friends</div>
+            </div>
+          </div>
+          <div class="row">
+            <button class="pri" style="margin:0" onclick="acceptFriend('${f.uid}')">Accept</button>
+            <button class="dn" onclick="declineFriend('${f.uid}')">Decline</button>
+          </div>
         </div>
       </div>`).join("")}
 
+    ${sent.length ? `<div class="sec-label">Sent</div>` : ""}
     ${sent.map(f => `
-      <div class="c">
-        <b>${esc(f.name)} #${esc(f.id)}</b>
-        <div class="m">Request sent. Waiting for them to accept.</div>
-      </div>`).join("")}
-
-    ${accepted.map(f => `
-      <div class="c">
-        <h3>${esc(f.name)} #${esc(f.id)}</h3>
-        <div class="m" style="font-size:12px">${esc(f.mode)} · ${esc(f.spec)}</div>
-        ${Object.entries(f.prs || {}).map(([n,b]) => `
-          <div class="ln"><span>${esc(n)}</span><b>${b.w} lb × ${b.r}</b></div>
-        `).join("") || '<div class="nt">No lifts shared yet</div>'}
-        ${f.recent ? `
-          <div class="nt" style="margin-top:8px">
-            <b>Latest: ${esc(f.recent.date)} · ${esc(f.recent.title)}</b><br>
-            ${f.recent.items.map(i => esc(i.name) + ": " + i.sets.map(s => s.w + "×" + s.r).join(", ")).join("<br>")}
-          </div>` : ""}
-        <div class="row" style="margin-top:10px">
-          <button class="pri" style="margin:0" onclick="openFriendChat('${f.uid}')">Chat</button>
-          <button style="margin:0" onclick="shareStatsWithFriend('${f.uid}')">Share stats</button>
+      <div class="c" style="margin-top:8px">
+        <div class="friend-head">
+          <div class="avatar">${initial(f.name)}</div>
+          <div class="friend-meta">
+            <div class="nm">${esc(f.name)} Â· #${esc(f.id)}</div>
+            <div class="sp">Waiting for them to accept</div>
+          </div>
         </div>
       </div>`).join("")}
 
-    <div class="nt">Friends only see your numbers after they accept. Tap Chat to message them privately.</div>
+    ${accepted.length ? `<div class="sec-label">Friends</div>` : ""}
+    ${accepted.map(f => `
+      <div class="c" style="margin-top:8px">
+        <div class="friend-card">
+          <div class="friend-head">
+            <div class="avatar">${initial(f.name)}</div>
+            <div class="friend-meta">
+              <div class="nm">${esc(f.name)} Â· #${esc(f.id)}</div>
+              <div class="sp">${esc(f.mode || "")}${f.spec ? " Â· " + esc(f.spec) : ""}</div>
+            </div>
+          </div>
+          ${Object.entries(f.prs || {}).length ? Object.entries(f.prs).map(([n,b]) => `
+            <div class="ln"><span>${esc(n)}</span><b>${b.w} lb Ã ${b.r}</b></div>
+          `).join("") : '<div class="nt">No lifts shared yet</div>'}
+          ${f.recent ? `
+            <div class="nt">
+              <b>Latest Â· ${esc(f.recent.date)}</b><br>
+              ${f.recent.items.map(i => esc(i.name) + ": " + i.sets.map(s => s.w + "Ã" + s.r).join(", ")).join("<br>")}
+            </div>` : ""}
+          <div class="row">
+            <button class="pri" style="margin:0" onclick="openFriendChat('${f.uid}')">Chat</button>
+            <button style="margin:0" onclick="shareStatsWithFriend('${f.uid}')">Share stats</button>
+          </div>
+        </div>
+      </div>`).join("")}
+
+    <div class="nt">Friends only see your numbers after they accept.</div>
   `;
 }
 
@@ -1455,6 +2256,7 @@ const addP = p => { PL.list.push(p); PL.list.sort((a,b) => b-a); render(); };
 
 function vPlates() {
   const {bar, list} = PL;
+  const total = bar + 2 * list.reduce((a,b) => a+b, 0);
   const sum = list.reduce((a,p) => a + PD[p].t, 0);
   const k = Math.min(1, 400 / (sum || 1));
   let L = "", R = "", o = 0;
@@ -1471,22 +2273,31 @@ function vPlates() {
     : `<line x1="0" y1="260" x2="2200" y2="260" stroke="#3a4350" stroke-width="4" stroke-dasharray="30 24"/>`;
 
   return `
+    <div class="page-hero">
+      <div class="title">Plates</div>
+      <div class="meta">Build the bar Â· both sides load the same</div>
+    </div>
+
     <div class="c">
-      <h2>Plate calculator</h2>
-      <div class="m" style="font-size:13px">Tap plates to load both sides. Starts at 0 with no bar; add the 45 lb bar with the button.</div>
-      <div class="big" style="font-size:76px;text-align:center;color:var(--a);margin-top:8px">${bar + 2 * list.reduce((a,b) => a+b, 0)}</div>
-      <div class="sub" style="text-align:center">lb total</div>
-      <svg viewBox="0 0 2200 520" width="100%">${bs}${L}${R}</svg>
-      <div class="row" style="margin-top:8px">
+      <div class="plate-total">
+        <div class="num">${total}</div>
+        <div class="unit">lb total</div>
+      </div>
+      <svg viewBox="0 0 2200 520" width="100%" style="margin:8px 0">${bs}${L}${R}</svg>
+      <div class="nt" style="text-align:center;margin-top:0">${bar ? "45 lb bar" : "No bar"}${list.length ? " Â· each side: " + list.join(" + ") : ""}</div>
+    </div>
+
+    <div class="c">
+      <h2>Add plates</h2>
+      <div class="row" style="margin-top:4px">
         ${[45,25,10,5,2.5].map(p =>
-          `<button class="pb" style="background:${PD[p].c};${p===25?"color:#111;":""}${p===2.5?"font-size:16px;":""}" onclick="addP(${p})">${p}</button>`
+          `<button class="pb" style="background:${PD[p].c};${p===25?"color:#111;":""}${p===2.5?"font-size:14px;":""}" onclick="addP(${p})">${p}</button>`
         ).join("")}
       </div>
-      <div class="nt" style="text-align:center">${bar ? "45 lb bar" : "No bar"}${list.length ? " + each side: " + list.join(" + ") : ""}</div>
-      <div class="row" style="margin-top:8px">
-        <button onclick="PL.bar=PL.bar?0:45;render()">${bar?"Remove bar":"Add 45 lb bar"}</button>
-        <button onclick="PL.list.pop();render()">Undo plate</button>
-        <button onclick="PL={bar:0,list:[]};render()">Clear all</button>
+      <div class="row" style="margin-top:12px">
+        <button onclick="PL.bar=PL.bar?0:45;render()">${bar?"Remove bar":"Add 45 bar"}</button>
+        <button onclick="PL.list.pop();render()">Undo</button>
+        <button onclick="PL={bar:0,list:[]};render()">Clear</button>
       </div>
     </div>`;
 }
@@ -1525,7 +2336,7 @@ setInterval(async () => {
     }
     // Friends list is already live via onSnapshot, no need to poll it
   } catch (e) {
-    // silent – background only
+    // silent â background only
   }
 }, 5000);
 </script>
