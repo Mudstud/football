@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8">
+<html lang="en">
+<head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
-<meta name="theme-color" content="#07090d"><meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#07090d">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <title>Lift Log</title>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <style>
 :root{--a:#c6ff00;--p:#0f1319;--p2:#161b23;--l:#222a35;--m:#8d98a8;--t:#f5f7fa}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -20,14 +20,13 @@ h2{font-size:24px;margin:0 0 6px}h3{font-size:20px;margin:0}
 .ex{border-left:4px solid var(--a)}
 label{display:block;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--m);margin:10px 0 4px}
 input,select,textarea{width:100%;background:#0a0d12;color:var(--t);border:1px solid var(--l);border-radius:12px;padding:12px;min-height:50px;font:600 17px system-ui}
-textarea{font-size:12px;min-height:70px;word-break:break-all}
-input:focus,select:focus{outline:0;border-color:var(--a)}
+textarea{font-size:14px;min-height:70px}
+input:focus,select:focus,textarea:focus{outline:0;border-color:var(--a)}
 button{border:0;border-radius:12px;min-height:48px;padding:10px 14px;font:700 15px system-ui;background:#1a212b;color:var(--t);border:1px solid #2c3644;cursor:pointer}
 button:active{transform:scale(.96)}
 .pri{background:var(--a);color:#0b0f00;font-size:18px;border:0;box-shadow:0 0 22px rgba(198,255,0,.35);width:100%;margin-top:12px}
 .dn{background:#2a1214;color:#ff8d8d;border-color:#5b2932}
 .row{display:flex;gap:8px;align-items:center}.row>*{flex:1}
-.sg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .set{background:#0a0d12;border:1px solid var(--l);border-radius:14px;padding:12px;margin-top:8px}
 .rc{display:flex;gap:10px;align-items:center;margin-top:4px}.rc button{min-width:56px;min-height:56px;font-size:24px;flex:0}
 .big{font-size:42px;min-width:56px;text-align:center}
@@ -43,199 +42,962 @@ button:active{transform:scale(.96)}
 .tab.on{color:var(--a);border-color:var(--a);background:rgba(198,255,0,.12)}
 .nt{font-size:12px;color:var(--m);line-height:1.5;margin-top:10px}
 .ln{display:flex;justify-content:space-between;gap:8px;margin-top:6px;font-size:14px}.ln b{color:var(--a)}
-</style></head><body><div class="w">
-<h1>🏋️ Lift Log</h1><div class="sub" id="sub">Log every set, rep and pound</div>
-<div id="setup" class="hide"></div>
-<div id="app" class="hide"><div id="v"></div></div>
-</div><div class="nav hide" id="nav"></div>
+.msg{background:#0a0d12;border-radius:12px;padding:10px 12px;margin-top:8px}
+.msg .who{font-size:12px;color:var(--a);margin-bottom:2px}
+.msg .ts{font-size:11px;color:var(--m)}
+.chatbox{display:flex;gap:8px;margin-top:10px}
+.chatbox input{flex:1;min-height:48px}
+.chatbox button{flex:0;min-width:70px}
+.status{font-size:12px;padding:6px 10px;border-radius:8px;margin-top:8px}
+.status.ok{background:rgba(198,255,0,.12);color:#e4ff8a}
+.status.err{background:rgba(255,80,80,.12);color:#ff8d8d}
+.status.info{background:rgba(100,150,255,.12);color:#a0c0ff}
+</style>
+</head>
+<body>
+<div class="w">
+  <h1>🏋️ Lift Log</h1>
+  <div class="sub" id="sub">Log every set, rep and pound</div>
+  <div id="setup" class="hide"></div>
+  <div id="app" class="hide"><div id="v"></div></div>
+</div>
+<div class="nav hide" id="nav"></div>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+
 <script>
-// PASTE YOUR FIREBASE SETTINGS HERE (see SETUP.md, step 5)
-const FIREBASE_CONFIG = {
+/* ============================================================
+   FIREBASE CONFIG – REPLACE WITH YOUR PROJECT VALUES
+   ============================================================ */
+const firebaseConfig = {
   apiKey: "AIzaSyBr6KkPC6WL9TDuRsPnHlaJH-TWkdMaQWQ",
   authDomain: "lift-log-4955e.firebaseapp.com",
   projectId: "lift-log-4955e",
-  appId: "1:105165663441:web:c3623e7a32a151a841e9f0"
+  storageBucket: "lift-log-4955e.firebasestorage.app",
+  messagingSenderId: "105165663441",
+  appId: "1:105165663441:web:c3623e7a32a151a841e9f0",
+  measurementId: "G-4HLH7ZBS6E"
 };
 
-const $=i=>document.getElementById(i),KEY="liftlog.v1";
-const esc=t=>String(t??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-let S=JSON.parse(localStorage.getItem(KEY)||"null")||{p:null,h:[],f:[],team:[],d:{}};
-if(S.p&&!/^\d{5}$/.test(S.p.id))S.p.id=String(10000+Math.floor(Math.random()*90000));
-const save=()=>localStorage.setItem(KEY,JSON.stringify(S));
-const today=()=>{const d=new Date();return new Date(d-d.getTimezoneOffset()*6e4).toISOString().slice(0,10)};
-const DAYS=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
-const POS=["Left tackle","Right tackle","Guard","Center","Defensive tackle","Defensive end","Tight end","Linebacker","Other"];
-const FOC=["Full meet","Squat","Bench","Deadlift"],GOALS=["Max strength","Size","Power & explosiveness","General fitness"];
-// inc = lb to add, tgt=[sets,reps], bw = body-weight ratios [beginner,intermediate,advanced]
-const EX={"Bench Press":{inc:5,t:[3,8],bw:[.35,.5,.75],pl:1},"Overhead Press":{inc:2.5,t:[3,8],bw:[.25,.35,.5]},"Close-Grip Bench Press":{inc:5,t:[3,8],bw:[.3,.45,.65]},
-"Squat":{inc:10,t:[3,5],bw:[.5,.75,1],pl:1},"Deadlift":{inc:10,t:[3,5],bw:[.6,.9,1.25],pl:1},"Romanian Deadlift":{inc:5,t:[3,8],bw:[.4,.6,.85]},
-"Barbell Row":{inc:5,t:[3,8],bw:[.35,.5,.7]},"Pull-Ups":{inc:5,t:[3,8],pu:1},"Face Pulls":{inc:5,t:[3,12],bw:[.1,.15,.2]},
-"Plank":{inc:0,t:[3,1]},"Hip & thoracic mobility":{inc:0,t:[1,1]},"Football position drills":{inc:0,t:[3,1]},"Short acceleration work":{inc:0,t:[4,1]}};
-function plan(){const fb=!!S.p.fb;
-const sat=fb?{title:"Optional football drills",ex:["Football position drills","Short acceleration work"]}:{title:"Optional accessories & mobility",ex:["Face Pulls","Plank","Hip & thoracic mobility"]};
-return {Monday:{title:"Chest, shoulders & triceps",ex:["Bench Press","Overhead Press","Close-Grip Bench Press"]},Wednesday:{title:"Legs",ex:["Squat","Deadlift","Romanian Deadlift"]},
-Friday:{title:"Back",ex:["Barbell Row","Pull-Ups"]},Saturday:sat}}
-const rnd=(x,s)=>Math.round(x/s)*s;
-const tgt=n=>{const e=EX[n];let[s,r]=e.t;if(S.p.pl&&e.pl){s=5;r=5}return[s,r]};
-function last(n){for(const h of S.h){const it=h.items.find(i=>i.name===n);if(it&&it.sets.length)return it.sets}return null}
-function suggest(n){const e=EX[n],lv=["Beginner","Intermediate","Advanced"].indexOf(S.p.level),[ts,tr]=tgt(n),L=last(n);
-if(!e.inc&&!e.bw&&!e.pu)return L?null:{t:"Do it with good form."};
-if(e.pu){if(!L)return{t:"Start with bodyweight. Aim for 5-8 reps each set."};
-const mr=Math.min(...L.map(s=>s.r)),w=Math.max(...L.map(s=>+s.w||0));
-return mr>=12?{w:w+5,t:`You hit ${mr} reps on every set. Add ${w?5:5} lb (weighted) and aim for 8 reps.`}:{w,t:`Aim for ${mr+1} reps each set${w?" at +"+w+" lb":""} (reps first, weight later).`}}
-if(!L){const w=rnd(S.p.bw*e.bw[lv],e.inc===2.5?2.5:5);return{w,t:`First time: start light at about ${w} lb and focus on clean reps.`}}
-const V=L.filter(s=>+s.w>0);if(!V.length)return null;const w=Math.max(...V.map(s=>+s.w)),top=V.filter(s=>+s.w===w);
-const all=V.length>=ts&&V.every(s=>s.r>=tr),close=V.every(s=>s.r>=tr-2);
-if(all)return{w:w+e.inc,t:`You hit every rep. Add ${e.inc} lb: try ${w+e.inc} lb.`};
-if(close)return{w,t:`Close. Stay at ${w} lb and aim for one more rep.`};
-const d=rnd(w*.9,e.inc===2.5?2.5:5);return{w:d,t:`Reps were low. Drop about 10% to ${d} lb and rebuild.`}}
-function prs(){const b={};S.h.forEach(h=>h.items.forEach(i=>i.sets.forEach(s=>{const w=+s.w;if(w>0&&(!b[i.name]||w>b[i.name].w||(w===b[i.name].w&&s.r>b[i.name].r)))b[i.name]={w,r:s.r,d:h.date}})));return b}
-// ---------- codes ----------
-const FBT=["JV1","JV2","Varsity"],WCS=["105","114","123","132","148","165","181","198","220","242","275","275+"],GRADES=[9,10,11,12],LIFTS=Object.keys(EX);
-const modeName=p=>p.fb&&p.pl?"Football + Powerlifting":p.fb?"Football":p.pl?"Powerlifting":"On my own";
-const specText=p=>p.fb||p.pl?[p.fb&&POS[p.fb.p]+" · "+FBT[p.fb.t],p.pl&&WCS[p.pl.w]+" lb · Grade "+p.pl.g].filter(Boolean).join(" | "):p.own;
-if(S.p&&!("fb" in S.p)){const m=S.p.mode;S.p.fb=m==="Football"?{p:Math.max(0,POS.indexOf(S.p.spec)),t:2}:null;S.p.pl=m==="Powerlifting"?{w:5,g:10}:null}
-// Team numbers: Football JV1=101, JV2=102, Varsity=103. Powerlifting = 2 + (grade-8) + weight-class number (2 digits), e.g. grade 10, 165 lb = 2205
-const tkeys=o=>[o.fb?String(101+o.fb.t):null,o.pl?"2"+(o.pl.g-8)+String(o.pl.w).padStart(2,"0"):null];
-const tname=k=>!k?"":k[0]==="1"?"Football · "+FBT[+k-101]:"Powerlifting · "+WCS[+k.slice(2)]+" lb · Grade "+(+k[1]+8);
-const myTeams=()=>tkeys(S.p).filter(Boolean);
-const snap=()=>JSON.parse(JSON.stringify({id:S.p.id,name:S.p.name,fb:S.p.fb,pl:S.p.pl,mode:modeName(S.p),prs:prs(),recent:S.h.slice(0,3),ts:Date.now()}));
-function statCard(o,note){const P=Object.entries(o.prs||{});return`<div class="c"><h3>${esc(o.name)} #${esc(o.id)}</h3><div class="m" style="font-size:12px">${esc(o.mode)} · ${esc(specText(o)||"")}${note?" · "+note:""}</div>
-${P.map(([n,b])=>`<div class="ln"><span>${esc(n)}</span><b>${b.w} lb × ${b.r}</b></div>`).join("")||'<div class="nt">No lifts yet</div>'}
-${(o.recent||[]).map(h=>`<div class="nt"><b>${esc(h.date)} · ${esc(h.title)}</b><br>${h.items.map(i=>esc(i.name)+": "+i.sets.map(s=>s.w+"×"+s.r).join(", ")).join("<br>")}</div>`).join("")}</div>`}
-// ---------- views ----------
-let tab="workout",day=DAYS[(new Date().getDay()+6)%7],lift="",nextMsg=null;
-const TABS=()=>[["workout","Workout"],["plan","Plan"],["history","History"],...((S.p.fb||S.p.pl)?[["team","Team"]]:[["plates","Plates"]]),["friends","Friends"]];
-function render(){
-if(!S.p){$("setup").classList.remove("hide");$("app").classList.add("hide");$("nav").classList.add("hide");return setupUI()}
-$("setup").classList.add("hide");$("app").classList.remove("hide");$("nav").classList.remove("hide");
-$("sub").textContent=`${S.p.name} #${S.p.id} · ${S.p.fb||S.p.pl?specText(S.p):S.p.own}`;
-if(!TABS().some(t=>t[0]===tab))tab="workout";
-$("nav").innerHTML=TABS().map(([k,n])=>`<button class="tab ${tab===k?"on":""}" onclick="tab='${k}';nextMsg=null;render()">${n}</button>`).join("");
-$("v").innerHTML=({workout:vWork,plan:vPlan,history:vHist,team:vTeam,plates:vPlates,friends:vFriends})[tab]();save();paintChat()}
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
 
-let su={fb:0,pl:0,own:0,fp:0,ft:2,pw:5,pg:10,n:"",w:"",s:""};
-function tog(k){keep();if(k==="own"){su.own=su.own?0:1;if(su.own){su.fb=0;su.pl=0}}else{su[k]=su[k]?0:1;if(su[k])su.own=0}setupUI()}
-function setupUI(){const any=su.fb||su.pl||su.own,opt=(a,v,f)=>a.map((x,i)=>`<option value="${f?x:i}" ${v==(f?x:i)?"selected":""}>${x}</option>`).join("");
-$("setup").innerHTML=`<div class="c"><h2>What are you training for?</h2><div class="nt">Pick Football, Powerlifting, or both.</div><div class="mode">${[["fb","Football"],["pl","Powerlifting"],["own","On my own"]].map(([k,n])=>`<button class="${su[k]?"on":""}" onclick="tog('${k}')">${n}</button>`).join("")}</div>
-${any?`<label>Your name (max 12 letters)</label><input id="sn" maxlength="12" value="${esc(su.n)}"><label>Body weight (lb)</label><input id="sw" type="number" inputmode="decimal" value="${su.w}">
-${su.fb?`<label>Football position</label><select id="fp">${opt(POS,su.fp)}</select><label>Football team</label><select id="ft">${opt(FBT,su.ft)}</select>`:""}
-${su.pl?`<label>Powerlifting weight class (lb)</label><select id="pw">${opt(WCS,su.pw)}</select><label>Grade</label><select id="pg">${opt(GRADES,su.pg,1)}</select>`:""}
-${su.own?`<label>What are you training for?</label><input id="ss" placeholder="e.g. get stronger" value="${esc(su.s)}">`:""}
-<label>Goal</label><select id="sg">${GOALS.map(x=>`<option>${x}</option>`).join("")}</select>
-<label>Lifting level</label><select id="sl">${["Beginner","Intermediate","Advanced"].map(x=>`<option>${x}</option>`).join("")}</select>
-<button class="pri" onclick="finishSetup()">Start lifting →</button>`:""}</div>`}
-function keep(){[["n","sn"],["w","sw"],["fp","fp"],["ft","ft"],["pw","pw"],["pg","pg"],["s","ss"]].forEach(([k,i])=>{if($(i))su[k]=$(i).value})}
-async function finishSetup(){keep();const n=su.n.trim();
-if(!/^[A-Za-z0-9]{2,12}$/.test(n)||!(+su.w>=50)||(su.own&&!su.s.trim()))return alert("Use a name with 2-12 letters or numbers (no spaces), a body weight, and what you're training for.");
-const p={name:n,bw:+su.w,goal:$("sg").value,level:$("sl").value,fb:su.fb?{p:+su.fp,t:+su.ft}:null,pl:su.pl?{w:+su.pw,g:+su.pg}:null,own:su.own?su.s.trim():""};
-try{p.id=await claim(p)}catch(e){return alert(e.message==="name"?"That name is already taken. Pick another.":"Could not save: "+(e.code||e.message))}
-p.mode=modeName(p);p.spec=specText(p);S.p=p;try{await pushStats()}catch(e){}render()}
-function editProfile(){const p=S.p;su={fb:p.fb?1:0,pl:p.pl?1:0,own:p.fb||p.pl?0:1,fp:p.fb?p.fb.p:0,ft:p.fb?p.fb.t:2,pw:p.pl?p.pl.w:5,pg:p.pl?p.pl.g:10,n:p.name,w:p.bw,s:p.own||"",id:p.id};S.p=null;render()}
-function vWork(){const d=plan()[day];
-const head=`<div class="c"><h2>${day}</h2><div class="m">${d?d.title:"Rest day"}</div><label>Day</label><select onchange="day=this.value;render()">${DAYS.map(x=>`<option ${x===day?"selected":""}>${x}</option>`).join("")}</select><label>Workout date</label><input type="date" id="wd" value="${today()}"></div>`;
-if(nextMsg)return`<div class="c"><h2>Saved! 💪</h2><div class="m">Try this next time:</div>${nextMsg.map(x=>`<div class="sug"><b>${esc(x[0])}</b><br>${esc(x[1])}</div>`).join("")}<button class="pri" onclick="nextMsg=null;render()">Done</button></div>`;
-if(!d)return head+'<div class="c m">Recovery day. Rest, hydrate and do light mobility if it feels good.</div>';
-const pr=prs();
-return head+d.ex.map(n=>{const g=suggest(n),D=S.d[n]||(S.d[n]={s:"",sets:[{w:"",r:0}]}),[ts,tr]=tgt(n);
-return`<div class="c ex"><h3>${n}</h3><div class="m" style="font-size:12px">Target: ${ts} × ${tr}</div>
-${pr[n]?`<div class="sug pr">🏆 PR: <b>${pr[n].w} lb × ${pr[n].r}</b></div>`:""}${g?`<div class="sug">📈 ${esc(g.t)}</div>`:""}
-<label>Starting weight (lb)</label><input type="number" inputmode="decimal" value="${D.s}" oninput="S.d['${n}'].s=this.value;save()">
-${D.sets.map((s,i)=>`<div class="set"><b class="big" style="font-size:18px;color:var(--a)">Set ${i+1}</b><label>Weight (lb)</label><input type="number" inputmode="decimal" value="${s.w}" oninput="S.d['${n}'].sets[${i}].w=this.value;save()">
-<label>Reps</label><div class="rc"><button onclick="rep('${n}',${i},-1)">−</button><span class="big">${s.r}</span><button class="plus" onclick="rep('${n}',${i},1)">+ Rep</button></div>
-${i?`<button class="dn" style="margin-top:8px" onclick="S.d['${n}'].sets.splice(${i},1);render()">Remove set</button>`:""}</div>`).join("")}
-<button style="width:100%;margin-top:10px" onclick="S.d['${n}'].sets.push({w:S.d['${n}'].s||'',r:0});render()">+ Add set</button></div>`}).join("")+`<button class="pri" onclick="finish()">Save workout</button>`}
-function rep(n,i,x){const s=S.d[n].sets[i];s.r=Math.max(0,s.r+x);render()}
-function finish(){const d=plan()[day],items=d.ex.map(n=>({name:n,sets:S.d[n].sets.filter(s=>s.r>0||+s.w>0).map(s=>({w:s.w||S.d[n].s||0,r:s.r}))})).filter(i=>i.sets.length);
-if(!items.length)return alert("Log at least one set first.");
-S.h.unshift({date:$("wd").value||today(),day,title:d.title,items});d.ex.forEach(n=>delete S.d[n]);
-nextMsg=items.map(i=>{const g=suggest(i.name);return[i.name,g?g.t:"Keep it up."]});render();pushStats().catch(()=>{})}
-function vPlan(){const P=plan();return`<div class="c"><h2>Weekly plan</h2>${DAYS.map(x=>`<div class="set" onclick="day='${x}';tab='workout';render()"><b class="big" style="font-size:20px">${x}</b><div class="m">${P[x]?P[x].title:"Rest day"}</div></div>`).join("")}<div class="nt">Adjust around practices and games. Rest days build strength.</div></div><div class="c"><button style="width:100%" onclick="editProfile()">Edit profile</button></div>`}
-function vHist(){const pr=prs(),names=Object.keys(pr);
-return`<div class="c"><h2>Best lifts &amp; next targets</h2>${names.map(n=>{const g=suggest(n);return`<div class="set"><b>${esc(n)}</b><div class="m">🏆 ${pr[n].w} lb × ${pr[n].r}</div>${g?`<div class="m" style="color:#e4ff8a">Next: ${esc(g.t)}</div>`:""}</div>`}).join("")||'<div class="m">Save a workout to see your bests.</div>'}</div>
-<div class="c"><h2>History</h2>${S.h.map(h=>`<div class="set"><b>${esc(h.day)} · ${esc(h.date)}</b><div class="m">${esc(h.title)}</div><div style="margin-top:6px;line-height:1.6">${h.items.map(i=>esc(i.name)+": "+i.sets.map(s=>s.w+" lb × "+s.r).join(", ")).join("<br>")}</div></div>`).join("")||'<div class="m">No workouts saved yet.</div>'}
-<div class="row" style="margin-top:12px"><button onclick="exp()">Export data</button><button class="dn" onclick="if(confirm('Delete all saved history on your account?')){S.h=[];render();pushStats().catch(()=>{})}">Clear history</button></div></div>`}
-function exp(){const b=new Blob([JSON.stringify(S,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="lift-log-"+today()+".json";a.click()}
-let curT="",FR=[],ST={},REQ={},TM={},subT="",unsubT=null,unsubF=null,unsubC=null,fm="",chat=null,CH=[];
-function vTeam(){const T=myTeams();if(!T.includes(curT))curT=T[0]||"";subTeam(curT);
-const mem=TM[curT]||[],L=[...new Set(mem.flatMap(o=>Object.keys(o.prs||{})))];
-if(!lift||!L.includes(lift))lift=L[0]||"";
-const rows=mem.filter(o=>o.prs&&o.prs[lift]).sort((a,b)=>b.prs[lift].w-a.prs[lift].w);
-return`<div class="c"><h2>Team #${esc(curT)}</h2><div class="m">${esc(tname(curT))}</div>${T.length>1?`<label>Switch team</label><select onchange="curT=this.value;render()">${T.map(k=>`<option value="${k}" ${k===curT?"selected":""}>#${k} · ${esc(tname(k))}</option>`).join("")}</select>`:""}<div class="nt">Your team number comes from what you picked in your profile. Everyone with the same number is on your team.</div><button class="pri" onclick="openChat('t','${curT}','Team #${curT} chat')">Open team chat</button></div>${chatCard("t")}
-<div class="c"><h2>Team PRs</h2>${L.length?`<label>Lift</label><select onchange="lift=this.value;render()">${L.map(x=>`<option ${x===lift?"selected":""}>${x}</option>`).join("")}</select>${rows.map((o,i)=>`<div class="ln"><span>${i+1}. ${esc(o.name)} #${esc(o.id)}${o.id===S.p.id?" (you)":""}</span><b>${o.prs[lift].w} lb × ${o.prs[lift].r}</b></div>`).join("")}`:'<div class="m">No lifts logged on this team yet.</div>'}</div>
-${mem.filter(o=>o.id!==S.p.id).map(o=>statCard(o,"team")).join("")}`}
-function subTeam(t){if(!t||subT===t)return;subT=t;unsubT&&unsubT();unsubT=FS.collection("teams/"+t+"/members").onSnapshot(q=>{TM[t]=q.docs.map(d=>d.data());if(tab==="team")render()},e=>console.log(e))}
-const oth=f=>f.members.find(x=>x!==U.uid),fnm=f=>(f.names||{})[oth(f)]||"Friend";
-function vFriends(){const inc=FR.filter(f=>f.status==="pending"&&f.requester!==U.uid),out=FR.filter(f=>f.status==="pending"&&f.requester===U.uid),fr=FR.filter(f=>f.status==="accepted");fr.forEach(f=>watchStats(oth(f)));
-return`<div class="c"><h2>Friends</h2><div class="m">Your friend code</div><div class="big" style="font-size:64px;text-align:center;color:var(--a)">${esc(S.p.id)}</div><div class="nt">Give friends this 6-digit number. They enter it to send you a request. You choose whether to accept.</div></div>
-<div class="c"><b>Add a friend</b><label>Friend code</label><input id="fc" inputmode="numeric" maxlength="6" placeholder="6-digit code"><button class="pri" onclick="addFriend()">Send request</button>${fm?`<div class="nt" style="color:var(--a)">${esc(fm)}</div>`:""}</div>
-${inc.map(f=>`<div class="c"><b>${esc(fnm(f))}</b> wants to be friends<div class="row" style="margin-top:8px"><button class="pri" style="margin:0" onclick="frAct('${f.id}','a')">Accept</button><button class="dn" onclick="frAct('${f.id}','d')">Decline</button></div></div>`).join("")}
-${out.map(f=>`<div class="c"><b>${esc(fnm(f))}</b><div class="m">Request sent. Waiting for them to accept.</div><button class="dn" style="width:100%;margin-top:8px" onclick="frAct('${f.id}','d')">Cancel request</button></div>`).join("")}
-${fr.map(f=>`${ST[oth(f)]?statCard(ST[oth(f)],"friend"):`<div class="c"><b>${esc(fnm(f))}</b><div class="m">No stats yet.</div></div>`}<div class="row" style="margin-top:8px"><button onclick="openChat('f','${f.id}','Chat with ${esc(fnm(f))}')">Chat</button><button class="dn" onclick="if(confirm('Remove this friend?'))frAct('${f.id}','d')">Remove</button></div>`).join("")}
-${chatCard("f")}<div class="c"><b>Account</b><div class="nt">${esc(U.email)}</div><button style="width:100%;margin-top:8px" onclick="AUTH.signOut()">Sign out</button></div>`}
-function watchStats(u){if(REQ[u])return;REQ[u]=FS.doc("stats/"+u).onSnapshot(d=>{if(d.exists)ST[u]=d.data();if(tab==="friends")render()},()=>{})}
-const pidOf=(a,b)=>a<b?a+"_"+b:b+"_"+a;
-async function addFriend(){const c=$("fc").value.trim();fm="";
-if(!/^\d{6}$/.test(c))fm="Friend codes are 6 numbers.";
-else try{const d=await FS.doc("friendCodes/"+c).get();if(!d.exists)fm="No one has that code.";
-else{const o=d.data(),id=pidOf(U.uid,o.uid);if(o.uid===U.uid)fm="That's your own code.";
-else if((await FS.doc("friendships/"+id).get()).exists)fm="You already have a request or friendship with "+o.name+".";
-else{await FS.doc("friendships/"+id).set({members:[U.uid,o.uid],requester:U.uid,status:"pending",names:{[U.uid]:S.p.name,[o.uid]:o.name}});fm="Request sent to "+o.name+"."}}}catch(e){fm="Could not send: "+(e.code||e.message)}
-render()}
-async function frAct(id,a){try{if(a==="a")await FS.doc("friendships/"+id).update({status:"accepted"});else await FS.doc("friendships/"+id).delete();if(chat&&chat.key===id){unsubC&&unsubC();chat=null}}catch(e){alert("Could not do that: "+(e.code||e.message))}}
-function chatCard(k){return chat&&chat.kind===k?`<div class="c"><b>${esc(chat.title)}</b><div id="chatlog" style="max-height:260px;overflow:auto;margin-top:8px"></div><div class="row" style="margin-top:8px"><input id="cm" maxlength="500" placeholder="Message"><button class="pri" style="margin:0;flex:0 0 90px" onclick="sendChat()">Send</button></div></div>`:""}
-const chatCol=()=>FS.collection(chat.kind==="f"?"friendships/"+chat.key+"/chat":"teams/"+chat.key+"/chat");
-function openChat(kind,key,title){unsubC&&unsubC();chat={kind,key,title};CH=[];
-unsubC=chatCol().orderBy("ts").limitToLast(60).onSnapshot(q=>{CH=q.docs.map(d=>({id:d.id,...d.data()}));paintChat()},e=>{alert("Can't open chat: "+(e.code||e.message))});render()}
-function paintChat(){const l=$("chatlog");if(!l)return;l.innerHTML=CH.map(m=>`<div class="nt" style="margin:6px 0;color:${m.uid===U.uid?"var(--a)":"var(--t)"}"><b>${esc(m.name)}</b> ${esc(m.text)}</div>`).join("")||'<div class="nt">No messages yet.</div>';l.scrollTop=l.scrollHeight}
-async function sendChat(){const i=$("cm"),t=i.value.trim();if(!t||!chat)return;i.value="";
-try{await chatCol().add({uid:U.uid,name:S.p.name,text:t,ts:firebase.firestore.FieldValue.serverTimestamp()})}catch(e){alert("Message not sent: "+(e.code||e.message))}}
-// ---------- account + cloud ----------
-let AUTH,FS,U=null,am="";
-function hideApp(){$("setup").classList.remove("hide");$("app").classList.add("hide");$("nav").classList.add("hide")}
-function authUI(){hideApp();$("setup").innerHTML=`<div class="c"><h2>Sign in</h2><div class="nt">Use your email. You verify it once.</div><label>Email</label><input id="ae" type="email" autocomplete="email"><label>Password (6+ characters)</label><input id="ap" type="password" autocomplete="current-password"><button class="pri" onclick="doAuth('in')">Sign in</button><button style="width:100%;margin-top:8px" onclick="doAuth('up')">Create account</button><button style="width:100%;margin-top:8px" onclick="doAuth('reset')">Forgot password</button>${am?`<div class="nt" style="color:var(--a)">${esc(am)}</div>`:""}</div>`}
-async function doAuth(k){const e=$("ae").value.trim(),p=$("ap").value;am="";
-try{if(k==="reset"){await AUTH.sendPasswordResetEmail(e);am="Password reset email sent."}
-else if(k==="in")await AUTH.signInWithEmailAndPassword(e,p);
-else{const c=await AUTH.createUserWithEmailAndPassword(e,p);await c.user.sendEmailVerification()}}
-catch(x){am=x.code==="auth/email-already-in-use"?"That email already has an account. Sign in instead.":x.code==="auth/invalid-credential"?"Wrong email or password.":(x.code||x.message)}
-if(!U)authUI()}
-function verifyUI(){hideApp();$("setup").innerHTML=`<div class="c"><h2>Verify your email</h2><div class="nt">We sent a link to ${esc(U.email)}. Open it, then tap the button below.</div><button class="pri" onclick="chkVerify()">I verified</button><button style="width:100%;margin-top:8px" onclick="U.sendEmailVerification().then(()=>{am='Sent again.';verifyUI()})">Resend email</button><button class="dn" style="width:100%;margin-top:8px" onclick="AUTH.signOut()">Sign out</button>${am?`<div class="nt" style="color:var(--a)">${esc(am)}</div>`:""}</div>`}
-async function chkVerify(){await U.reload();U=AUTH.currentUser;if(U.emailVerified){await U.getIdToken(true);try{await loadCloud();render()}catch(e){alert(e.code||e.message)}}else{am="Not verified yet.";verifyUI()}}
-async function claim(p){const u=U.uid,low=p.name.toLowerCase(),T=tkeys(p).filter(Boolean);let fc,prev=[];
-await FS.runTransaction(async t=>{
-const nr=FS.doc("names/"+low),nd=await t.get(nr);if(nd.exists&&nd.data().uid!==u)throw new Error("name");
-const ur=FS.doc("users/"+u),ud=await t.get(ur),old=ud.exists?ud.data():{};fc=old.friendCode;prev=old.teams||[];
-if(!fc)for(let k=0;k<8&&!fc;k++){const c=String(100000+Math.floor(Math.random()*900000));if(!(await t.get(FS.doc("friendCodes/"+c))).exists)fc=c}
-if(!fc)throw new Error("code");
-t.set(FS.doc("friendCodes/"+fc),{uid:u,name:p.name});
-if(old.nameLower&&old.nameLower!==low)t.delete(FS.doc("names/"+old.nameLower));
-t.set(nr,{uid:u});t.set(ur,{name:p.name,nameLower:low,bw:p.bw,goal:p.goal,level:p.level,fb:p.fb,pl:p.pl,own:p.own,friendCode:fc,teams:T,email:U.email})});
-S.prevTeams=prev;return fc}
-async function pushStats(){if(!U||!S.p)return;const u=U.uid,o=snap(),T=myTeams(),b=FS.batch();
-b.set(FS.doc("stats/"+u),{...o,teams:T});b.set(FS.doc("logs/"+u),{h:JSON.parse(JSON.stringify(S.h))});
-T.forEach(t=>b.set(FS.doc("teams/"+t+"/members/"+u),o));
-(S.prevTeams||[]).filter(t=>!T.includes(t)).forEach(t=>b.delete(FS.doc("teams/"+t+"/members/"+u)));
-await b.commit();S.prevTeams=T}
-async function loadCloud(){const u=U.uid,[ud,ld]=await Promise.all([FS.doc("users/"+u).get(),FS.doc("logs/"+u).get()]);
-S.h=ld.exists?ld.data().h||[]:[];S.d={};S.f=[];S.team=[];
-if(ud.exists){const o=ud.data();S.p={id:o.friendCode,name:o.name,bw:o.bw,goal:o.goal,level:o.level,fb:o.fb||null,pl:o.pl||null,own:o.own||""};S.p.mode=modeName(S.p);S.p.spec=specText(S.p);S.prevTeams=o.teams||[]}else S.p=null;
-unsubF&&unsubF();unsubF=FS.collection("friendships").where("members","array-contains",u).onSnapshot(q=>{FR=q.docs.map(d=>({id:d.id,...d.data()}));if(tab==="friends")render()},e=>console.log(e))}
-function cleanup(){[unsubF,unsubT,unsubC].forEach(f=>f&&f());Object.values(REQ).forEach(f=>f&&f());unsubF=unsubT=unsubC=null;REQ={};ST={};TM={};FR=[];chat=null;subT="";try{localStorage.removeItem(KEY)}catch(e){}S={p:null,h:[],f:[],team:[],d:{}}}
-function boot(){if(!/^AIza/.test(FIREBASE_CONFIG.apiKey||"")){hideApp();$("setup").innerHTML='<div class="c"><h2>Almost there</h2><div class="nt">Paste your Firebase settings into FIREBASE_CONFIG at the top of this file. See SETUP.md.</div></div>';return}
-firebase.initializeApp(FIREBASE_CONFIG);AUTH=firebase.auth();FS=firebase.firestore();
-AUTH.onAuthStateChanged(async u=>{U=u;if(!u){cleanup();return authUI()}if(!u.emailVerified)return verifyUI();try{await loadCloud();render()}catch(e){alert("Could not load your data: "+(e.code||e.message))}})}
-const PD={45:{t:32,d:450,c:"#d62828"},25:{t:26,d:340,c:"#f2c200"},10:{t:20,d:255,c:"#1f9d55"},5:{t:15,d:205,c:"#111418"},2.5:{t:11,d:165,c:"#111418"}};
-let PL={bar:0,list:[]};
-const addP=p=>{PL.list.push(p);PL.list.sort((a,b)=>b-a);render()};
-function vPlates(){const{bar,list}=PL,sum=list.reduce((a,p)=>a+PD[p].t,0),k=Math.min(1,400/(sum||1));let L="",R="",o=0;
-list.forEach(p=>{const{t,d,c}=PD[p],w=t*k,at=`y="${260-d/2}" width="${w}" height="${d}" rx="10" fill="${c}" stroke="${c=="#111418"?"#8a93a0":"#000"}" stroke-opacity=".6" stroke-width="3"`;L+=`<rect x="${415-o-w}" ${at}/>`;R+=`<rect x="${1785+o}" ${at}/>`;o+=w});
-const bs=bar?`<rect x="0" y="243" width="2200" height="34" rx="6" fill="#aeb6c2"/><rect x="0" y="235" width="415" height="50" rx="6" fill="#9aa3b0"/><rect x="1785" y="235" width="415" height="50" rx="6" fill="#9aa3b0"/><rect x="400" y="215" width="18" height="90" fill="#5d6673"/><rect x="1782" y="215" width="18" height="90" fill="#5d6673"/>`:`<line x1="0" y1="260" x2="2200" y2="260" stroke="#3a4350" stroke-width="4" stroke-dasharray="30 24"/>`;
-return`<div class="c"><h2>Plate calculator</h2><div class="m" style="font-size:13px">Tap plates to load both sides. Starts at 0 with no bar; add the 45 lb bar with the button.</div>
-<div class="big" style="font-size:76px;text-align:center;color:var(--a);margin-top:8px">${bar+2*list.reduce((a,b)=>a+b,0)}</div><div class="sub" style="text-align:center">lb total</div>
-<svg viewBox="0 0 2200 520" width="100%">${bs}${L}${R}</svg>
-<div class="row" style="margin-top:8px">${[45,25,10,5,2.5].map(p=>`<button class="pb" style="background:${PD[p].c};${p==25?"color:#111;":""}${p==2.5?"font-size:16px;":""}" onclick="addP(${p})">${p}</button>`).join("")}</div>
-<div class="nt" style="text-align:center">${bar?"45 lb bar":"No bar"}${list.length?" + each side: "+list.join(" + "):""}</div>
-<div class="row" style="margin-top:8px"><button onclick="PL.bar=PL.bar?0:45;render()">${bar?"Remove bar":"Add 45 lb bar"}</button><button onclick="PL.list.pop();render()">Undo plate</button><button onclick="PL={bar:0,list:[]};render()">Clear all</button></div></div>`}
-boot();
-</script></body></html>
+/* ============================================================
+   CONSTANTS & HELPERS
+   ============================================================ */
+const $ = id => document.getElementById(id);
+const esc = t => String(t ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const today = () => {
+  const d = new Date();
+  return new Date(d - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 10);
+};
+const DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+const POS = ["Left tackle","Right tackle","Guard","Center","Defensive tackle","Defensive end","Tight end","Linebacker","Other"];
+const FOC = ["Full meet","Squat","Bench","Deadlift"];
+const GOALS = ["Max strength","Size","Power & explosiveness","General fitness"];
+const FBT = ["JV1","JV2","Varsity"];
+const WCS = ["105","114","123","132","148","165","181","198","220","242","275","275+"];
+const GRADES = [9,10,11,12];
+
+const EX = {
+  "Bench Press":{inc:5,t:[3,8],bw:[.35,.5,.75],pl:1},
+  "Overhead Press":{inc:2.5,t:[3,8],bw:[.25,.35,.5]},
+  "Close-Grip Bench Press":{inc:5,t:[3,8],bw:[.3,.45,.65]},
+  "Squat":{inc:10,t:[3,5],bw:[.5,.75,1],pl:1},
+  "Deadlift":{inc:10,t:[3,5],bw:[.6,.9,1.25],pl:1},
+  "Romanian Deadlift":{inc:5,t:[3,8],bw:[.4,.6,.85]},
+  "Barbell Row":{inc:5,t:[3,8],bw:[.35,.5,.7]},
+  "Pull-Ups":{inc:5,t:[3,8],pu:1},
+  "Face Pulls":{inc:5,t:[3,12],bw:[.1,.15,.2]},
+  "Plank":{inc:0,t:[3,1]},
+  "Hip & thoracic mobility":{inc:0,t:[1,1]},
+  "Football position drills":{inc:0,t:[3,1]},
+  "Short acceleration work":{inc:0,t:[4,1]}
+};
+const LIFTS = Object.keys(EX);
+
+function plan() {
+  const fb = !!S.p.fb;
+  const sat = fb
+    ? {title:"Optional football drills",ex:["Football position drills","Short acceleration work"]}
+    : {title:"Optional accessories & mobility",ex:["Face Pulls","Plank","Hip & thoracic mobility"]};
+  return {
+    Monday:{title:"Chest, shoulders & triceps",ex:["Bench Press","Overhead Press","Close-Grip Bench Press"]},
+    Wednesday:{title:"Legs",ex:["Squat","Deadlift","Romanian Deadlift"]},
+    Friday:{title:"Back",ex:["Barbell Row","Pull-Ups"]},
+    Saturday:sat
+  };
+}
+
+const rnd = (x,s) => Math.round(x/s)*s;
+const tgt = n => {
+  const e = EX[n];
+  let [s,r] = e.t;
+  if (S.p.pl && e.pl) { s=5; r=5; }
+  return [s,r];
+};
+
+function last(n) {
+  for (const h of S.h) {
+    const it = h.items.find(i => i.name === n);
+    if (it && it.sets.length) return it.sets;
+  }
+  return null;
+}
+
+function suggest(n) {
+  const e = EX[n], lv = ["Beginner","Intermediate","Advanced"].indexOf(S.p.level), [ts,tr] = tgt(n), L = last(n);
+  if (!e.inc && !e.bw && !e.pu) return L ? null : {t:"Do it with good form."};
+  if (e.pu) {
+    if (!L) return {t:"Start with bodyweight. Aim for 5-8 reps each set."};
+    const mr = Math.min(...L.map(s => s.r)), w = Math.max(...L.map(s => +s.w || 0));
+    return mr >= 12
+      ? {w:w+5, t:`You hit ${mr} reps on every set. Add ${w?5:5} lb (weighted) and aim for 8 reps.`}
+      : {w, t:`Aim for ${mr+1} reps each set${w?" at +"+w+" lb":""} (reps first, weight later).`};
+  }
+  if (!L) {
+    const w = rnd(S.p.bw * e.bw[lv], e.inc === 2.5 ? 2.5 : 5);
+    return {w, t:`First time: start light at about ${w} lb and focus on clean reps.`};
+  }
+  const V = L.filter(s => +s.w > 0);
+  if (!V.length) return null;
+  const w = Math.max(...V.map(s => +s.w)), top = V.filter(s => +s.w === w);
+  const all = V.length >= ts && V.every(s => s.r >= tr), close = V.every(s => s.r >= tr-2);
+  if (all) return {w:w+e.inc, t:`You hit every rep. Add ${e.inc} lb: try ${w+e.inc} lb.`};
+  if (close) return {w, t:`Close. Stay at ${w} lb and aim for one more rep.`};
+  const d = rnd(w*.9, e.inc === 2.5 ? 2.5 : 5);
+  return {w:d, t:`Reps were low. Drop about 10% to ${d} lb and rebuild.`};
+}
+
+function prs() {
+  const b = {};
+  S.h.forEach(h => h.items.forEach(i => i.sets.forEach(s => {
+    const w = +s.w;
+    if (w > 0 && (!b[i.name] || w > b[i.name].w || (w === b[i.name].w && s.r > b[i.name].r)))
+      b[i.name] = {w, r:s.r, d:h.date};
+  })));
+  return b;
+}
+
+function modeName(p) {
+  return p.fb && p.pl ? "Football + Powerlifting" : p.fb ? "Football" : p.pl ? "Powerlifting" : "On my own";
+}
+function specText(p) {
+  return p.fb || p.pl
+    ? [p.fb && POS[p.fb.p] + " · " + FBT[p.fb.t], p.pl && WCS[p.pl.w] + " lb · Grade " + p.pl.g].filter(Boolean).join(" | ")
+    : p.own;
+}
+function teamKeys(p) {
+  const keys = [];
+  if (p.fb) keys.push("F" + p.fb.t);
+  if (p.pl) keys.push("P" + p.pl.w + "-" + p.pl.g);
+  return keys;
+}
+function tname(k) {
+  if (!k) return "";
+  if (k[0] === "F") return "Football · " + FBT[+k.slice(1)];
+  const parts = k.slice(1).split("-");
+  return "Powerlifting · " + WCS[+parts[0]] + " lb · Grade " + parts[1];
+}
+
+/* ============================================================
+   STATE
+   ============================================================ */
+let S = {
+  p: null,          // profile
+  h: [],            // history
+  d: {},            // draft sets for current day
+  friends: [],      // {uid, id, name, status, prs?, recent?}
+  teamMembers: [],  // same shape, filtered by shared team
+  messages: [],     // chat messages for current team
+  uid: null,
+  code: null        // 5-digit friend code
+};
+
+let tab = "workout";
+let day = DAYS[(new Date().getDay() + 6) % 7];
+let lift = "";
+let nextMsg = null;
+let curTeam = "";
+let chatUnsub = null;
+let friendsUnsub = null;
+let statusMsg = "";
+let statusType = "info";
+
+function setStatus(msg, type = "info") {
+  statusMsg = msg;
+  statusType = type;
+  render();
+}
+
+/* ============================================================
+   AUTH + PROFILE
+   ============================================================ */
+auth.onAuthStateChanged(async user => {
+  if (!user) {
+    // Sign in anonymously
+    try {
+      await auth.signInAnonymously();
+    } catch (e) {
+      console.error(e);
+      setStatus("Could not connect to Firebase. Check your config.", "err");
+    }
+    return;
+  }
+  S.uid = user.uid;
+  await loadProfile();
+});
+
+async function loadProfile() {
+  try {
+    const snap = await db.collection("users").doc(S.uid).get();
+    if (snap.exists) {
+      const data = snap.data();
+      S.p = data.profile;
+      S.code = data.code;
+      S.h = data.history || [];
+      // Load friends
+      await loadFriends();
+      render();
+    } else {
+      // New user → show setup
+      S.p = null;
+      render();
+    }
+  } catch (e) {
+    console.error(e);
+    setStatus("Error loading profile: " + e.message, "err");
+    render();
+  }
+}
+
+async function saveProfile() {
+  if (!S.uid || !S.p) return;
+  try {
+    await db.collection("users").doc(S.uid).set({
+      profile: S.p,
+      code: S.code,
+      history: S.h.slice(0, 50), // keep last 50
+      prs: prs(),
+      teamKeys: teamKeys(S.p),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, {merge: true});
+  } catch (e) {
+    console.error(e);
+    setStatus("Save failed: " + e.message, "err");
+  }
+}
+
+function generateCode() {
+  return String(10000 + Math.floor(Math.random() * 90000));
+}
+
+async function finishSetup() {
+  keep();
+  const n = su.n.trim();
+  if (!n || !(+su.w >= 50) || (su.own && !su.s.trim())) {
+    alert("Enter your name, a body weight (≥50), and what you're training for.");
+    return;
+  }
+
+  // Generate unique 5-digit code
+  let code, exists = true, tries = 0;
+  while (exists && tries < 20) {
+    code = generateCode();
+    const check = await db.collection("codes").doc(code).get();
+    exists = check.exists;
+    tries++;
+  }
+  if (exists) {
+    alert("Could not generate a unique code. Try again.");
+    return;
+  }
+
+  S.p = {
+    id: code,
+    name: n,
+    bw: +su.w,
+    goal: $("sg").value,
+    level: $("sl").value,
+    fb: su.fb ? {p: +su.fp, t: +su.ft} : null,
+    pl: su.pl ? {w: +su.pw, g: +su.pg} : null,
+    own: su.own ? su.s.trim() : ""
+  };
+  S.p.mode = modeName(S.p);
+  S.p.spec = specText(S.p);
+  S.code = code;
+
+  // Write user + code mapping
+  await db.collection("users").doc(S.uid).set({
+    profile: S.p,
+    code,
+    history: [],
+    prs: {},
+    teamKeys: teamKeys(S.p),
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+  await db.collection("codes").doc(code).set({uid: S.uid, name: n});
+
+  setStatus("Profile created! Your friend code is " + code, "ok");
+  render();
+}
+
+/* ============================================================
+   FRIENDS
+   ============================================================ */
+async function loadFriends() {
+  if (friendsUnsub) friendsUnsub();
+  friendsUnsub = db.collection("users").doc(S.uid).collection("friends")
+    .onSnapshot(snap => {
+      S.friends = [];
+      snap.forEach(doc => {
+        const d = doc.data();
+        S.friends.push({
+          uid: doc.id,
+          id: d.id,
+          name: d.name,
+          status: d.status, // "pending" | "sent" | "accepted"
+          prs: d.prs || {},
+          recent: d.recent || null,
+          mode: d.mode || "",
+          spec: d.spec || ""
+        });
+      });
+      // Also refresh team members
+      refreshTeamMembers();
+      render();
+    }, err => console.error(err));
+}
+
+async function addFriendByCode(code) {
+  code = code.trim();
+  if (!/^\d{5}$/.test(code)) {
+    setStatus("Enter a valid 5-digit friend code.", "err");
+    return;
+  }
+  if (code === S.code) {
+    setStatus("That's your own code.", "err");
+    return;
+  }
+  try {
+    const codeSnap = await db.collection("codes").doc(code).get();
+    if (!codeSnap.exists) {
+      setStatus("No one found with that code.", "err");
+      return;
+    }
+    const {uid, name} = codeSnap.data();
+    // Check if already friends
+    const existing = S.friends.find(f => f.uid === uid);
+    if (existing) {
+      setStatus("You already have a connection with " + name, "info");
+      return;
+    }
+    // Create pending on their side + sent on ours
+    await db.collection("users").doc(uid).collection("friends").doc(S.uid).set({
+      id: S.code,
+      name: S.p.name,
+      status: "pending",
+      mode: S.p.mode,
+      spec: S.p.spec,
+      ts: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    await db.collection("users").doc(S.uid).collection("friends").doc(uid).set({
+      id: code,
+      name,
+      status: "sent",
+      ts: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    setStatus("Friend request sent to " + name, "ok");
+  } catch (e) {
+    console.error(e);
+    setStatus("Error: " + e.message, "err");
+  }
+}
+
+async function acceptFriend(friendUid) {
+  const f = S.friends.find(x => x.uid === friendUid);
+  if (!f) return;
+  try {
+    // Update both sides to accepted + share current stats
+    const myPrs = prs();
+    const myRecent = S.h[0] || null;
+    await db.collection("users").doc(S.uid).collection("friends").doc(friendUid).update({
+      status: "accepted",
+      prs: myPrs,
+      recent: myRecent,
+      mode: S.p.mode,
+      spec: S.p.spec
+    });
+    await db.collection("users").doc(friendUid).collection("friends").doc(S.uid).update({
+      status: "accepted",
+      name: S.p.name,
+      id: S.code,
+      prs: myPrs,
+      recent: myRecent,
+      mode: S.p.mode,
+      spec: S.p.spec
+    });
+    setStatus("You are now friends with " + f.name, "ok");
+  } catch (e) {
+    console.error(e);
+    setStatus("Error accepting: " + e.message, "err");
+  }
+}
+
+async function declineFriend(friendUid) {
+  try {
+    await db.collection("users").doc(S.uid).collection("friends").doc(friendUid).delete();
+    // Optionally clean the other side, but leave it for them to manage
+    setStatus("Request declined.", "info");
+  } catch (e) {
+    setStatus("Error: " + e.message, "err");
+  }
+}
+
+async function shareStatsWithFriend(friendUid) {
+  const myPrs = prs();
+  const myRecent = S.h[0] || null;
+  try {
+    await db.collection("users").doc(friendUid).collection("friends").doc(S.uid).update({
+      prs: myPrs,
+      recent: myRecent,
+      mode: S.p.mode,
+      spec: S.p.spec,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    setStatus("Stats shared!", "ok");
+  } catch (e) {
+    setStatus("Could not share: " + e.message, "err");
+  }
+}
+
+/* ============================================================
+   TEAMS
+   ============================================================ */
+function refreshTeamMembers() {
+  // Team members = accepted friends who share at least one teamKey
+  const myKeys = teamKeys(S.p);
+  S.teamMembers = S.friends.filter(f => {
+    if (f.status !== "accepted") return false;
+    // We don't store their teamKeys on the friend doc yet, so for now
+    // we show all accepted friends in the Team tab and let the PR board
+    // be filtered by the currently selected team. A more advanced version
+    // could also store teamKeys on the friend document.
+    return true;
+  });
+}
+
+/* ============================================================
+   CHAT (per team)
+   ============================================================ */
+function loadChat(teamKey) {
+  if (chatUnsub) chatUnsub();
+  if (!teamKey) {
+    S.messages = [];
+    return;
+  }
+  chatUnsub = db.collection("chats").doc(teamKey).collection("messages")
+    .orderBy("ts", "desc")
+    .limit(40)
+    .onSnapshot(snap => {
+      S.messages = [];
+      snap.forEach(doc => {
+        const d = doc.data();
+        S.messages.push({
+          id: doc.id,
+          from: d.from,
+          name: d.name,
+          text: d.text,
+          ts: d.ts ? d.ts.toDate() : new Date()
+        });
+      });
+      S.messages.reverse(); // oldest first
+      render();
+    }, err => console.error(err));
+}
+
+async function sendChat(teamKey, text) {
+  text = text.trim();
+  if (!text || !teamKey) return;
+  try {
+    await db.collection("chats").doc(teamKey).collection("messages").add({
+      from: S.uid,
+      name: S.p.name,
+      text,
+      ts: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  } catch (e) {
+    setStatus("Chat error: " + e.message, "err");
+  }
+}
+
+/* ============================================================
+   WORKOUT HELPERS (same as original)
+   ============================================================ */
+function rep(n, i, x) {
+  const s = S.d[n].sets[i];
+  s.r = Math.max(0, s.r + x);
+  render();
+}
+
+async function finish() {
+  const d = plan()[day];
+  const items = d.ex.map(n => ({
+    name: n,
+    sets: (S.d[n] || {sets:[]}).sets
+      .filter(s => s.r > 0 || +s.w > 0)
+      .map(s => ({w: s.w || S.d[n].s || 0, r: s.r}))
+  })).filter(i => i.sets.length);
+
+  if (!items.length) {
+    alert("Log at least one set first.");
+    return;
+  }
+
+  const workout = {
+    date: $("wd").value || today(),
+    day,
+    title: d.title,
+    items
+  };
+  S.h.unshift(workout);
+  d.ex.forEach(n => delete S.d[n]);
+  nextMsg = items.map(i => {
+    const g = suggest(i.name);
+    return [i.name, g ? g.t : "Keep it up."];
+  });
+
+  await saveProfile();
+  // Also push updated PRs to all accepted friends
+  const myPrs = prs();
+  const accepted = S.friends.filter(f => f.status === "accepted");
+  for (const f of accepted) {
+    try {
+      await db.collection("users").doc(f.uid).collection("friends").doc(S.uid).update({
+        prs: myPrs,
+        recent: workout
+      });
+    } catch (_) {}
+  }
+  render();
+}
+
+/* ============================================================
+   UI – SETUP
+   ============================================================ */
+let su = {fb:0, pl:0, own:0, fp:0, ft:2, pw:5, pg:10, n:"", w:"", s:""};
+
+function tog(k) {
+  keep();
+  if (k === "own") {
+    su.own = su.own ? 0 : 1;
+    if (su.own) { su.fb = 0; su.pl = 0; }
+  } else {
+    su[k] = su[k] ? 0 : 1;
+    if (su[k]) su.own = 0;
+  }
+  setupUI();
+}
+
+function keep() {
+  [["n","sn"],["w","sw"],["fp","fp"],["ft","ft"],["pw","pw"],["pg","pg"],["s","ss"]].forEach(([k,i]) => {
+    if ($(i)) su[k] = $(i).value;
+  });
+}
+
+function setupUI() {
+  const any = su.fb || su.pl || su.own;
+  const opt = (a, v, f) => a.map((x,i) => `<option value="${f?x:i}" ${v==(f?x:i)?"selected":""}>${x}</option>`).join("");
+  $("setup").innerHTML = `
+    <div class="c">
+      <h2>What are you training for?</h2>
+      <div class="nt">Pick Football, Powerlifting, or both. This also determines your team.</div>
+      <div class="mode">
+        ${[["fb","Football"],["pl","Powerlifting"],["own","On my own"]].map(([k,n]) =>
+          `<button class="${su[k]?"on":""}" onclick="tog('${k}')">${n}</button>`).join("")}
+      </div>
+      ${any ? `
+        <label>Your name (max 12 letters)</label>
+        <input id="sn" maxlength="12" value="${esc(su.n)}">
+        <label>Body weight (lb)</label>
+        <input id="sw" type="number" inputmode="decimal" value="${su.w}">
+        ${su.fb ? `
+          <label>Football position</label>
+          <select id="fp">${opt(POS,su.fp)}</select>
+          <label>Football team</label>
+          <select id="ft">${opt(FBT,su.ft)}</select>
+        ` : ""}
+        ${su.pl ? `
+          <label>Powerlifting weight class (lb)</label>
+          <select id="pw">${opt(WCS,su.pw)}</select>
+          <label>Grade</label>
+          <select id="pg">${opt(GRADES,su.pg,1)}</select>
+        ` : ""}
+        ${su.own ? `
+          <label>What are you training for?</label>
+          <input id="ss" placeholder="e.g. get stronger" value="${esc(su.s)}">
+        ` : ""}
+        <label>Goal</label>
+        <select id="sg">${GOALS.map(x => `<option>${x}</option>`).join("")}</select>
+        <label>Lifting level</label>
+        <select id="sl">${["Beginner","Intermediate","Advanced"].map(x => `<option>${x}</option>`).join("")}</select>
+        <button class="pri" onclick="finishSetup()">Start lifting →</button>
+      ` : ""}
+    </div>
+    ${statusMsg ? `<div class="status ${statusType}">${esc(statusMsg)}</div>` : ""}
+  `;
+}
+
+function editProfile() {
+  const p = S.p;
+  su = {
+    fb: p.fb ? 1 : 0,
+    pl: p.pl ? 1 : 0,
+    own: p.fb || p.pl ? 0 : 1,
+    fp: p.fb ? p.fb.p : 0,
+    ft: p.fb ? p.fb.t : 2,
+    pw: p.pl ? p.pl.w : 5,
+    pg: p.pl ? p.pl.g : 10,
+    n: p.name,
+    w: p.bw,
+    s: p.own || ""
+  };
+  // Keep the same uid & code – just re-run setup UI
+  S.p = null;
+  render();
+}
+
+/* ============================================================
+   UI – VIEWS
+   ============================================================ */
+const TABS = () => [
+  ["workout","Workout"],
+  ["plan","Plan"],
+  ["history","History"],
+  ...((S.p && (S.p.fb || S.p.pl)) ? [["team","Team"]] : [["plates","Plates"]]),
+  ["friends","Friends"]
+];
+
+function render() {
+  if (!S.p) {
+    $("setup").classList.remove("hide");
+    $("app").classList.add("hide");
+    $("nav").classList.add("hide");
+    setupUI();
+    return;
+  }
+  $("setup").classList.add("hide");
+  $("app").classList.remove("hide");
+  $("nav").classList.remove("hide");
+  $("sub").textContent = `${S.p.name} #${S.code} · ${S.p.fb || S.p.pl ? specText(S.p) : S.p.own}`;
+
+  if (!TABS().some(t => t[0] === tab)) tab = "workout";
+  $("nav").innerHTML = TABS().map(([k,n]) =>
+    `<button class="tab ${tab===k?"on":""}" onclick="tab='${k}';nextMsg=null;statusMsg='';render()">${n}</button>`
+  ).join("");
+
+  $("v").innerHTML = ({
+    workout: vWork,
+    plan: vPlan,
+    history: vHist,
+    team: vTeam,
+    plates: vPlates,
+    friends: vFriends
+  })[tab]();
+}
+
+function vWork() {
+  const d = plan()[day];
+  const head = `
+    <div class="c">
+      <h2>${day}</h2>
+      <div class="m">${d ? d.title : "Rest day"}</div>
+      <label>Day</label>
+      <select onchange="day=this.value;render()">${DAYS.map(x => `<option ${x===day?"selected":""}>${x}</option>`).join("")}</select>
+      <label>Workout date</label>
+      <input type="date" id="wd" value="${today()}">
+    </div>`;
+  if (nextMsg) {
+    return `
+      <div class="c">
+        <h2>Saved! 💪</h2>
+        <div class="m">Try this next time:</div>
+        ${nextMsg.map(x => `<div class="sug"><b>${esc(x[0])}</b><br>${esc(x[1])}</div>`).join("")}
+        <button class="pri" onclick="nextMsg=null;render()">Done</button>
+      </div>`;
+  }
+  if (!d) return head + '<div class="c m">Recovery day. Rest, hydrate and do light mobility if it feels good.</div>';
+
+  const pr = prs();
+  return head + d.ex.map(n => {
+    const g = suggest(n);
+    const D = S.d[n] || (S.d[n] = {s:"", sets:[{w:"",r:0}]});
+    const [ts,tr] = tgt(n);
+    return `
+      <div class="c ex">
+        <h3>${n}</h3>
+        <div class="m" style="font-size:12px">Target: ${ts} × ${tr}</div>
+        ${pr[n] ? `<div class="sug pr">🏆 PR: <b>${pr[n].w} lb × ${pr[n].r}</b></div>` : ""}
+        ${g ? `<div class="sug">📈 ${esc(g.t)}</div>` : ""}
+        <label>Starting weight (lb)</label>
+        <input type="number" inputmode="decimal" value="${D.s}" oninput="S.d['${n}'].s=this.value">
+        ${D.sets.map((s,i) => `
+          <div class="set">
+            <b class="big" style="font-size:18px;color:var(--a)">Set ${i+1}</b>
+            <label>Weight (lb)</label>
+            <input type="number" inputmode="decimal" value="${s.w}" oninput="S.d['${n}'].sets[${i}].w=this.value">
+            <label>Reps</label>
+            <div class="rc">
+              <button onclick="rep('${n}',${i},-1)">−</button>
+              <span class="big">${s.r}</span>
+              <button class="plus" onclick="rep('${n}',${i},1)">+ Rep</button>
+            </div>
+            ${i ? `<button class="dn" style="margin-top:8px" onclick="S.d['${n}'].sets.splice(${i},1);render()">Remove set</button>` : ""}
+          </div>`).join("")}
+        <button style="width:100%;margin-top:10px" onclick="S.d['${n}'].sets.push({w:S.d['${n}'].s||'',r:0});render()">+ Add set</button>
+      </div>`;
+  }).join("") + `<button class="pri" onclick="finish()">Save workout</button>`;
+}
+
+function vPlan() {
+  const P = plan();
+  return `
+    <div class="c">
+      <h2>Weekly plan</h2>
+      ${DAYS.map(x => `
+        <div class="set" onclick="day='${x}';tab='workout';render()">
+          <b class="big" style="font-size:20px">${x}</b>
+          <div class="m">${P[x] ? P[x].title : "Rest day"}</div>
+        </div>`).join("")}
+      <div class="nt">Adjust around practices and games. Rest days build strength.</div>
+    </div>
+    <div class="c">
+      <button style="width:100%" onclick="editProfile()">Edit profile</button>
+    </div>`;
+}
+
+function vHist() {
+  const pr = prs();
+  const names = Object.keys(pr);
+  return `
+    <div class="c">
+      <h2>Best lifts & next targets</h2>
+      ${names.map(n => {
+        const g = suggest(n);
+        return `<div class="set">
+          <b>${esc(n)}</b>
+          <div class="m">🏆 ${pr[n].w} lb × ${pr[n].r}</div>
+          ${g ? `<div class="m" style="color:#e4ff8a">Next: ${esc(g.t)}</div>` : ""}
+        </div>`;
+      }).join("") || '<div class="m">Save a workout to see your bests.</div>'}
+    </div>
+    <div class="c">
+      <h2>History</h2>
+      ${S.h.map(h => `
+        <div class="set">
+          <b>${esc(h.day)} · ${esc(h.date)}</b>
+          <div class="m">${esc(h.title)}</div>
+          <div style="margin-top:6px;line-height:1.6">
+            ${h.items.map(i => esc(i.name) + ": " + i.sets.map(s => s.w + " lb × " + s.r).join(", ")).join("<br>")}
+          </div>
+        </div>`).join("") || '<div class="m">No workouts saved yet.</div>'}
+      <div class="row" style="margin-top:12px">
+        <button onclick="exp()">Export data</button>
+        <button class="dn" onclick="if(confirm('Delete all saved history on this device and in the cloud?')){S.h=[];saveProfile();render()}">Clear history</button>
+      </div>
+    </div>`;
+}
+
+function exp() {
+  const b = new Blob([JSON.stringify({profile:S.p, history:S.h, code:S.code}, null, 2)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(b);
+  a.download = "lift-log-" + today() + ".json";
+  a.click();
+}
+
+function vTeam() {
+  const myKeys = teamKeys(S.p);
+  if (!myKeys.length) {
+    return `<div class="c"><h2>Team</h2><div class="m">You need Football or Powerlifting selected in your profile to have a team.</div></div>`;
+  }
+  if (!curTeam || !myKeys.includes(curTeam)) curTeam = myKeys[0];
+
+  // For the PR board we currently show accepted friends (they share stats)
+  const members = [{id:S.code, name:S.p.name, prs:prs(), uid:S.uid}, ...S.friends.filter(f => f.status === "accepted")];
+  const allLifts = [...new Set(members.flatMap(m => Object.keys(m.prs || {})))];
+  if (!lift || !allLifts.includes(lift)) lift = allLifts[0] || "";
+
+  const rows = members
+    .filter(m => m.prs && m.prs[lift])
+    .sort((a,b) => b.prs[lift].w - a.prs[lift].w);
+
+  // Load chat for current team
+  if (chatUnsub === null || true) loadChat(curTeam); // simple: always (re)attach
+
+  return `
+    <div class="c">
+      <h2>${esc(tname(curTeam))}</h2>
+      ${myKeys.length > 1 ? `
+        <label>Switch team</label>
+        <select onchange="curTeam=this.value;loadChat(curTeam);render()">
+          ${myKeys.map(k => `<option value="${k}" ${k===curTeam?"selected":""}>${esc(tname(k))}</option>`).join("")}
+        </select>` : ""}
+      <div class="nt">Your team is determined by the Football team or Powerlifting weight class + grade you chose in your profile. Friends who are also on this team appear here with their PRs.</div>
+    </div>
+
+    <div class="c">
+      <h2>Team PRs</h2>
+      ${allLifts.length ? `
+        <label>Lift</label>
+        <select onchange="lift=this.value;render()">
+          ${allLifts.map(x => `<option ${x===lift?"selected":""}>${x}</option>`).join("")}
+        </select>
+        ${rows.map((o,i) => `
+          <div class="ln">
+            <span>${i+1}. ${esc(o.name)} #${esc(o.id)}${o.uid===S.uid?" (you)":""}</span>
+            <b>${o.prs[lift].w} lb × ${o.prs[lift].r}</b>
+          </div>`).join("")}
+      ` : '<div class="m">Log a lift and add friends to start the board.</div>'}
+    </div>
+
+    <div class="c">
+      <h2>Team Chat</h2>
+      <div class="nt">Everyone on this team can see messages here.</div>
+      <div id="chatmsgs" style="max-height:260px;overflow-y:auto;margin-top:8px">
+        ${S.messages.length ? S.messages.map(m => `
+          <div class="msg">
+            <div class="who">${esc(m.name)}${m.from===S.uid?" (you)":""}</div>
+            <div>${esc(m.text)}</div>
+            <div class="ts">${m.ts.toLocaleString()}</div>
+          </div>`).join("") : '<div class="m">No messages yet. Say hi!</div>'}
+      </div>
+      <div class="chatbox">
+        <input id="chatinput" placeholder="Type a message..." onkeydown="if(event.key==='Enter'){sendChat(curTeam,$('chatinput').value);$('chatinput').value=''}">
+        <button class="pri" style="margin:0" onclick="sendChat(curTeam,$('chatinput').value);$('chatinput').value=''">Send</button>
+      </div>
+    </div>
+
+    ${statusMsg ? `<div class="status ${statusType}">${esc(statusMsg)}</div>` : ""}
+  `;
+}
+
+function vFriends() {
+  const pending = S.friends.filter(f => f.status === "pending");
+  const sent = S.friends.filter(f => f.status === "sent");
+  const accepted = S.friends.filter(f => f.status === "accepted");
+
+  return `
+    <div class="c">
+      <h2>Friends</h2>
+      <div class="m">Your friend code</div>
+      <div class="big" style="font-size:64px;text-align:center;color:var(--a)">${S.code}</div>
+      <div class="nt">Give this 5-digit number to friends. They enter it below to send you a request.</div>
+    </div>
+
+    <div class="c">
+      <b>Add a friend</b>
+      <label>Enter their 5-digit code</label>
+      <input id="friendcode" inputmode="numeric" maxlength="5" placeholder="e.g. 48291">
+      <button class="pri" onclick="addFriendByCode($('friendcode').value)">Send request</button>
+      ${statusMsg ? `<div class="status ${statusType}">${esc(statusMsg)}</div>` : ""}
+    </div>
+
+    ${pending.map(f => `
+      <div class="c">
+        <b>${esc(f.name)} #${esc(f.id)}</b>
+        <div class="m">wants to be friends</div>
+        <div class="row" style="margin-top:8px">
+          <button class="pri" style="margin:0" onclick="acceptFriend('${f.uid}')">Accept</button>
+          <button class="dn" onclick="declineFriend('${f.uid}')">Decline</button>
+        </div>
+      </div>`).join("")}
+
+    ${sent.map(f => `
+      <div class="c">
+        <b>${esc(f.name)} #${esc(f.id)}</b>
+        <div class="m">Request sent. Waiting for them to accept.</div>
+      </div>`).join("")}
+
+    ${accepted.map(f => `
+      <div class="c">
+        <h3>${esc(f.name)} #${esc(f.id)}</h3>
+        <div class="m" style="font-size:12px">${esc(f.mode)} · ${esc(f.spec)}</div>
+        ${Object.entries(f.prs || {}).map(([n,b]) => `
+          <div class="ln"><span>${esc(n)}</span><b>${b.w} lb × ${b.r}</b></div>
+        `).join("") || '<div class="nt">No lifts shared yet</div>'}
+        ${f.recent ? `
+          <div class="nt" style="margin-top:8px">
+            <b>Latest: ${esc(f.recent.date)} · ${esc(f.recent.title)}</b><br>
+            ${f.recent.items.map(i => esc(i.name) + ": " + i.sets.map(s => s.w + "×" + s.r).join(", ")).join("<br>")}
+          </div>` : ""}
+        <button style="width:100%;margin-top:10px" onclick="shareStatsWithFriend('${f.uid}')">Share my latest stats</button>
+      </div>`).join("")}
+
+    <div class="nt">Friends only see your numbers after they accept. Stats update when you save a workout or tap “Share my latest stats”.</div>
+  `;
+}
+
+/* ============================================================
+   PLATE CALCULATOR (unchanged)
+   ============================================================ */
+const PD = {
+  45:{t:32,d:450,c:"#d62828"},
+  25:{t:26,d:340,c:"#f2c200"},
+  10:{t:20,d:255,c:"#1f9d55"},
+  5:{t:15,d:205,c:"#111418"},
+  2.5:{t:11,d:165,c:"#111418"}
+};
+let PL = {bar:0, list:[]};
+const addP = p => { PL.list.push(p); PL.list.sort((a,b) => b-a); render(); };
+
+function vPlates() {
+  const {bar, list} = PL;
+  const sum = list.reduce((a,p) => a + PD[p].t, 0);
+  const k = Math.min(1, 400 / (sum || 1));
+  let L = "", R = "", o = 0;
+  list.forEach(p => {
+    const {t,d,c} = PD[p];
+    const w = t * k;
+    const at = `y="${260-d/2}" width="${w}" height="${d}" rx="10" fill="${c}" stroke="${c==="#111418"?"#8a93a0":"#000"}" stroke-opacity=".6" stroke-width="3"`;
+    L += `<rect x="${415-o-w}" ${at}/>`;
+    R += `<rect x="${1785+o}" ${at}/>`;
+    o += w;
+  });
+  const bs = bar
+    ? `<rect x="0" y="243" width="2200" height="34" rx="6" fill="#aeb6c2"/><rect x="0" y="235" width="415" height="50" rx="6" fill="#9aa3b0"/><rect x="1785" y="235" width="415" height="50" rx="6" fill="#9aa3b0"/><rect x="400" y="215" width="18" height="90" fill="#5d6673"/><rect x="1782" y="215" width="18" height="90" fill="#5d6673"/>`
+    : `<line x1="0" y1="260" x2="2200" y2="260" stroke="#3a4350" stroke-width="4" stroke-dasharray="30 24"/>`;
+
+  return `
+    <div class="c">
+      <h2>Plate calculator</h2>
+      <div class="m" style="font-size:13px">Tap plates to load both sides. Starts at 0 with no bar; add the 45 lb bar with the button.</div>
+      <div class="big" style="font-size:76px;text-align:center;color:var(--a);margin-top:8px">${bar + 2 * list.reduce((a,b) => a+b, 0)}</div>
+      <div class="sub" style="text-align:center">lb total</div>
+      <svg viewBox="0 0 2200 520" width="100%">${bs}${L}${R}</svg>
+      <div class="row" style="margin-top:8px">
+        ${[45,25,10,5,2.5].map(p =>
+          `<button class="pb" style="background:${PD[p].c};${p===25?"color:#111;":""}${p===2.5?"font-size:16px;":""}" onclick="addP(${p})">${p}</button>`
+        ).join("")}
+      </div>
+      <div class="nt" style="text-align:center">${bar ? "45 lb bar" : "No bar"}${list.length ? " + each side: " + list.join(" + ") : ""}</div>
+      <div class="row" style="margin-top:8px">
+        <button onclick="PL.bar=PL.bar?0:45;render()">${bar?"Remove bar":"Add 45 lb bar"}</button>
+        <button onclick="PL.list.pop();render()">Undo plate</button>
+        <button onclick="PL={bar:0,list:[]};render()">Clear all</button>
+      </div>
+    </div>`;
+}
+
+/* ============================================================
+   START
+   ============================================================ */
+// Initial render while auth resolves
+render();
+</script>
+</body>
+</html>
