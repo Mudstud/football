@@ -223,6 +223,7 @@ let day = DAYS[(new Date().getDay() + 6) % 7];
 let lift = "";
 let nextMsg = null;
 let curTeam = "";
+let chatWith = null;   // friend uid for private chat, or null
 let chatUnsub = null;
 let friendsUnsub = null;
 let statusMsg = "";
@@ -492,17 +493,27 @@ function refreshTeamMembers() {
 }
 
 /* ============================================================
-   CHAT (per team)
+   CHAT (team + private friends)
    ============================================================ */
-function loadChat(teamKey) {
-  if (chatUnsub) chatUnsub();
-  if (!teamKey) {
-    S.messages = [];
-    return;
-  }
-  chatUnsub = db.collection("chats").doc(teamKey).collection("messages")
+function chatId(a, b) {
+  // Always sort the two uids so both people write to the same conversation
+  return [a, b].sort().join("_");
+}
+
+function loadChat(target) {
+  // target can be a teamKey (string starting with F or P) or a friend uid
+  if (chatUnsub) { chatUnsub(); chatUnsub = null; }
+  S.messages = [];
+  if (!target) return;
+
+  const isPrivate = !target.startsWith("F") && !target.startsWith("P");
+  const path = isPrivate
+    ? db.collection("privateChats").doc(chatId(S.uid, target)).collection("messages")
+    : db.collection("chats").doc(target).collection("messages");
+
+  chatUnsub = path
     .orderBy("ts", "desc")
-    .limit(40)
+    .limit(50)
     .onSnapshot(snap => {
       S.messages = [];
       snap.forEach(doc => {
@@ -515,16 +526,22 @@ function loadChat(teamKey) {
           ts: d.ts ? d.ts.toDate() : new Date()
         });
       });
-      S.messages.reverse(); // oldest first
+      S.messages.reverse();
       render();
     }, err => console.error(err));
 }
 
-async function sendChat(teamKey, text) {
-  text = text.trim();
-  if (!text || !teamKey) return;
+async function sendChat(target, text) {
+  text = (text || "").trim();
+  if (!text || !target) return;
+
+  const isPrivate = !target.startsWith("F") && !target.startsWith("P");
+  const path = isPrivate
+    ? db.collection("privateChats").doc(chatId(S.uid, target)).collection("messages")
+    : db.collection("chats").doc(target).collection("messages");
+
   try {
-    await db.collection("chats").doc(teamKey).collection("messages").add({
+    await path.add({
       from: S.uid,
       name: S.p.name,
       text,
@@ -533,6 +550,20 @@ async function sendChat(teamKey, text) {
   } catch (e) {
     setStatus("Chat error: " + e.message, "err");
   }
+}
+
+function openFriendChat(friendUid) {
+  chatWith = friendUid;
+  tab = "friends";
+  loadChat(friendUid);
+  render();
+}
+
+function closeFriendChat() {
+  chatWith = null;
+  if (chatUnsub) { chatUnsub(); chatUnsub = null; }
+  S.messages = [];
+  render();
 }
 
 /* ============================================================
@@ -697,7 +728,7 @@ function render() {
 
   if (!TABS().some(t => t[0] === tab)) tab = "workout";
   $("nav").innerHTML = TABS().map(([k,n]) =>
-    `<button class="tab ${tab===k?"on":""}" onclick="tab='${k}';nextMsg=null;statusMsg='';render()">${n}</button>`
+    `<button class="tab ${tab===k?"on":""}" onclick="tab='${k}';nextMsg=null;statusMsg='';if(chatWith)closeFriendChat();else render()">${n}</button>`
   ).join("");
 
   $("v").innerHTML = ({
@@ -887,6 +918,40 @@ function vTeam() {
 }
 
 function vFriends() {
+  // If a private chat is open, show the chat UI instead of the friend list
+  if (chatWith) {
+    const friend = S.friends.find(f => f.uid === chatWith);
+    const friendName = friend ? friend.name : "Friend";
+    return `
+      <div class="c">
+        <div class="row" style="align-items:center;margin-bottom:8px">
+          <button onclick="closeFriendChat()" style="flex:0;min-width:60px">← Back</button>
+          <h2 style="margin:0;flex:1;text-align:center">${esc(friendName)}</h2>
+          <div style="width:60px"></div>
+        </div>
+        <div class="nt">Private chat – only you two can see these messages.</div>
+      </div>
+
+      <div class="c">
+        <div id="chatmsgs" style="max-height:340px;overflow-y:auto">
+          ${S.messages.length ? S.messages.map(m => `
+            <div class="msg">
+              <div class="who">${esc(m.name)}${m.from===S.uid?" (you)":""}</div>
+              <div>${esc(m.text)}</div>
+              <div class="ts">${m.ts.toLocaleString()}</div>
+            </div>`).join("") : '<div class="m">No messages yet. Say hi!</div>'}
+        </div>
+        <div class="chatbox">
+          <input id="chatinput" placeholder="Type a message..." 
+            onkeydown="if(event.key==='Enter'){sendChat(chatWith,$('chatinput').value);$('chatinput').value=''}">
+          <button class="pri" style="margin:0" 
+            onclick="sendChat(chatWith,$('chatinput').value);$('chatinput').value=''">Send</button>
+        </div>
+      </div>
+      ${statusMsg ? `<div class="status ${statusType}">${esc(statusMsg)}</div>` : ""}
+    `;
+  }
+
   const pending = S.friends.filter(f => f.status === "pending");
   const sent = S.friends.filter(f => f.status === "sent");
   const accepted = S.friends.filter(f => f.status === "accepted");
@@ -935,10 +1000,13 @@ function vFriends() {
             <b>Latest: ${esc(f.recent.date)} · ${esc(f.recent.title)}</b><br>
             ${f.recent.items.map(i => esc(i.name) + ": " + i.sets.map(s => s.w + "×" + s.r).join(", ")).join("<br>")}
           </div>` : ""}
-        <button style="width:100%;margin-top:10px" onclick="shareStatsWithFriend('${f.uid}')">Share my latest stats</button>
+        <div class="row" style="margin-top:10px">
+          <button class="pri" style="margin:0" onclick="openFriendChat('${f.uid}')">Chat</button>
+          <button style="margin:0" onclick="shareStatsWithFriend('${f.uid}')">Share stats</button>
+        </div>
       </div>`).join("")}
 
-    <div class="nt">Friends only see your numbers after they accept. Stats update when you save a workout or tap “Share my latest stats”.</div>
+    <div class="nt">Friends only see your numbers after they accept. Tap Chat to message them privately.</div>
   `;
 }
 
@@ -994,10 +1062,36 @@ function vPlates() {
 }
 
 /* ============================================================
-   START
+   START + quiet background refresh
    ============================================================ */
 // Initial render while auth resolves
 render();
+
+// Quiet background refresh every 5 seconds.
+// Updates friends / PRs / history without a visible "page reload".
+// Chat already updates live via onSnapshot, so we only refresh other data.
+setInterval(async () => {
+  if (!S.uid || !S.p) return;
+  try {
+    // Soft-refresh own profile + history (in case another device updated)
+    const snap = await db.collection("users").doc(S.uid).get();
+    if (snap.exists) {
+      const data = snap.data();
+      // Only update history if it actually changed (avoid flicker)
+      const newHist = data.history || [];
+      if (JSON.stringify(newHist) !== JSON.stringify(S.h)) {
+        S.h = newHist;
+        // Only re-render if we're on a tab that shows history/PRs
+        if (tab === "history" || tab === "workout" || tab === "team") {
+          render();
+        }
+      }
+    }
+    // Friends list is already live via onSnapshot, no need to poll it
+  } catch (e) {
+    // silent – background only
+  }
+}, 5000);
 </script>
 </body>
 </html>
