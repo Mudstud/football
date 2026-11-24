@@ -120,11 +120,50 @@ const EX = {
 };
 const LIFTS = Object.keys(EX);
 
+function posList(p) {
+  // Support old single position (number) and new multi (array)
+  if (!p || !p.fb) return [];
+  if (Array.isArray(p.fb.p)) return p.fb.p;
+  if (typeof p.fb.p === "number") return [p.fb.p];
+  return [];
+}
+
 function plan() {
   const fb = !!S.p.fb;
+  const positions = posList(S.p);
+  const isOL = positions.some(i => i <= 3); // LT, RT, Guard, Center
+  const isDL = positions.some(i => i === 4 || i === 5); // DT, DE
+  const isSkill = positions.some(i => i === 6 || i === 7); // TE, LB
   const sat = fb
     ? {title:"Optional football drills",ex:["Football position drills","Short acceleration work"]}
     : {title:"Optional accessories & mobility",ex:["Face Pulls","Plank","Hip & thoracic mobility"]};
+
+  // Position-based weekly plan
+  if (fb && isOL) {
+    return {
+      Monday:{title:"Upper power (OL)",ex:["Bench Press","Close-Grip Bench Press","Overhead Press"]},
+      Wednesday:{title:"Lower power (OL)",ex:["Squat","Deadlift","Romanian Deadlift"]},
+      Friday:{title:"Back & core (OL)",ex:["Barbell Row","Pull-Ups","Plank"]},
+      Saturday:sat
+    };
+  }
+  if (fb && isDL) {
+    return {
+      Monday:{title:"Upper strength (DL)",ex:["Bench Press","Overhead Press","Barbell Row"]},
+      Wednesday:{title:"Lower strength (DL)",ex:["Squat","Deadlift","Romanian Deadlift"]},
+      Friday:{title:"Power & back (DL)",ex:["Close-Grip Bench Press","Pull-Ups","Face Pulls"]},
+      Saturday:sat
+    };
+  }
+  if (fb && isSkill) {
+    return {
+      Monday:{title:"Upper + explosiveness",ex:["Bench Press","Overhead Press","Pull-Ups"]},
+      Wednesday:{title:"Legs + power",ex:["Squat","Romanian Deadlift","Short acceleration work"]},
+      Friday:{title:"Back & athleticism",ex:["Barbell Row","Face Pulls","Plank"]},
+      Saturday:sat
+    };
+  }
+  // Default / powerlifting / own
   return {
     Monday:{title:"Chest, shoulders & triceps",ex:["Bench Press","Overhead Press","Close-Grip Bench Press"]},
     Wednesday:{title:"Legs",ex:["Squat","Deadlift","Romanian Deadlift"]},
@@ -187,9 +226,11 @@ function modeName(p) {
   return p.fb && p.pl ? "Football + Powerlifting" : p.fb ? "Football" : p.pl ? "Powerlifting" : "On my own";
 }
 function specText(p) {
-  return p.fb || p.pl
-    ? [p.fb && POS[p.fb.p] + " · " + FBT[p.fb.t], p.pl && WCS[p.pl.w] + " lb · Grade " + p.pl.g].filter(Boolean).join(" | ")
-    : p.own;
+  if (!(p.fb || p.pl)) return p.own;
+  const posNames = posList(p).map(i => POS[i]).filter(Boolean);
+  const fbPart = p.fb ? (posNames.length ? posNames.join(", ") : "Football") + " · " + FBT[p.fb.t] : null;
+  const plPart = p.pl ? WCS[p.pl.w] + " lb · Grade " + p.pl.g : null;
+  return [fbPart, plPart].filter(Boolean).join(" | ");
 }
 function teamKeys(p) {
   const keys = [];
@@ -238,15 +279,23 @@ function setStatus(msg, type = "info") {
 /* ============================================================
    AUTH + PROFILE
    ============================================================ */
+let authMode = "login"; // "login" | "signup"
+let authReady = false;  // true once Firebase has told us if user is signed in
+let authForm = { email: "", pass: "", pass2: "" }; // keep values across re-renders
+let chatDraft = ""; // keep chat text while messages update live
+let friendCodeDraft = ""; // keep friend-code field across friend-list updates
+
 auth.onAuthStateChanged(async user => {
+  authReady = true;
   if (!user) {
-    // Sign in anonymously
-    try {
-      await auth.signInAnonymously();
-    } catch (e) {
-      console.error(e);
-      setStatus("Could not connect to Firebase. Check your config.", "err");
-    }
+    S.uid = null;
+    S.p = null;
+    S.code = null;
+    S.h = [];
+    S.friends = [];
+    if (friendsUnsub) { friendsUnsub(); friendsUnsub = null; }
+    if (chatUnsub) { chatUnsub(); chatUnsub = null; }
+    render();
     return;
   }
   S.uid = user.uid;
@@ -255,25 +304,161 @@ auth.onAuthStateChanged(async user => {
 
 async function loadProfile() {
   try {
+    if (!auth.currentUser) {
+      setStatus("Not signed in yet. Wait a second and try again.", "err");
+      render();
+      return;
+    }
+    // Force refresh token so Firestore sees the auth user
+    await auth.currentUser.getIdToken(true);
     const snap = await db.collection("users").doc(S.uid).get();
     if (snap.exists) {
       const data = snap.data();
       S.p = data.profile;
       S.code = data.code;
       S.h = data.history || [];
-      // Load friends
       await loadFriends();
       render();
     } else {
-      // New user → show setup
+      // Signed in but no profile yet → show setup
       S.p = null;
       render();
     }
   } catch (e) {
     console.error(e);
-    setStatus("Error loading profile: " + e.message, "err");
+    const hint = (e.code === "permission-denied")
+      ? " Firestore rules are blocking this. In Firebase Console → Firestore → Rules, publish rules that allow read/write when request.auth != null (or temporarily if true for testing)."
+      : "";
+    setStatus("Error loading profile: " + e.message + hint, "err");
     render();
   }
+}
+
+function saveAuthForm() {
+  if ($("authEmail")) authForm.email = $("authEmail").value;
+  if ($("authPass")) authForm.pass = $("authPass").value;
+  if ($("authPass2")) authForm.pass2 = $("authPass2").value;
+}
+
+async function doLogin() {
+  saveAuthForm();
+  const email = authForm.email;
+  const pass = authForm.pass;
+  if (!email.trim() || !pass) {
+    setStatus("Enter email and password.", "err");
+    return;
+  }
+  try {
+    setStatus("Signing in…", "info");
+    const cred = await auth.signInWithEmailAndPassword(email.trim(), pass);
+    await cred.user.getIdToken(true);
+  } catch (e) {
+    console.error(e);
+    let msg = e.message || "Login failed";
+    if (e.code === "auth/user-not-found") msg = "No account with that email. Create one?";
+    if (e.code === "auth/wrong-password") msg = "Wrong password.";
+    if (e.code === "auth/invalid-email") msg = "Invalid email address.";
+    if (e.code === "auth/invalid-credential") msg = "Wrong email or password.";
+    if (e.code === "auth/admin-restricted-operation") msg = "Email/Password sign-in is not enabled. In Firebase Console → Authentication → Sign-in method → enable Email/Password.";
+    setStatus(msg, "err");
+  }
+}
+
+async function doSignup() {
+  saveAuthForm();
+  const email = authForm.email;
+  const pass = authForm.pass;
+  const pass2 = authForm.pass2;
+  if (!email.trim() || !pass) {
+    setStatus("Enter email and password.", "err");
+    return;
+  }
+  if (pass.length < 6) {
+    setStatus("Password must be at least 6 characters.", "err");
+    return;
+  }
+  if (pass !== pass2) {
+    setStatus("Passwords do not match.", "err");
+    return;
+  }
+  try {
+    setStatus("Creating account…", "info");
+    const cred = await auth.createUserWithEmailAndPassword(email.trim(), pass);
+    await cred.user.getIdToken(true);
+  } catch (e) {
+    console.error(e);
+    let msg = e.message || "Signup failed";
+    if (e.code === "auth/email-already-in-use") msg = "That email is already registered. Log in instead.";
+    if (e.code === "auth/weak-password") msg = "Password is too weak (min 6 characters).";
+    if (e.code === "auth/invalid-email") msg = "Invalid email address.";
+    if (e.code === "auth/admin-restricted-operation") msg = "Email/Password sign-in is not enabled. In Firebase Console → Authentication → Sign-in method → enable Email/Password.";
+    setStatus(msg, "err");
+  }
+}
+
+async function doLogout() {
+  try {
+    await auth.signOut();
+    authForm = { email: "", pass: "", pass2: "" };
+    setStatus("Signed out.", "info");
+  } catch (e) {
+    setStatus("Logout error: " + e.message, "err");
+  }
+}
+
+async function doGuestLogin() {
+  try {
+    setStatus("Starting guest session…", "info");
+    const cred = await auth.signInAnonymously();
+    await cred.user.getIdToken(true);
+  } catch (e) {
+    console.error(e);
+    let msg = e.message || "Guest login failed";
+    if (e.code === "auth/admin-restricted-operation" || e.code === "auth/operation-not-allowed") {
+      msg = "Guest login is turned off. Firebase → Authentication → Sign-in method → enable Anonymous (and Email/Password for email).";
+    }
+    setStatus(msg, "err");
+  }
+}
+
+function authUI() {
+  return `
+    <div class="c">
+      <h2>${authMode === "login" ? "Log in" : "Create account"}</h2>
+      <div class="nt">Use email, or continue as guest to try the app.</div>
+      <label>Email</label>
+      <input id="authEmail" type="email" inputmode="email" autocomplete="email" placeholder="you@school.edu"
+        value="${esc(authForm.email)}" oninput="authForm.email=this.value">
+      <label>Password</label>
+      <input id="authPass" type="password" autocomplete="${authMode === "login" ? "current-password" : "new-password"}" placeholder="••••••••"
+        value="${esc(authForm.pass)}" oninput="authForm.pass=this.value">
+      ${authMode === "signup" ? `
+        <label>Confirm password</label>
+        <input id="authPass2" type="password" autocomplete="new-password" placeholder="••••••••"
+          value="${esc(authForm.pass2)}" oninput="authForm.pass2=this.value">
+      ` : ""}
+      <button class="pri" onclick="${authMode === "login" ? "doLogin()" : "doSignup()"}">
+        ${authMode === "login" ? "Log in" : "Create account"}
+      </button>
+      <button style="width:100%;margin-top:10px" onclick="doGuestLogin()">Continue as guest</button>
+      <div class="nt" style="margin-top:14px;text-align:center">
+        ${authMode === "login"
+          ? `No account? <a href="#" style="color:var(--a)" onclick="saveAuthForm();authMode='signup';statusMsg='';render();return false">Sign up</a>`
+          : `Already have an account? <a href="#" style="color:var(--a)" onclick="saveAuthForm();authMode='login';statusMsg='';render();return false">Log in</a>`}
+      </div>
+    </div>
+    ${statusMsg ? `<div class="status ${statusType}">${esc(statusMsg)}</div>` : ""}
+    <div class="c">
+      <b>Seeing “restricted to administrators only”?</b>
+      <div class="nt">
+        That is a Firebase project setting, not an app bug. Do all of these:<br><br>
+        1. Authentication → Sign-in method → enable <b>Email/Password</b> AND <b>Anonymous</b> → Save<br>
+        2. Google Cloud Console (same project) → APIs &amp; Services → enable <b>Identity Toolkit API</b><br>
+        3. Identity Platform (if used) → Settings → allow account creation from the client SDK<br>
+        4. Open the app at <b>http://localhost</b> (run <code>npx serve .</code>), not as a file
+      </div>
+    </div>
+  `;
 }
 
 async function saveProfile() {
@@ -304,33 +489,46 @@ function generateCode() {
 }
 
 async function finishSetup() {
-  keep();
-  const n = su.n.trim();
+  keep(); // pulls name, weight, school, and all checked positions
+  const n = String(su.n || "").trim();
+  const city = (su.city || "").trim();
+  if ($("sschool")) su.school = $("sschool").value;
   if (!n || !(+su.w >= 50) || (su.own && !su.s.trim())) {
     alert("Enter your name, a body weight (≥50), and what you're training for.");
+    return;
+  }
+  if (su.fb && (!Array.isArray(su.fp) || !su.fp.length)) {
+    alert("Pick at least one football position.");
+    return;
+  }
+  if (!city) {
+    alert("Enter your city so we can show nearby schools.");
     return;
   }
 
   // Handle school
   let schoolId = su.school;
   let schoolName = "";
+  let schoolCity = city;
   if (schoolId === "__new__") {
     schoolName = (su.newSchool || "").trim();
     if (!schoolName) {
       alert("Enter a school name.");
       return;
     }
-    // Create new school
+    // Create new school with city so others nearby can find it
     const ref = await db.collection("schools").add({
       name: schoolName,
+      city: schoolCity,
       createdBy: S.uid,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
     schoolId = ref.id;
-    schoolList.push({id: schoolId, name: schoolName});
+    schoolList.push({id: schoolId, name: schoolName, city: schoolCity});
   } else if (schoolId) {
     const found = schoolList.find(s => s.id === schoolId);
     schoolName = found ? found.name : "";
+    schoolCity = found && found.city ? found.city : city;
   } else {
     alert("Select or create a school.");
     return;
@@ -355,11 +553,12 @@ async function finishSetup() {
     bw: +su.w,
     goal: $("sg").value,
     level: $("sl").value,
-    fb: su.fb ? {p: +su.fp, t: +su.ft} : null,
+    fb: su.fb ? {p: (Array.isArray(su.fp) ? su.fp.map(Number) : [+su.fp]).filter(n => !isNaN(n)), t: +su.ft} : null,
     pl: su.pl ? {w: +su.pw, g: +su.pg} : null,
     own: su.own ? su.s.trim() : "",
     schoolId,
-    schoolName
+    schoolName,
+    city
   };
   S.p.mode = modeName(S.p);
   S.p.spec = specText(S.p);
@@ -373,9 +572,19 @@ async function finishSetup() {
     prs: {},
     teamKeys: teamKeys(S.p),
     schoolId,
+    city,
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
   });
   await db.collection("codes").doc(code).set({uid: S.uid, name: n});
+
+  // Use the name they typed as their Firebase display name (guest + email accounts)
+  try {
+    if (auth.currentUser) {
+      await auth.currentUser.updateProfile({ displayName: n });
+    }
+  } catch (e) {
+    console.warn("Could not update displayName", e);
+  }
 
   setStatus("Profile created! Your friend code is " + code, "ok");
   render();
@@ -402,8 +611,11 @@ async function loadFriends() {
           spec: d.spec || ""
         });
       });
-      // Also refresh team members
       refreshTeamMembers();
+      // Don't rebuild the screen while typing in a private chat
+      if (chatWith && $("chatinput")) return;
+      // Don't steal focus from friend-code field
+      if (document.activeElement && document.activeElement.id === "friendcode") return;
       render();
     }, err => console.error(err));
 }
@@ -446,6 +658,7 @@ async function addFriendByCode(code) {
       status: "sent",
       ts: firebase.firestore.FieldValue.serverTimestamp()
     });
+    friendCodeDraft = "";
     setStatus("Friend request sent to " + name, "ok");
   } catch (e) {
     console.error(e);
@@ -567,7 +780,22 @@ function loadChat(target) {
         });
       });
       S.messages.reverse();
-      render();
+      // Only update the messages list — never touch the input (keeps keyboard open)
+      const box = $("chatmsgs");
+      if (box) {
+        const atBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 80;
+        box.innerHTML = S.messages.length
+          ? S.messages.map(m => `
+            <div class="msg">
+              <div class="who">${esc(m.name)}${m.from===S.uid?" (you)":""}</div>
+              <div>${esc(m.text)}</div>
+              <div class="ts">${m.ts.toLocaleString()}</div>
+            </div>`).join("")
+          : '<div class="m">No messages yet. Say hi!</div>';
+        if (atBottom) box.scrollTop = box.scrollHeight;
+      } else if (!document.activeElement || document.activeElement.id !== "chatinput") {
+        render();
+      }
     }, err => console.error(err));
 }
 
@@ -660,17 +888,36 @@ async function finish() {
 /* ============================================================
    UI – SETUP
    ============================================================ */
-let su = {fb:0, pl:0, own:0, fp:0, ft:2, pw:5, pg:10, n:"", w:"", s:"", school:"", newSchool:""};
-let schoolList = []; // [{id, name}]
+let su = {fb:0, pl:0, own:0, fp:[], ft:2, pw:5, pg:10, n:"", w:"", s:"", school:"", newSchool:"", city:""};
+let schoolList = []; // [{id, name, city}]
+
+function normCity(c) {
+  return String(c || "").trim().toLowerCase().replace(/\s+/g, " ");
+}
 
 async function loadSchools() {
   try {
     const snap = await db.collection("schools").orderBy("name").get();
     schoolList = [];
-    snap.forEach(doc => schoolList.push({id: doc.id, name: doc.data().name}));
+    snap.forEach(doc => {
+      const d = doc.data();
+      schoolList.push({id: doc.id, name: d.name, city: d.city || ""});
+    });
   } catch (e) {
     console.error(e);
   }
+}
+
+function schoolsNearCity(city) {
+  const c = normCity(city);
+  if (!c) return {near: [], other: schoolList.slice()};
+  const near = [], other = [];
+  schoolList.forEach(s => {
+    if (normCity(s.city) === c || normCity(s.name).includes(c) || normCity(s.city).includes(c)) near.push(s);
+    else other.push(s);
+  });
+  // also match if city is contained in school city (e.g. "austin" matches "Austin, TX")
+  return {near, other};
 }
 
 function tog(k) {
@@ -686,16 +933,106 @@ function tog(k) {
 }
 
 function keep() {
-  [["n","sn"],["w","sw"],["fp","fp"],["ft","ft"],["pw","pw"],["pg","pg"],["s","ss"],["school","sschool"],["newSchool","snewschool"]].forEach(([k,i]) => {
-    if ($(i)) su[k] = $(i).value;
+  if ($("sn")) su.n = $("sn").value;
+  if ($("sw")) su.w = $("sw").value;
+  if ($("scity")) su.city = $("scity").value;
+  if ($("sschool")) su.school = $("sschool").value;
+  if ($("snewschool")) su.newSchool = $("snewschool").value;
+  if ($("ss")) su.s = $("ss").value;
+  if ($("ft")) su.ft = $("ft").value;
+  if ($("pw")) su.pw = $("pw").value;
+  if ($("pg")) su.pg = $("pg").value;
+  if (!Array.isArray(su.fp)) su.fp = [];
+  POS.forEach((_, i) => {
+    const el = $("fp" + i);
+    if (el) {
+      if (el.checked && !su.fp.includes(i)) su.fp.push(i);
+      if (!el.checked) su.fp = su.fp.filter(x => x !== i);
+    }
   });
 }
 
+function togglePos(i) {
+  // Only update the array — do NOT rebuild the form (keeps name/weight)
+  i = +i;
+  if (!Array.isArray(su.fp)) su.fp = [];
+  if (su.fp.includes(i)) su.fp = su.fp.filter(x => x !== i);
+  else su.fp.push(i);
+}
+
+function schoolOptionsHtml() {
+  const {near, other} = schoolsNearCity(su.city);
+  let schoolOpts = "";
+  if (near.length) {
+    schoolOpts += `<optgroup label="Near ${esc(su.city) || "you"}">`;
+    schoolOpts += near.map(s => `<option value="${esc(s.id)}" ${su.school===s.id?"selected":""}>${esc(s.name)}${s.city ? " · " + esc(s.city) : ""}</option>`).join("");
+    schoolOpts += `</optgroup>`;
+  }
+  if (other.length) {
+    schoolOpts += `<optgroup label="${near.length ? "Other schools" : "All schools"}">`;
+    schoolOpts += other.map(s => `<option value="${esc(s.id)}" ${su.school===s.id?"selected":""}>${esc(s.name)}${s.city ? " · " + esc(s.city) : ""}</option>`).join("");
+    schoolOpts += `</optgroup>`;
+  }
+  if (!schoolList.length) {
+    schoolOpts = `<option value="" disabled>No schools yet — create one</option>`;
+  }
+  return schoolOpts;
+}
+
+function onSchoolChange() {
+  // Save name/weight, update school, only toggle the "new school" field — no full form wipe
+  if ($("sn")) su.n = $("sn").value;
+  if ($("sw")) su.w = $("sw").value;
+  if ($("scity")) su.city = $("scity").value;
+  su.school = $("sschool") ? $("sschool").value : su.school;
+
+  const wrap = $("newSchoolWrap");
+  if (!wrap) return;
+  if (su.school === "__new__") {
+    wrap.classList.remove("hide");
+  } else {
+    wrap.classList.add("hide");
+  }
+}
+
+function onCityBlur() {
+  if ($("sn")) su.n = $("sn").value;
+  if ($("sw")) su.w = $("sw").value;
+  if ($("scity")) su.city = $("scity").value;
+  // Only refresh the school dropdown options, not the whole form
+  const sel = $("sschool");
+  if (!sel) return;
+  const current = su.school;
+  sel.innerHTML = `<option value="">— Select a school —</option>${schoolOptionsHtml()}<option value="__new__" ${current==="__new__"?"selected":""}>+ Create new school</option>`;
+  // restore selection if still valid
+  if (current && current !== "__new__") {
+    const stillThere = [...sel.options].some(o => o.value === current);
+    if (stillThere) sel.value = current;
+  } else if (current === "__new__") {
+    sel.value = "__new__";
+  }
+}
+
 async function setupUI() {
+  // Only full rebuild when switching Football / Powerlifting / Own — not on school pick
+  if ($("sn")) su.n = $("sn").value;
+  if ($("sw")) su.w = $("sw").value;
+  if ($("scity")) su.city = $("scity").value;
+  if ($("sschool")) su.school = $("sschool").value;
+  if ($("snewschool")) su.newSchool = $("snewschool").value;
+
   if (!schoolList.length) await loadSchools();
   const any = su.fb || su.pl || su.own;
   const opt = (a, v, f) => a.map((x,i) => `<option value="${f?x:i}" ${v==(f?x:i)?"selected":""}>${x}</option>`).join("");
-  const schoolOpts = schoolList.map(s => `<option value="${esc(s.id)}" ${su.school===s.id?"selected":""}>${esc(s.name)}</option>`).join("");
+  if (!Array.isArray(su.fp)) su.fp = typeof su.fp === "number" ? [su.fp] : [];
+
+  const posChecks = POS.map((name, i) => `
+    <label style="display:flex;align-items:center;gap:10px;margin:6px 0;text-transform:none;letter-spacing:0;font-size:15px;color:var(--t);font-weight:600">
+      <input type="checkbox" id="fp${i}" ${su.fp.includes(i)?"checked":""}
+        onchange="togglePos(${i})" style="width:22px;height:22px;min-height:0;accent-color:var(--a)">
+      ${esc(name)}
+    </label>`).join("");
+
   $("setup").innerHTML = `
     <div class="c">
       <h2>What are you training for?</h2>
@@ -706,36 +1043,44 @@ async function setupUI() {
       </div>
       ${any ? `
         <label>Your name (max 12 letters)</label>
-        <input id="sn" maxlength="12" value="${esc(su.n)}">
+        <input id="sn" maxlength="12" value="${esc(su.n)}" oninput="su.n=this.value">
         <label>Body weight (lb)</label>
-        <input id="sw" type="number" inputmode="decimal" value="${su.w}">
+        <input id="sw" type="number" inputmode="decimal" value="${esc(String(su.w ?? ""))}" oninput="su.w=this.value">
+
+        <label>Your city</label>
+        <input id="scity" placeholder="e.g. Austin" value="${esc(su.city)}"
+          oninput="su.city=this.value"
+          onblur="onCityBlur()">
+        <div class="nt">Type your city, then tap outside the box — nearby schools appear at the top.</div>
 
         <label>School</label>
-        <select id="sschool" onchange="su.school=this.value;setupUI()">
+        <select id="sschool" onchange="onSchoolChange()">
           <option value="">— Select a school —</option>
-          ${schoolOpts}
+          ${schoolOptionsHtml()}
           <option value="__new__" ${su.school==="__new__"?"selected":""}>+ Create new school</option>
         </select>
-        ${su.school === "__new__" ? `
+        <div id="newSchoolWrap" class="${su.school==="__new__"?"":"hide"}">
           <label>New school name</label>
-          <input id="snewschool" placeholder="e.g. Lincoln High" value="${esc(su.newSchool)}">
-        ` : ""}
+          <input id="snewschool" placeholder="e.g. Lincoln High" value="${esc(su.newSchool)}" oninput="su.newSchool=this.value">
+          <div class="nt">It will be listed under ${esc(su.city) || "your city"} for other athletes.</div>
+        </div>
 
         ${su.fb ? `
-          <label>Football position</label>
-          <select id="fp">${opt(POS,su.fp)}</select>
+          <label>Football position(s) — pick all that apply</label>
+          <div class="set" style="margin-top:4px">${posChecks}</div>
+          <div class="nt">Your workout plan changes based on these positions.</div>
           <label>Football team</label>
-          <select id="ft">${opt(FBT,su.ft)}</select>
+          <select id="ft" onchange="su.ft=this.value">${opt(FBT,su.ft)}</select>
         ` : ""}
         ${su.pl ? `
           <label>Powerlifting weight class (lb)</label>
-          <select id="pw">${opt(WCS,su.pw)}</select>
+          <select id="pw" onchange="su.pw=this.value">${opt(WCS,su.pw)}</select>
           <label>Grade</label>
-          <select id="pg">${opt(GRADES,su.pg,1)}</select>
+          <select id="pg" onchange="su.pg=this.value">${opt(GRADES,su.pg,1)}</select>
         ` : ""}
         ${su.own ? `
           <label>What are you training for?</label>
-          <input id="ss" placeholder="e.g. get stronger" value="${esc(su.s)}">
+          <input id="ss" placeholder="e.g. get stronger" value="${esc(su.s)}" oninput="su.s=this.value">
         ` : ""}
         <label>Goal</label>
         <select id="sg">${GOALS.map(x => `<option>${x}</option>`).join("")}</select>
@@ -750,11 +1095,12 @@ async function setupUI() {
 
 function editProfile() {
   const p = S.p;
+  const positions = posList(p);
   su = {
     fb: p.fb ? 1 : 0,
     pl: p.pl ? 1 : 0,
     own: p.fb || p.pl ? 0 : 1,
-    fp: p.fb ? p.fb.p : 0,
+    fp: positions.slice(),
     ft: p.fb ? p.fb.t : 2,
     pw: p.pl ? p.pl.w : 5,
     pg: p.pl ? p.pl.g : 10,
@@ -762,9 +1108,9 @@ function editProfile() {
     w: p.bw,
     s: p.own || "",
     school: p.schoolId || "",
-    newSchool: ""
+    newSchool: "",
+    city: p.city || p.schoolCity || ""
   };
-  // Keep the same uid & code – just re-run setup UI
   S.p = null;
   render();
 }
@@ -782,10 +1128,21 @@ const TABS = () => [
 ];
 
 function render() {
+  // Not signed in → login / signup
+  if (!S.uid) {
+    $("setup").classList.remove("hide");
+    $("app").classList.add("hide");
+    $("nav").classList.add("hide");
+    $("sub").textContent = "Log in to track lifts & chat";
+    $("setup").innerHTML = authReady ? authUI() : `<div class="c"><div class="nt">Connecting…</div></div>`;
+    return;
+  }
+  // Signed in but no profile → training setup
   if (!S.p) {
     $("setup").classList.remove("hide");
     $("app").classList.add("hide");
     $("nav").classList.add("hide");
+    $("sub").textContent = "Set up your profile";
     setupUI();
     return;
   }
@@ -876,6 +1233,7 @@ function vPlan() {
     </div>
     <div class="c">
       <button style="width:100%" onclick="editProfile()">Edit profile</button>
+      <button class="dn" style="width:100%;margin-top:8px" onclick="doLogout()">Log out</button>
     </div>`;
 }
 
@@ -976,8 +1334,10 @@ function vTeam() {
           </div>`).join("") : '<div class="m">No messages yet. Say hi!</div>'}
       </div>
       <div class="chatbox">
-        <input id="chatinput" placeholder="Type a message..." onkeydown="if(event.key==='Enter'){sendChat(curTeam,$('chatinput').value);$('chatinput').value=''}">
-        <button class="pri" style="margin:0" onclick="sendChat(curTeam,$('chatinput').value);$('chatinput').value=''">Send</button>
+        <input id="chatinput" placeholder="Type a message..." value="${esc(chatDraft)}"
+          oninput="chatDraft=this.value"
+          onkeydown="if(event.key==='Enter'){sendChat(curTeam,chatDraft);chatDraft='';this.value=''}">
+        <button class="pri" style="margin:0" onclick="sendChat(curTeam,chatDraft);chatDraft='';if($('chatinput'))$('chatinput').value=''">Send</button>
       </div>
     </div>
 
@@ -1010,10 +1370,11 @@ function vFriends() {
             </div>`).join("") : '<div class="m">No messages yet. Say hi!</div>'}
         </div>
         <div class="chatbox">
-          <input id="chatinput" placeholder="Type a message..." 
-            onkeydown="if(event.key==='Enter'){sendChat(chatWith,$('chatinput').value);$('chatinput').value=''}">
+          <input id="chatinput" placeholder="Type a message..." value="${esc(chatDraft)}"
+            oninput="chatDraft=this.value"
+            onkeydown="if(event.key==='Enter'){sendChat(chatWith,chatDraft);chatDraft='';this.value=''}">
           <button class="pri" style="margin:0" 
-            onclick="sendChat(chatWith,$('chatinput').value);$('chatinput').value=''">Send</button>
+            onclick="sendChat(chatWith,chatDraft);chatDraft='';if($('chatinput'))$('chatinput').value=''">Send</button>
         </div>
       </div>
       ${statusMsg ? `<div class="status ${statusType}">${esc(statusMsg)}</div>` : ""}
@@ -1035,8 +1396,9 @@ function vFriends() {
     <div class="c">
       <b>Add a friend</b>
       <label>Enter their friend code</label>
-      <input id="friendcode" maxlength="7" placeholder="e.g. K7M2X9" style="text-transform:uppercase">
-      <button class="pri" onclick="addFriendByCode($('friendcode').value)">Send request</button>
+      <input id="friendcode" maxlength="7" placeholder="e.g. K7M2X9" style="text-transform:uppercase"
+        value="${esc(friendCodeDraft)}" oninput="friendCodeDraft=this.value">
+      <button class="pri" onclick="addFriendByCode(friendCodeDraft)">Send request</button>
       ${statusMsg ? `<div class="status ${statusType}">${esc(statusMsg)}</div>` : ""}
     </div>
 
@@ -1150,7 +1512,13 @@ setInterval(async () => {
       if (JSON.stringify(newHist) !== JSON.stringify(S.h)) {
         S.h = newHist;
         // Only re-render if we're on a tab that shows history/PRs
-        if (tab === "history" || tab === "workout" || tab === "team") {
+        // Never rebuild UI while the user is typing in chat
+        if (document.activeElement && document.activeElement.id === "chatinput") return;
+        if (tab === "history" || tab === "workout") {
+          render();
+        }
+        // team tab: only refresh if not in the chat input
+        if (tab === "team" && !chatWith) {
           render();
         }
       }
