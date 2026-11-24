@@ -187,9 +187,10 @@ button{border:0;border-radius:10px;padding:11px 14px;font-weight:750;cursor:poin
   <section id="scheduleView" class="hidden">
     <div class="panel">
       <h2>Weekly training plan</h2>
-      <div class="muted">Pick a day to open its plan in the Workout tab.</div>
+      <div class="muted">Choose the workout for each day, or tap Open to log it.</div>
       <div id="weekList" class="daylist"></div>
-      <p class="notice">This is a basic template. Adjust it around football practices, games, and your coach's program. Recovery days are part of getting stronger.</p>
+      <button class="secondary full" id="resetWeek" style="margin-top:10px">Reset to default (Mon-Fri workouts, Sat/Sun rest)</button>
+      <p class="notice">Your changes save on this device. Adjust around football practices, games, and your coach's program. Recovery days are part of getting stronger.</p>
     </div>
   </section>
 
@@ -208,25 +209,55 @@ button{border:0;border-radius:10px;padding:11px 14px;font-weight:750;cursor:poin
 </main>
 
 <script>
-const plan = [
- {day:"Monday",title:"Chest, shoulders & triceps",type:"lift",items:[
-  ["Bench Press","Upper-body pushing strength"],
-  ["Overhead Press","Shoulder strength and stability"],
-  ["Close-Grip Bench Press","Triceps and pressing strength"]]},
- {day:"Tuesday",title:"Recovery",type:"rest",items:[]},
- {day:"Wednesday",title:"Legs & lower-body strength",type:"lift",items:[
-  ["Squat","Leg strength and drive"],
-  ["Deadlift","Hip, back and posterior-chain strength"],
-  ["Romanian Deadlift","Hamstrings and hip strength"]]},
- {day:"Thursday",title:"Recovery",type:"rest",items:[]},
- {day:"Friday",title:"Back & pulling strength",type:"lift",items:[
-  ["Barbell Row","Upper-back strength for contact and posture"],
-  ["Pull-Ups","Back and upper-body pulling strength"]]},
- {day:"Saturday",title:"Optional football conditioning",type:"optional",items:[
-  ["Football position drills","Stance, first-step technique and footwork"],
-  ["Short acceleration work","Brief, quality starts with full recovery"]]},
- {day:"Sunday",title:"Rest day",type:"rest",items:[]}
-];
+const DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+
+// Workout choices you can put on any day
+const TEMPLATES = {
+  push: {title:"Chest, shoulders & triceps",type:"lift",items:[
+    ["Bench Press","Upper-body pushing strength"],
+    ["Overhead Press","Shoulder strength and stability"],
+    ["Close-Grip Bench Press","Triceps and pressing strength"]]},
+  pull: {title:"Back & pulling strength",type:"lift",items:[
+    ["Barbell Row","Upper-back strength for contact and posture"],
+    ["Pull-Ups","Back and upper-body pulling strength"]]},
+  legs: {title:"Legs & lower-body strength",type:"lift",items:[
+    ["Squat","Leg strength and drive"],
+    ["Deadlift","Hip, back and posterior-chain strength"],
+    ["Romanian Deadlift","Hamstrings and hip strength"]]},
+  upper: {title:"Upper-body strength & arms",type:"lift",items:[
+    ["Incline Dumbbell Press","Upper chest and shoulder strength"],
+    ["Dumbbell Row","Back thickness and pulling strength"],
+    ["Face Pulls","Shoulder health and rear delts"],
+    ["Barbell Curl","Biceps strength"]]},
+  lower: {title:"Lower-body power & hips",type:"lift",items:[
+    ["Hip Thrust","Glute and hip drive"],
+    ["Front Squat","Leg strength and core bracing"],
+    ["Walking Lunges","Single-leg strength and balance"]]},
+  cond: {title:"Optional football conditioning",type:"optional",items:[
+    ["Football position drills","Stance, first-step technique and footwork"],
+    ["Short acceleration work","Brief, quality starts with full recovery"]]},
+  rest: {title:"Rest day",type:"rest",items:[]}
+};
+const TEMPLATE_NAMES = {
+  push:"Chest, shoulders & triceps", pull:"Back & pulling", legs:"Legs & lower body",
+  upper:"Upper body & arms", lower:"Lower-body power & hips", cond:"Football conditioning", rest:"Rest day"
+};
+
+// Default week: workouts Mon-Fri, rest Sat & Sun
+const DEFAULT_WEEK = {
+  Monday:"push", Tuesday:"pull", Wednesday:"legs", Thursday:"upper", Friday:"lower",
+  Saturday:"rest", Sunday:"rest"
+};
+
+let week = Object.assign({}, DEFAULT_WEEK, JSON.parse(localStorage.getItem("linemanWeek")||"{}"));
+let plan = [];
+function buildPlan(){
+  plan = DAYS.map(day => {
+    const t = TEMPLATES[week[day]] || TEMPLATES.rest;
+    return {day, title:t.title, type:t.type, items:t.items};
+  });
+}
+buildPlan();
 
 const $ = id => document.getElementById(id);
 const todayISO = () => {const d=new Date();return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10)};
@@ -519,15 +550,37 @@ function renderWeek(){
   $("weekList").innerHTML = "";
   const today = new Date().toLocaleDateString("en-US",{weekday:"long"});
   plan.forEach(d => {
-    const item = document.createElement("button");
-    item.className = "dayitem" + (d.day === today ? " today" : "");
-    item.style.textAlign = "left";
-    item.style.color = "var(--text)";
-    item.innerHTML = `<b>${d.day}${d.day===today?" · Today":""}</b><small>${d.title}</small>`;
-    item.addEventListener("click", () => { selectDay(d.day); showTab("workout"); });
-    $("weekList").appendChild(item);
+    const row = document.createElement("div");
+    row.className = "dayitem" + (d.day === today ? " today" : "");
+    row.style.display = "grid";
+    row.style.gap = "8px";
+    row.innerHTML = `<b>${d.day}${d.day===today?" · Today":""}</b>`;
+    const sel = document.createElement("select");
+    sel.innerHTML = Object.keys(TEMPLATE_NAMES).map(k => `<option value="${k}"${week[d.day]===k?" selected":""}>${TEMPLATE_NAMES[k]}</option>`).join("");
+    sel.addEventListener("change", () => {
+      week[d.day] = sel.value;
+      localStorage.setItem("linemanWeek", JSON.stringify(week));
+      buildPlan();
+      renderDay();
+    });
+    const open = document.createElement("button");
+    open.className = "secondary small";
+    open.textContent = "Open";
+    open.addEventListener("click", () => { selectDay(d.day); showTab("workout"); });
+    row.appendChild(sel);
+    row.appendChild(open);
+    $("weekList").appendChild(row);
   });
 }
+
+$("resetWeek").addEventListener("click", () => {
+  if(!confirm("Reset the week to the default plan?")) return;
+  week = Object.assign({}, DEFAULT_WEEK);
+  localStorage.setItem("linemanWeek", JSON.stringify(week));
+  buildPlan();
+  renderDay();
+  renderWeek();
+});
 
 $("finishWorkout").addEventListener("click", () => {
   const d = plan.find(x => x.day === selectedDay);
