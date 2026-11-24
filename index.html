@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
-<meta name="theme-color" content="#101827">
+<meta name="theme-color" content="#07090d">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Football</title>
@@ -88,7 +88,50 @@ button{border:0;border-radius:10px;padding:11px 14px;font-weight:750;cursor:poin
   .profile{grid-template-columns:repeat(4,1fr)}
   header,main,.setup-wrap{max-width:560px}
 }
+
+/* ===== GYM REDESIGN ===== */
+.rep-controls .plus{flex:1;background:var(--accent)!important;color:#0b0f00;border:0!important;font-size:20px!important;font-family:Impact,system-ui,sans-serif;text-transform:uppercase;letter-spacing:.05em}
+:root{--bg:#07090d;--panel:#0f1319;--panel2:#161b23;--text:#f5f7fa;--muted:#8d98a8;--line:#222a35;--accent:#c6ff00;--green:#c6ff00;--red:#ff4d4d;--hot:#ff6a00}
+html{background:#07090d;overscroll-behavior:none}
+body{background:radial-gradient(120% 60% at 50% -10%,#1b2a0a 0%,#07090d 55%) fixed,#07090d;overscroll-behavior:none;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+h1,h2,h3,.rep-count,.tab,.primary,.settop,.stat strong,.dayitem b{font-family:Impact,"Haettenschweiler","Arial Narrow Bold","Arial Black",system-ui,sans-serif;text-transform:uppercase;letter-spacing:.04em;font-weight:400}
+h1{font-size:clamp(34px,11vw,52px);font-style:italic;line-height:1;letter-spacing:.02em;text-shadow:0 0 24px rgba(198,255,0,.35)}
+.sub{color:var(--muted);text-transform:uppercase;letter-spacing:.12em;font-size:11px;margin-top:6px}
+.profile,.panel,.exercise,.history-card,.setup-card{background:linear-gradient(180deg,#121720,#0d1117);border:1px solid var(--line);border-radius:18px;box-shadow:0 8px 24px rgba(0,0,0,.45)}
+.profile{border-left:4px solid var(--accent)}
+.stat small{color:var(--accent);letter-spacing:.14em;font-size:10px}
+.stat strong{font-size:17px;letter-spacing:.05em}
+.panel h2,.setup-card h2{font-size:26px;letter-spacing:.05em}
+.exercise{border-left:4px solid var(--accent);padding:14px}
+.exercise h3{font-size:22px;letter-spacing:.05em}
+.focus{text-transform:uppercase;letter-spacing:.1em;font-size:10.5px}
+.suggest{background:rgba(198,255,0,.08);border:1px solid rgba(198,255,0,.4);color:#e4ff8a;border-radius:12px}
+.set{background:#0a0d12;border:1px solid var(--line);border-radius:14px;padding:12px}
+.settop{font-size:17px;color:var(--accent)}
+input,select,textarea{background:#0a0d12;border:1px solid var(--line);border-radius:12px;min-height:50px;font-size:17px;font-weight:600}
+input:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(198,255,0,.18)}
+label{text-transform:uppercase;letter-spacing:.1em;font-size:10.5px}
+button{border-radius:12px;min-height:48px;transition:transform .08s}
+button:active{transform:scale(.96)}
+.primary{background:var(--accent);color:#0b0f00;font-size:18px;box-shadow:0 0 22px rgba(198,255,0,.35)}
+.secondary{background:#1a212b;border:1px solid #2c3644}
+.good{background:var(--accent);color:#0b0f00;font-family:Impact,system-ui,sans-serif;text-transform:uppercase;letter-spacing:.05em;font-weight:400;font-size:18px;box-shadow:0 0 22px rgba(198,255,0,.35)}
+.danger{background:#2a1214;color:#ff8d8d;border:1px solid #5b2932}
+.rep-controls{gap:12px}
+.rep-controls button{min-width:60px;min-height:56px;font-size:26px;background:#1a212b;border:1px solid #2c3644}
+.rep-count{font-size:44px;color:var(--text);min-width:72px;text-shadow:0 0 18px rgba(198,255,0,.4)}
+.dayitem{background:#0a0d12;border:1px solid var(--line);border-radius:14px}
+.dayitem b{font-size:18px}
+.dayitem.today{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),0 0 18px rgba(198,255,0,.2)}
+.pos-grid label{background:#0a0d12;border-radius:12px}
+.pos-grid input{accent-color:var(--accent)}
+main{padding-bottom:calc(118px + var(--safe-bottom))}
+.tabs{position:fixed;left:0;right:0;bottom:0;margin:0 auto;max-width:560px;z-index:50;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:8px 10px calc(10px + var(--safe-bottom));overflow:visible;background:rgba(7,9,13,.88);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border-top:1px solid var(--line)}
+.tab{white-space:normal;text-align:center;border:1px solid transparent;background:transparent;color:var(--muted);border-radius:12px;padding:11px 2px;font-size:12px;line-height:1.1;letter-spacing:.06em;min-height:48px}
+.tab.active{background:rgba(198,255,0,.12);border-color:var(--accent);color:var(--accent);box-shadow:0 0 16px rgba(198,255,0,.25)}
 </style>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 </head>
 <body>
 <header>
@@ -146,6 +189,10 @@ button{border:0;border-radius:10px;padding:11px 14px;font-weight:750;cursor:poin
       </select>
     </div>
 
+    <div class="field">
+      <label style="display:flex;gap:8px;align-items:center;font-size:14px;color:var(--text)"><input type="checkbox" id="setupShare" checked style="width:auto"> Share my lifts on the team leaderboard</label>
+    </div>
+
     <button class="primary full" id="saveProfile">Start lifting →</button>
     <p class="notice">Everything saves on this device. You can edit your profile later from the top of the app.</p>
   </div>
@@ -166,6 +213,7 @@ button{border:0;border-radius:10px;padding:11px 14px;font-weight:750;cursor:poin
     <button class="tab active" data-tab="workout">Workout</button>
     <button class="tab" data-tab="schedule">Weekly plan</button>
     <button class="tab" data-tab="history">History & progress</button>
+    <button class="tab" data-tab="team">Team</button>
   </div>
 
   <section id="workoutView">
@@ -191,6 +239,15 @@ button{border:0;border-radius:10px;padding:11px 14px;font-weight:750;cursor:poin
       <div id="weekList" class="daylist"></div>
       <button class="secondary full" id="resetWeek" style="margin-top:10px">Reset to default (Mon-Fri workouts, Sat/Sun rest)</button>
       <p class="notice">Your changes save on this device. Adjust around football practices, games, and your coach's program. Recovery days are part of getting stronger.</p>
+    </div>
+  </section>
+
+  <section id="teamView" class="hidden">
+    <div class="panel">
+      <h2>Team leaderboard</h2>
+      <div class="muted" id="teamStatus">Everyone's best lifts, live.</div>
+      <div class="field"><label for="teamLift">Lift</label><select id="teamLift"></select></div>
+      <div id="teamList" class="daylist"></div>
     </div>
   </section>
 
@@ -357,6 +414,7 @@ function showSetup(){
     $("setupWeight").value = profile.weight || "";
     $("setupLevel").value = profile.level || "Intermediate";
     $("setupGoal").value = profile.goal || "Strength + muscle";
+    $("setupShare").checked = profile.share !== false;
     document.querySelectorAll('input[name="pos"]').forEach(cb => {
       cb.checked = (profile.positions || []).includes(cb.value);
     });
@@ -402,8 +460,9 @@ $("saveProfile").addEventListener("click", () => {
     return;
   }
 
-  profile = { name, weight: Number(weight), level, goal, positions };
+  profile = { name, weight: Number(weight), level, goal, positions, share: $("setupShare").checked };
   localStorage.setItem("linemanProfile", JSON.stringify(profile));
+  syncTeam();
   showApp();
 });
 
@@ -439,7 +498,8 @@ function renderDay(){
 
     let suggestHTML = "";
     if(suggestion){
-      suggestHTML = `<div class="suggest">📈 Next target: <strong>${suggestion.next} lb</strong><br>${suggestion.reason}</div>`;
+      const _pr = computeBest()[name];
+      suggestHTML = (_pr ? `<div class="suggest" style="border-color:var(--hot);color:#ffb27a;background:rgba(255,106,0,.1)">🏆 PR: <strong>${_pr.w} lb × ${_pr.r} rep${_pr.r===1?"":"s"}</strong></div>` : "") + `<div class="suggest">📈 Next target: <strong>${suggestion.next} lb</strong><br>${suggestion.reason}</div>`;
     } else {
       suggestHTML = `<div class="suggest">No history yet for this lift. Start with a weight you can control for 5–8 clean reps.</div>`;
     }
@@ -540,9 +600,10 @@ $("workoutDate").value = todayISO();
 
 function showTab(tab){
   document.querySelectorAll(".tab").forEach(b => b.classList.toggle("active", b.dataset.tab === tab));
-  ["workout","schedule","history"].forEach(v => $(v+"View").classList.toggle("hidden", v !== tab));
+  ["workout","schedule","history","team"].forEach(v => $(v+"View").classList.toggle("hidden", v !== tab));
   if(tab === "schedule") renderWeek();
   if(tab === "history") renderHistory();
+  if(tab === "team") openTeam();
 }
 document.querySelectorAll(".tab").forEach(b => b.addEventListener("click", () => showTab(b.dataset.tab)));
 
@@ -597,6 +658,7 @@ $("finishWorkout").addEventListener("click", () => {
   };
   history.unshift(record);
   localStorage.setItem("linemanHistory", JSON.stringify(history));
+  syncTeam();
 
   // Clear draft for these exercises so next time starts fresh with new suggestion
   d.items.forEach(([name]) => { delete entries[name]; });
@@ -623,7 +685,7 @@ function renderHistory(){
       const el = document.createElement("div");
       el.className = "dayitem";
       el.innerHTML = `<b>${name}</b>
-        <small>Best logged: ${w} lb</small>
+        <small>🏆 PR: ${w} lb × ${(computeBest()[name]||{}).r ?? 0} reps</small>
         ${sug ? `<small style="color:#f6d27a;display:block;margin-top:4px">Next target ≈ ${sug.next} lb</small>` : ""}`;
       p.appendChild(el);
     });
@@ -662,9 +724,114 @@ $("clearData").addEventListener("click", () => {
   if(confirm("Delete all saved workout history on this device? This cannot be undone.")){
     history = [];
     localStorage.removeItem("linemanHistory");
+    syncTeam();
     renderHistory();
   }
 });
+
+// ===== TEAM LEADERBOARD (Firebase Firestore) =====
+// Paste your Firebase web app config here (see setup steps). Leave projectId empty to turn the team tab off.
+const FIREBASE_CONFIG = {
+  apiKey: "",
+  authDomain: "",
+  projectId: "",
+  appId: ""
+};
+
+let db = null, teamDocs = [], teamUnsub = null;
+try{
+  if(FIREBASE_CONFIG.projectId && typeof firebase !== "undefined"){
+    firebase.initializeApp(FIREBASE_CONFIG);
+    db = firebase.firestore();
+  }
+}catch(e){ db = null; }
+
+let athleteId = localStorage.getItem("linemanId");
+if(!athleteId){
+  athleteId = "a" + Date.now().toString(36) + Math.random().toString(36).slice(2,10);
+  localStorage.setItem("linemanId", athleteId);
+}
+
+function computeBest(){
+  const best = {};
+  history.forEach(h => h.items.forEach(e => (e.sets||[]).forEach(s => {
+    const w = Number(s.weight), r = Number(s.reps)||0;
+    if(!(w > 0)) return;
+    const cur = best[e.name];
+    if(!cur || w > cur.w || (w === cur.w && r > cur.r)) best[e.name] = {w, r, d: h.date};
+  })));
+  return best;
+}
+
+function syncTeam(){
+  if(!db || !profile) return;
+  const ref = db.collection("athletes").doc(athleteId);
+  if(profile.share === false){ ref.delete().catch(()=>{}); return; }
+  ref.set({
+    name: String(profile.name||"Athlete").slice(0,30),
+    positions: (profile.positions||[]).join(" · ").slice(0,40),
+    best: computeBest(),
+    sessions: history.length,
+    updated: Date.now()
+  }).catch(()=>{});
+}
+
+function openTeam(){
+  const sel = $("teamLift");
+  if(!sel.options.length){
+    const names = [...new Set(Object.values(TEMPLATES).flatMap(t => t.items.map(i => i[0])))];
+    sel.innerHTML = ['<option value="__all">Everyone\'s PRs (all lifts)</option>','<option value="__sessions">Workouts logged</option>']
+      .concat(names.map(n => `<option>${n}</option>`)).join("");
+    sel.value = "__all";
+    sel.addEventListener("change", renderTeam);
+  }
+  if(!db){
+    $("teamStatus").textContent = "Team leaderboard isn't set up yet.";
+    $("teamList").innerHTML = "";
+    return;
+  }
+  if(!teamUnsub){
+    $("teamStatus").textContent = "Loading…";
+    teamUnsub = db.collection("athletes").onSnapshot(snap => {
+      teamDocs = snap.docs.map(d => ({id:d.id, ...d.data()}));
+      renderTeam();
+    }, () => { $("teamStatus").textContent = "Couldn't load the team. Check your connection."; });
+  } else renderTeam();
+}
+
+function renderTeam(){
+  const lift = $("teamLift").value;
+  if(lift === "__all"){
+    const esc2 = t => String(t).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+    $("teamStatus").textContent = `${teamDocs.length} athlete${teamDocs.length===1?"":"s"} on the team. Updates live.`;
+    const box = $("teamList");
+    box.innerHTML = teamDocs.length ? "" : '<div class="empty">No one has shared lifts yet.</div>';
+    [...teamDocs].sort((a,b)=>String(a.name).localeCompare(String(b.name))).forEach(a => {
+      const prs = Object.entries(a.best||{}).map(([n,b]) => `<div style="display:flex;justify-content:space-between;gap:8px;margin-top:6px"><span>${esc2(n)}</span><strong style="color:var(--accent)">${b.w} lb × ${b.r}</strong></div>`).join("");
+      const el = document.createElement("div");
+      el.className = "dayitem" + (a.id === athleteId ? " today" : "");
+      el.innerHTML = `<b>${esc2(a.name)}</b><small>${esc2(a.positions||"")}</small>${prs || '<small style="display:block;margin-top:6px">No lifts logged yet</small>'}`;
+      box.appendChild(el);
+    });
+    return;
+  }
+  const rows = teamDocs.map(a => {
+    if(lift === "__sessions") return {a, score:a.sessions||0, label:`${a.sessions||0} workouts`};
+    const b = a.best && a.best[lift];
+    return b ? {a, score:b.w, label:`${b.w} lb × ${b.r}`} : null;
+  }).filter(Boolean).sort((x,y) => y.score - x.score);
+  $("teamStatus").textContent = `${teamDocs.length} athlete${teamDocs.length===1?"":"s"} on the team. Updates live.`;
+  const list = $("teamList");
+  list.innerHTML = rows.length ? "" : '<div class="empty">No one has logged this lift yet.</div>';
+  const esc = t => String(t).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  rows.forEach((r, i) => {
+    const el = document.createElement("div");
+    el.className = "dayitem" + (r.a.id === athleteId ? " today" : "");
+    el.innerHTML = `<b>${i+1}. ${esc(r.a.name)}</b><small>${esc(r.a.positions||"")}</small>
+      <small style="color:#f6d27a;display:block;margin-top:4px">${r.label}</small>`;
+    list.appendChild(el);
+  });
+}
 
 // Boot
 loadEntries();
@@ -672,6 +839,7 @@ const today = new Date().toLocaleDateString("en-US",{weekday:"long"});
 if(plan.some(d => d.day === today)) selectedDay = today;
 
 if(profile && profile.name){
+  syncTeam();
   showApp();
 } else {
   showSetup();
