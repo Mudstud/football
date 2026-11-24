@@ -128,7 +128,7 @@ function posList(p) {
   return [];
 }
 
-function basePlan() {
+function plan() {
   const fb = !!S.p.fb;
   const positions = posList(S.p);
   const isOL = positions.some(i => i <= 3); // LT, RT, Guard, Center
@@ -172,20 +172,6 @@ function basePlan() {
   };
 }
 
-function plan() {
-  const original = basePlan();
-  const sessions = Object.values(original);
-  const rest = Array.isArray(S.p.restDays) ? S.p.restDays : ["Tuesday","Thursday","Sunday"];
-  const available = DAYS.filter(d => !rest.includes(d));
-  const P = {};
-  if (!available.length) return P;
-  // Spread the existing training sessions across the selected non-rest days.
-  sessions.forEach((session, i) => {
-    const idx = sessions.length === 1 ? 0 : Math.round(i * (available.length - 1) / (sessions.length - 1));
-    P[available[idx]] = session;
-  });
-  return P;
-}
 const rnd = (x,s) => Math.round(x/s)*s;
 const tgt = n => {
   const e = EX[n];
@@ -524,16 +510,7 @@ async function finishSetup() {
   let schoolId = su.school;
   let schoolName = "";
   let schoolCity = city;
-  if (String(schoolId).startsWith("nearby:")) {
-    const picked = nearbySchoolList[+schoolId.split(":")[1]];
-    if (!picked) { alert("Please choose a school again."); return; }
-    const ref = await db.collection("schools").add({
-      name:picked.name, city:picked.city || city, lat:picked.lat || null, lon:picked.lon || null,
-      createdBy:S.uid, createdAt:firebase.firestore.FieldValue.serverTimestamp()
-    });
-    schoolId=ref.id; schoolName=picked.name; schoolCity=picked.city || city;
-    schoolList.push({id:schoolId,name:schoolName,city:schoolCity});
-  } else if (schoolId === "__new__") {
+  if (schoolId === "__new__") {
     schoolName = (su.newSchool || "").trim();
     if (!schoolName) {
       alert("Enter a school name.");
@@ -1026,7 +1003,7 @@ function onCityBlur() {
   const sel = $("sschool");
   if (!sel) return;
   const current = su.school;
-  sel.innerHTML = `<option value="">— Select a school —</option>${schoolOptionsHtml()}<option value="__new__" ${current==="__new__"?"selected":""}>+ Make this a school?</option>`;
+  sel.innerHTML = `<option value="">— Select a school —</option>${schoolOptionsHtml()}<option value="__new__" ${current==="__new__"?"selected":""}>+ Create new school</option>`;
   // restore selection if still valid
   if (current && current !== "__new__") {
     const stillThere = [...sel.options].some(o => o.value === current);
@@ -1074,16 +1051,13 @@ async function setupUI() {
         <input id="scity" placeholder="e.g. Austin" value="${esc(su.city)}"
           oninput="su.city=this.value"
           onblur="onCityBlur()">
-        <div class="nt">You can enter a city or use your device location to find the closest schools.</div>
-        <button type="button" style="width:100%;margin-top:8px" onclick="findNearbySchools()">📍 Find schools near me</button>
-        <div id="schoolLocationStatus" class="nt"></div>
+        <div class="nt">Type your city, then tap outside the box — nearby schools appear at the top.</div>
 
         <label>School</label>
         <select id="sschool" onchange="onSchoolChange()">
           <option value="">— Select a school —</option>
           ${schoolOptionsHtml()}
-          ${nearbySchoolList.length ? `<optgroup label="Closest schools near your location">${nearbySchoolList.map((x,i)=>`<option value="nearby:${i}" ${su.school===`nearby:${i}`?"selected":""}>${esc(x.name)}${x.city?" · "+esc(x.city):""}</option>`).join("")}</optgroup>` : ""}
-          <option value="__new__" ${su.school==="__new__"?"selected":""}>+ Make this a school?</option>
+          <option value="__new__" ${su.school==="__new__"?"selected":""}>+ Create new school</option>
         </select>
         <div id="newSchoolWrap" class="${su.school==="__new__"?"":"hide"}">
           <label>New school name</label>
@@ -1202,7 +1176,6 @@ function vWork() {
       <select onchange="day=this.value;render()">${DAYS.map(x => `<option ${x===day?"selected":""}>${x}</option>`).join("")}</select>
       <label>Workout date</label>
       <input type="date" id="wd" value="${today()}">
-      ${d ? `<button style="width:100%;margin-top:10px" onclick="skipWorkout()">Skip this workout → make it up next week</button>` : ""}
     </div>`;
   if (nextMsg) {
     return `
@@ -1248,8 +1221,6 @@ function vWork() {
 
 function vPlan() {
   const P = plan();
-  const rest = Array.isArray(S.p.restDays) ? S.p.restDays : ["Tuesday","Thursday","Sunday"];
-  const makeups = Array.isArray(S.p.makeups) ? S.p.makeups : [];
   return `
     <div class="c">
       <h2>Weekly plan</h2>
@@ -1258,17 +1229,7 @@ function vPlan() {
           <b class="big" style="font-size:20px">${x}</b>
           <div class="m">${P[x] ? P[x].title : "Rest day"}</div>
         </div>`).join("")}
-      <div class="nt">Tap a day to open it. Change your rest days below whenever your schedule changes.</div>
-    </div>
-    <div class="c">
-      <h2>Choose rest days</h2>
-      ${DAYS.map(x=>`<label style="display:flex;align-items:center;gap:10px;text-transform:none;letter-spacing:0;color:var(--t);font-size:15px"><input type="checkbox" style="width:22px;min-height:22px;accent-color:var(--a)" ${rest.includes(x)?"checked":""} onchange="toggleRestDay('${x}',this.checked)">${x}</label>`).join("")}
-      <div class="nt">Uncheck a day to make it a workout day again. Your workout plan will automatically return for that day.</div>
-    </div>
-    <div class="c">
-      <h2>Make-up workouts</h2>
-      <div class="nt">When you skip a scheduled workout, it stays here for you to complete the following week.</div>
-      ${makeups.length ? makeups.map(m=>`<div class="set"><b>${esc(m.day)} · ${esc(m.title)}</b><div class="m">Skipped ${esc(m.date)} · Make up by ${esc(m.dueDate)}</div><div class="nt">${(m.ex||[]).map(esc).join(" · ")}</div><button class="pri" onclick="finishMakeup('${esc(m.id)}')">Mark make-up complete</button></div>`).join("") : `<div class="m">No missed workouts. You're caught up!</div>`}
+      <div class="nt">Adjust around practices and games. Rest days build strength.</div>
     </div>
     <div class="c">
       <button style="width:100%" onclick="editProfile()">Edit profile</button>
