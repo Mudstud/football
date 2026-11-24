@@ -215,7 +215,7 @@ let S = {
   teamMembers: [],  // same shape, filtered by shared team
   messages: [],     // chat messages for current team
   uid: null,
-  code: null        // 5-digit friend code
+  code: null        // 6-7 character alphanumeric friend code
 };
 
 let tab = "workout";
@@ -285,6 +285,7 @@ async function saveProfile() {
       history: S.h.slice(0, 50), // keep last 50
       prs: prs(),
       teamKeys: teamKeys(S.p),
+      schoolId: S.p.schoolId || null,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     }, {merge: true});
   } catch (e) {
@@ -294,7 +295,12 @@ async function saveProfile() {
 }
 
 function generateCode() {
-  return String(10000 + Math.floor(Math.random() * 90000));
+  // 6-7 character alphanumeric friend codes (letters + numbers)
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no I/O/0/1 to avoid confusion
+  const len = 6 + Math.floor(Math.random() * 2); // 6 or 7
+  let code = "";
+  for (let i = 0; i < len; i++) code += chars[Math.floor(Math.random() * chars.length)];
+  return code;
 }
 
 async function finishSetup() {
@@ -305,9 +311,34 @@ async function finishSetup() {
     return;
   }
 
-  // Generate unique 5-digit code
+  // Handle school
+  let schoolId = su.school;
+  let schoolName = "";
+  if (schoolId === "__new__") {
+    schoolName = (su.newSchool || "").trim();
+    if (!schoolName) {
+      alert("Enter a school name.");
+      return;
+    }
+    // Create new school
+    const ref = await db.collection("schools").add({
+      name: schoolName,
+      createdBy: S.uid,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    schoolId = ref.id;
+    schoolList.push({id: schoolId, name: schoolName});
+  } else if (schoolId) {
+    const found = schoolList.find(s => s.id === schoolId);
+    schoolName = found ? found.name : "";
+  } else {
+    alert("Select or create a school.");
+    return;
+  }
+
+  // Generate unique alphanumeric code (6-7 chars)
   let code, exists = true, tries = 0;
-  while (exists && tries < 20) {
+  while (exists && tries < 30) {
     code = generateCode();
     const check = await db.collection("codes").doc(code).get();
     exists = check.exists;
@@ -326,7 +357,9 @@ async function finishSetup() {
     level: $("sl").value,
     fb: su.fb ? {p: +su.fp, t: +su.ft} : null,
     pl: su.pl ? {w: +su.pw, g: +su.pg} : null,
-    own: su.own ? su.s.trim() : ""
+    own: su.own ? su.s.trim() : "",
+    schoolId,
+    schoolName
   };
   S.p.mode = modeName(S.p);
   S.p.spec = specText(S.p);
@@ -339,6 +372,7 @@ async function finishSetup() {
     history: [],
     prs: {},
     teamKeys: teamKeys(S.p),
+    schoolId,
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
   });
   await db.collection("codes").doc(code).set({uid: S.uid, name: n});
@@ -375,9 +409,9 @@ async function loadFriends() {
 }
 
 async function addFriendByCode(code) {
-  code = code.trim();
-  if (!/^\d{5}$/.test(code)) {
-    setStatus("Enter a valid 5-digit friend code.", "err");
+  code = code.trim().toUpperCase();
+  if (!/^[A-Z0-9]{5,7}$/.test(code)) {
+    setStatus("Enter a valid 5–7 character friend code (letters and numbers).", "err");
     return;
   }
   if (code === S.code) {
@@ -500,6 +534,12 @@ function chatId(a, b) {
   return [a, b].sort().join("_");
 }
 
+function teamChatPath(teamKey) {
+  // School-scoped team chat so different schools don't share the same room
+  const school = (S.p && S.p.schoolId) ? S.p.schoolId : "global";
+  return db.collection("chats").doc(school + "_" + teamKey).collection("messages");
+}
+
 function loadChat(target) {
   // target can be a teamKey (string starting with F or P) or a friend uid
   if (chatUnsub) { chatUnsub(); chatUnsub = null; }
@@ -509,7 +549,7 @@ function loadChat(target) {
   const isPrivate = !target.startsWith("F") && !target.startsWith("P");
   const path = isPrivate
     ? db.collection("privateChats").doc(chatId(S.uid, target)).collection("messages")
-    : db.collection("chats").doc(target).collection("messages");
+    : teamChatPath(target);
 
   chatUnsub = path
     .orderBy("ts", "desc")
@@ -538,7 +578,7 @@ async function sendChat(target, text) {
   const isPrivate = !target.startsWith("F") && !target.startsWith("P");
   const path = isPrivate
     ? db.collection("privateChats").doc(chatId(S.uid, target)).collection("messages")
-    : db.collection("chats").doc(target).collection("messages");
+    : teamChatPath(target);
 
   try {
     await path.add({
@@ -620,7 +660,18 @@ async function finish() {
 /* ============================================================
    UI – SETUP
    ============================================================ */
-let su = {fb:0, pl:0, own:0, fp:0, ft:2, pw:5, pg:10, n:"", w:"", s:""};
+let su = {fb:0, pl:0, own:0, fp:0, ft:2, pw:5, pg:10, n:"", w:"", s:"", school:"", newSchool:""};
+let schoolList = []; // [{id, name}]
+
+async function loadSchools() {
+  try {
+    const snap = await db.collection("schools").orderBy("name").get();
+    schoolList = [];
+    snap.forEach(doc => schoolList.push({id: doc.id, name: doc.data().name}));
+  } catch (e) {
+    console.error(e);
+  }
+}
 
 function tog(k) {
   keep();
@@ -635,14 +686,16 @@ function tog(k) {
 }
 
 function keep() {
-  [["n","sn"],["w","sw"],["fp","fp"],["ft","ft"],["pw","pw"],["pg","pg"],["s","ss"]].forEach(([k,i]) => {
+  [["n","sn"],["w","sw"],["fp","fp"],["ft","ft"],["pw","pw"],["pg","pg"],["s","ss"],["school","sschool"],["newSchool","snewschool"]].forEach(([k,i]) => {
     if ($(i)) su[k] = $(i).value;
   });
 }
 
-function setupUI() {
+async function setupUI() {
+  if (!schoolList.length) await loadSchools();
   const any = su.fb || su.pl || su.own;
   const opt = (a, v, f) => a.map((x,i) => `<option value="${f?x:i}" ${v==(f?x:i)?"selected":""}>${x}</option>`).join("");
+  const schoolOpts = schoolList.map(s => `<option value="${esc(s.id)}" ${su.school===s.id?"selected":""}>${esc(s.name)}</option>`).join("");
   $("setup").innerHTML = `
     <div class="c">
       <h2>What are you training for?</h2>
@@ -656,6 +709,18 @@ function setupUI() {
         <input id="sn" maxlength="12" value="${esc(su.n)}">
         <label>Body weight (lb)</label>
         <input id="sw" type="number" inputmode="decimal" value="${su.w}">
+
+        <label>School</label>
+        <select id="sschool" onchange="su.school=this.value;setupUI()">
+          <option value="">— Select a school —</option>
+          ${schoolOpts}
+          <option value="__new__" ${su.school==="__new__"?"selected":""}>+ Create new school</option>
+        </select>
+        ${su.school === "__new__" ? `
+          <label>New school name</label>
+          <input id="snewschool" placeholder="e.g. Lincoln High" value="${esc(su.newSchool)}">
+        ` : ""}
+
         ${su.fb ? `
           <label>Football position</label>
           <select id="fp">${opt(POS,su.fp)}</select>
@@ -695,7 +760,9 @@ function editProfile() {
     pg: p.pl ? p.pl.g : 10,
     n: p.name,
     w: p.bw,
-    s: p.own || ""
+    s: p.own || "",
+    school: p.schoolId || "",
+    newSchool: ""
   };
   // Keep the same uid & code – just re-run setup UI
   S.p = null;
@@ -709,7 +776,8 @@ const TABS = () => [
   ["workout","Workout"],
   ["plan","Plan"],
   ["history","History"],
-  ...((S.p && (S.p.fb || S.p.pl)) ? [["team","Team"]] : [["plates","Plates"]]),
+  ...(S.p && (S.p.fb || S.p.pl) ? [["team","Team"]] : []),
+  ["plates","Plates"],
   ["friends","Friends"]
 ];
 
@@ -724,7 +792,7 @@ function render() {
   $("setup").classList.add("hide");
   $("app").classList.remove("hide");
   $("nav").classList.remove("hide");
-  $("sub").textContent = `${S.p.name} #${S.code} · ${S.p.fb || S.p.pl ? specText(S.p) : S.p.own}`;
+  $("sub").textContent = `${S.p.name} · ${S.code}${S.p.schoolName ? " · " + S.p.schoolName : ""} · ${S.p.fb || S.p.pl ? specText(S.p) : S.p.own}`;
 
   if (!TABS().some(t => t[0] === tab)) tab = "workout";
   $("nav").innerHTML = TABS().map(([k,n]) =>
@@ -878,7 +946,7 @@ function vTeam() {
         <select onchange="curTeam=this.value;loadChat(curTeam);render()">
           ${myKeys.map(k => `<option value="${k}" ${k===curTeam?"selected":""}>${esc(tname(k))}</option>`).join("")}
         </select>` : ""}
-      <div class="nt">Your team is determined by the Football team or Powerlifting weight class + grade you chose in your profile. Friends who are also on this team appear here with their PRs.</div>
+      <div class="nt">Team chat and PRs are scoped to your school (${esc(S.p.schoolName || "your school")}). Only people at the same school see the same team chat. Friends from any school can still message you privately.</div>
     </div>
 
     <div class="c">
@@ -960,14 +1028,14 @@ function vFriends() {
     <div class="c">
       <h2>Friends</h2>
       <div class="m">Your friend code</div>
-      <div class="big" style="font-size:64px;text-align:center;color:var(--a)">${S.code}</div>
-      <div class="nt">Give this 5-digit number to friends. They enter it below to send you a request.</div>
+      <div class="big" style="font-size:48px;text-align:center;color:var(--a);letter-spacing:0.08em">${S.code}</div>
+      <div class="nt">Give this code to friends. They enter it below to send you a request.</div>
     </div>
 
     <div class="c">
       <b>Add a friend</b>
-      <label>Enter their 5-digit code</label>
-      <input id="friendcode" inputmode="numeric" maxlength="5" placeholder="e.g. 48291">
+      <label>Enter their friend code</label>
+      <input id="friendcode" maxlength="7" placeholder="e.g. K7M2X9" style="text-transform:uppercase">
       <button class="pri" onclick="addFriendByCode($('friendcode').value)">Send request</button>
       ${statusMsg ? `<div class="status ${statusType}">${esc(statusMsg)}</div>` : ""}
     </div>
