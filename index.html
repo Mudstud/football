@@ -146,6 +146,33 @@ button{border:0;border-radius:10px;padding:11px 14px;font-weight:750;cursor:poin
       </select>
     </div>
 
+    <div class="field">
+      <label for="setupBump">Normal bump (lb) — added when you hit the minimum reps</label>
+      <input id="setupBump" type="number" min="0" step="0.5" inputmode="decimal" placeholder="Auto">
+    </div>
+    <div class="field">
+      <label for="setupBigBump">Big bump (lb) — added when you hit the big-bump reps</label>
+      <input id="setupBigBump" type="number" min="0" step="0.5" inputmode="decimal" placeholder="Auto">
+    </div>
+    <div class="field">
+      <label for="setupMinReps">Minimum reps to add weight</label>
+      <input id="setupMinReps" type="number" min="1" max="30" step="1" inputmode="numeric" placeholder="5">
+    </div>
+    <div class="field">
+      <label for="setupBigReps">Reps needed for the big bump</label>
+      <input id="setupBigReps" type="number" min="1" max="30" step="1" inputmode="numeric" placeholder="8">
+    </div>
+    <div class="field">
+      <label for="setupRound">Round suggestions to nearest</label>
+      <select id="setupRound">
+        <option value="0.5">0.5 lb</option>
+        <option value="1">1 lb</option>
+        <option value="2.5" selected>2.5 lb</option>
+        <option value="5">5 lb</option>
+      </select>
+    </div>
+    <p class="notice">Leave a box blank to use automatic values for your level and goal.</p>
+
     <button class="primary full" id="saveProfile">Start lifting →</button>
     <p class="notice">Everything saves on this device. You can edit your profile later from the top of the app.</p>
   </div>
@@ -261,50 +288,48 @@ function getLastPerformance(exerciseName){
   return null;
 }
 
-/** Suggest next starting weight based on last session + goal/level */
+/** Suggest next starting weight based on last session + your settings */
 function suggestNextWeight(exerciseName){
   const last = getLastPerformance(exerciseName);
   if(!last) return null;
 
   const goal = (profile && profile.goal) || "Strength + muscle";
   const level = (profile && profile.level) || "Intermediate";
+  const st = (profile && profile.settings) || {};
 
-  // Base increment rules (lbs)
-  let increment = 5;
-  if(level === "Beginner") increment = 5;
-  if(level === "Advanced") increment = 2.5;
+  // Automatic defaults by level/goal; your settings override them
+  let bump = level === "Advanced" ? 2.5 : 5;
+  let bigBump = level === "Advanced" ? 5 : 10;
+  if(goal === "Max strength" || goal === "Size / hypertrophy") bigBump = 5;
+  if(st.bump != null) bump = st.bump;
+  if(st.bigBump != null) bigBump = st.bigBump;
+  const minReps = st.minReps != null ? st.minReps : 5;
+  const bigReps = st.bigReps != null ? st.bigReps : 8;
+  const round = st.round || 2.5;
+  const holdReps = Math.max(1, Math.min(3, minReps - 1));
 
-  // If they hit solid reps on the top set, push a bit more; if low reps, hold or small bump
   const topReps = last.best.reps;
-  let next = last.topWeight;
-  let reason = "";
+  const w = last.topWeight;
+  let next = w, reason = "";
 
-  if(topReps >= 8){
-    next = last.topWeight + (level === "Advanced" ? 5 : 10);
-    reason = `You hit ${topReps} reps at ${last.topWeight} lb — strong session. Try ~${next} lb next time.`;
-  } else if(topReps >= 5){
-    next = last.topWeight + increment;
-    reason = `Solid ${topReps} reps at ${last.topWeight} lb. Aim for about ${next} lb next session.`;
-  } else if(topReps >= 3){
-    next = last.topWeight;
-    reason = `Only ${topReps} reps at ${last.topWeight} lb. Repeat that weight and try to add reps.`;
+  if(topReps >= bigReps){
+    next = w + bigBump;
+    reason = `You hit ${topReps} reps at ${w} lb. Try ~${next} lb next time.`;
+  } else if(topReps >= minReps){
+    next = w + bump;
+    reason = `Solid ${topReps} reps at ${w} lb. Aim for about ${next} lb next session.`;
+  } else if(topReps >= holdReps){
+    reason = `Only ${topReps} reps at ${w} lb. Repeat that weight and try to add reps.`;
   } else {
-    next = Math.max(0, last.topWeight - increment);
+    next = Math.max(0, w - bump);
     reason = `Tough set (${topReps} reps). Drop to ~${next} lb and rebuild form/reps.`;
   }
 
-  // Goal tweak
-  if(goal === "Max strength" && topReps >= 5){
-    next = last.topWeight + (level === "Advanced" ? 5 : 5);
-    reason = `Strength focus: last top was ${last.topWeight} lb × ${topReps}. Try ${next} lb.`;
+  next = Math.round(next / round) * round;
+  next = Math.round(next * 100) / 100;
+  if(next !== w && /~[\d.]+ lb|about [\d.]+ lb/.test(reason)){
+    reason = reason.replace(/(~|about )[\d.]+ lb/, `$1${next} lb`);
   }
-  if(goal === "Size / hypertrophy" && topReps >= 8){
-    next = last.topWeight + 5;
-    reason = `Hypertrophy: good volume at ${last.topWeight} lb. Nudge to ${next} lb.`;
-  }
-
-  // Round to nearest 2.5
-  next = Math.round(next * 2) / 2;
 
   return { next, reason, last };
 }
@@ -317,6 +342,12 @@ function showSetup(){
     $("setupWeight").value = profile.weight || "";
     $("setupLevel").value = profile.level || "Intermediate";
     $("setupGoal").value = profile.goal || "Strength + muscle";
+    const st = profile.settings || {};
+    $("setupBump").value = st.bump ?? "";
+    $("setupBigBump").value = st.bigBump ?? "";
+    $("setupMinReps").value = st.minReps ?? "";
+    $("setupBigReps").value = st.bigReps ?? "";
+    $("setupRound").value = st.round ?? "2.5";
     document.querySelectorAll('input[name="pos"]').forEach(cb => {
       cb.checked = (profile.positions || []).includes(cb.value);
     });
@@ -362,7 +393,13 @@ $("saveProfile").addEventListener("click", () => {
     return;
   }
 
-  profile = { name, weight: Number(weight), level, goal, positions };
+  const num = id => { const v = $(id).value.trim(); return v === "" ? null : Number(v); };
+  const settings = {
+    bump: num("setupBump"), bigBump: num("setupBigBump"),
+    minReps: num("setupMinReps"), bigReps: num("setupBigReps"),
+    round: Number($("setupRound").value) || 2.5
+  };
+  profile = { name, weight: Number(weight), level, goal, positions, settings };
   localStorage.setItem("linemanProfile", JSON.stringify(profile));
   showApp();
 });
