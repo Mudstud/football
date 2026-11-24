@@ -160,6 +160,33 @@ h3 {
   margin-top: 10px;
 }
 
+/* ===== COMPACT SET ===== */
+.cset { padding: 10px 12px; margin-top: 8px; }
+.cs-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+.cs-head b { font-weight: 750; }
+.cs-head span { color: var(--a); font-size: 12px; font-weight: 600; white-space: nowrap; }
+.cs-row { display: flex; align-items: center; gap: 8px; }
+.cset input { min-height: 42px; padding: 8px 10px; text-align: center; border-radius: 10px; }
+.cset .cw { flex: 1; min-width: 0; }
+.crep { display: flex; align-items: center; gap: 4px; flex: 1.5; min-width: 0; }
+.crep input { flex: 1; min-width: 0; width: 100%; }
+.crep button {
+  min-width: 40px; min-height: 42px; padding: 0; flex: none;
+  font-size: 20px; border-radius: 10px; background: var(--surface3);
+}
+.crep .plus {
+  background: linear-gradient(180deg, #c42a45, #9e1b32);
+  color: #fff; border: 0; font-weight: 750;
+}
+.cset .cx { width: 36px; min-width: 36px; min-height: 42px; padding: 0; flex: none; font-size: 20px; }
+
 /* ===== FORMS ===== */
 label {
   display: block;
@@ -2191,31 +2218,21 @@ function vWork() {
         <input type="number" inputmode="decimal" value="${D.s}" oninput="S.d['${n}'].s=this.value" placeholder="0">
         ${D.sets.map((s,i) => {
           const p = plan[i];
-          const tip = p ? `Suggested: ${p.line}` : "";
           return `
-          <div class="set">
-            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
-              <b class="set-num" style="padding:0">Set ${i+1}${p ? " · " + p.tag : ""}</b>
-              ${p ? `<span class="m" style="font-size:12px;color:var(--a)">${esc(p.line)}</span>` : ""}
+          <div class="set cset">
+            <div class="cs-head">
+              <b>Set ${i+1}${p ? " · " + p.tag : ""}</b>
+              ${p ? `<span>${esc(p.line)}</span>` : ""}
             </div>
-            ${tip ? `<div class="nt" style="margin:4px 0 0">Aim for <b>${esc(p.line)}</b></div>` : ""}
-            <div class="set-row">
-              <div class="set-num">#${i+1}</div>
-              <div>
-                <label>Weight</label>
-                <input type="number" inputmode="decimal" value="${s.w}" oninput="S.d['${n}'].sets[${i}].w=this.value" placeholder="${p && p.w != null ? p.w : "lb"}">
-              </div>
-              <div>
-                <label>Reps</label>
+            <div class="cs-row">
+              <input class="cw" type="number" inputmode="decimal" value="${s.w}" oninput="S.d['${n}'].sets[${i}].w=this.value" placeholder="${p && p.w != null ? p.w : "lb"}">
+              <div class="crep">
+                <button onclick="rep('${n}',${i},-1)">−</button>
                 <input type="number" inputmode="numeric" value="${s.r||""}" oninput="S.d['${n}'].sets[${i}].r=+this.value||0" placeholder="${p ? p.r : "0"}">
+                <button class="plus" onclick="rep('${n}',${i},1)">+</button>
               </div>
+              ${i ? `<button class="dn cx" aria-label="Remove set" onclick="S.d['${n}'].sets.splice(${i},1);render()">×</button>` : ""}
             </div>
-            <div class="rc" style="margin-top:10px">
-              <button onclick="rep('${n}',${i},-1)">−</button>
-              <span class="big" style="font-size:28px">${s.r}</span>
-              <button class="plus" onclick="rep('${n}',${i},1)">+ Rep</button>
-            </div>
-            ${i ? `<button class="dn" style="width:100%;margin-top:8px" onclick="S.d['${n}'].sets.splice(${i},1);render()">Remove set</button>` : ""}
           </div>`;
         }).join("")}
         <button style="width:100%;margin-top:10px" onclick="S.d['${n}'].sets.push({w:S.d['${n}'].s||'',r:0});render()">+ Add set</button>
