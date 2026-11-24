@@ -3,28 +3,27 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
-<meta name="theme-color" content="#0c090a">
+<meta name="theme-color" content="#000000">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Lift Log</title>
 <style>
 :root {
-  --a: #9e1b32;
-  --a2: #7a1526;
-  --a-soft: rgba(158,27,50,.18);
-  --a-glow: rgba(158,27,50,.4);
-  --bg: #0c090a;
-  --surface: #161011;
-  --surface2: #1e1517;
-  --surface3: #2a1c1f;
-  --stroke: #3a282c;
-  --muted: #a09094;
-  --text: #f7f2f3;
-  --text2: #d4c8cb;
-  --danger: #ff6b6b;
-  --danger-bg: #2a1214;
-  --ok: #c45c6a;
-  --warn: #e8a04a;
+  --a: #ff4d00;
+  --a-soft: rgba(255,77,0,.14);
+  --a-glow: rgba(255,77,0,.35);
+  --bg: #000000;
+  --surface: #111111;
+  --surface2: #1a1a1a;
+  --surface3: #222222;
+  --stroke: #2a2a2a;
+  --muted: #888888;
+  --text: #ffffff;
+  --text2: #c8c8c8;
+  --danger: #ff5c5c;
+  --danger-bg: #1f0f0f;
+  --ok: #3dff9a;
+  --warn: #ffb020;
   --r: 20px;
   --r-sm: 14px;
 }
@@ -68,7 +67,7 @@ body {
   width: 40px;
   height: 40px;
   border-radius: 12px;
-  background: linear-gradient(145deg, #c42a45, #9e1b32 50%, #6e1222);
+  background: linear-gradient(145deg, #ff6a1a, #ff4d00 50%, #cc3a00);
   display: grid;
   place-items: center;
   font-size: 20px;
@@ -160,6 +159,18 @@ h3 {
   margin-top: 10px;
 }
 
+
+/* ===== COMPACT SET ROW ===== */
+.cset { display:flex; align-items:center; gap:8px; padding:8px 10px; margin-top:8px; }
+.cset .set-num { width:26px; flex:none; font-weight:800; color:var(--a); font-size:14px; }
+.cset input { min-height:42px; padding:8px 10px; text-align:center; border-radius:10px; }
+.cset .cw { flex:1; min-width:0; }
+.crep { display:flex; align-items:center; gap:4px; flex:1.4; min-width:0; }
+.crep input { flex:1; min-width:0; width:100%; }
+.crep button { min-width:40px; min-height:42px; padding:0; flex:none; font-size:20px; border-radius:10px; background:var(--surface3); }
+.crep .plus { background:linear-gradient(180deg,#ff6a1a,#ff4d00); color:#fff; border:0; font-weight:750; }
+.cset .cx { width:34px; min-width:34px; min-height:42px; padding:0; flex:none; font-size:20px; }
+
 /* ===== FORMS ===== */
 label {
   display: block;
@@ -211,7 +222,7 @@ button {
 }
 button:active { transform: scale(.97); }
 .pri {
-  background: linear-gradient(180deg, #c42a45, #9e1b32);
+  background: linear-gradient(180deg, #ff6a1a, #ff4d00);
   color: #fff;
   font-size: 16px;
   font-weight: 750;
@@ -243,7 +254,7 @@ button:active { transform: scale(.97); }
 }
 .rc .plus {
   flex: 1;
-  background: linear-gradient(180deg, #c42a45, #9e1b32);
+  background: linear-gradient(180deg, #ff6a1a, #ff4d00);
   color: #fff;
   border: 0;
   font-size: 15px;
@@ -254,8 +265,8 @@ button:active { transform: scale(.97); }
 /* ===== CHIPS / SUGGESTIONS ===== */
 .sug {
   background: var(--a-soft);
-  border: 1px solid rgba(158,27,50,.35);
-  color: #f0b8c0;
+  border: 1px solid rgba(255,77,0,.35);
+  color: #ffb48a;
   border-radius: 12px;
   padding: 11px 13px;
   font-size: 13px;
@@ -283,7 +294,7 @@ button:active { transform: scale(.97); }
   border-color: var(--a);
   color: #fff;
   background: var(--a-soft);
-  box-shadow: 0 0 0 1px rgba(158,27,50,.4), inset 0 0 24px rgba(158,27,50,.08);
+  box-shadow: 0 0 0 1px rgba(255,77,0,.4), inset 0 0 24px rgba(255,77,0,.08);
 }
 
 .hide { display: none !important; }
@@ -334,7 +345,7 @@ button:active { transform: scale(.97); }
 }
 .tab.on {
   color: #fff;
-  background: linear-gradient(180deg, #c42a45, #9e1b32);
+  background: linear-gradient(180deg, #ff6a1a, #ff4d00);
   box-shadow: 0 4px 16px var(--a-glow);
 }
 
@@ -412,8 +423,8 @@ a { color: var(--a); font-weight: 650; text-decoration: none; }
   padding: 5px 10px;
   border-radius: 999px;
   background: var(--a-soft);
-  color: #f0b8c0;
-  border: 1px solid rgba(158,27,50,.3);
+  color: #ffb48a;
+  border: 1px solid rgba(255,77,0,.3);
   white-space: nowrap;
 }
 .day-chip .badge.rest {
@@ -469,7 +480,7 @@ a { color: var(--a); font-weight: 650; text-decoration: none; }
 .day-pill.on {
   background: var(--a-soft);
   border-color: var(--a);
-  box-shadow: 0 0 0 1px rgba(158,27,50,.35);
+  box-shadow: 0 0 0 1px rgba(255,77,0,.35);
 }
 .day-pill.on .abbr { color: var(--a); }
 .day-pill.rest-pill { opacity: 0.65; }
@@ -565,8 +576,8 @@ a { color: var(--a); font-weight: 650; text-decoration: none; }
   padding: 3px 8px;
   border-radius: 999px;
   background: var(--a-soft);
-  color: #f0b8c0;
-  border: 1px solid rgba(158,27,50,.3);
+  color: #ffb48a;
+  border: 1px solid rgba(255,77,0,.3);
 }
 .week-cell .tag.rest {
   background: rgba(255,255,255,.06);
@@ -611,7 +622,7 @@ a { color: var(--a); font-weight: 650; text-decoration: none; }
   padding: 20px 12px;
   background: linear-gradient(180deg, var(--a-soft), transparent);
   border-radius: 16px;
-  border: 1px solid rgba(158,27,50,.25);
+  border: 1px solid rgba(255,77,0,.25);
   margin-top: 4px;
 }
 .code-hero .code {
@@ -641,7 +652,7 @@ a { color: var(--a); font-weight: 650; text-decoration: none; }
   width: 44px;
   height: 44px;
   border-radius: 14px;
-  background: linear-gradient(145deg, #c42a45, #7a1526);
+  background: linear-gradient(145deg, #ff6a1a, #cc3a00);
   display: grid;
   place-items: center;
   font-weight: 800;
@@ -705,40 +716,6 @@ a { color: var(--a); font-weight: 650; text-decoration: none; }
   margin: 18px 0 8px;
 }
 
-
-/* Football position chips */
-.pos-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  margin-top: 8px;
-}
-.pos-chip {
-  min-height: 48px;
-  padding: 10px 12px;
-  border-radius: 12px;
-  border: 1.5px solid var(--stroke);
-  background: var(--surface2);
-  color: var(--text);
-  font: 650 13px/1.25 -apple-system, system-ui, sans-serif;
-  text-align: left;
-  cursor: pointer;
-}
-.pos-chip.on {
-  border-color: var(--a);
-  background: var(--a-soft);
-  color: #fff;
-  box-shadow: 0 0 0 1px rgba(158,27,50,.45);
-}
-input[type=checkbox] {
-  width: 22px !important;
-  min-height: 22px !important;
-  height: 22px;
-  padding: 0 !important;
-  flex-shrink: 0;
-  accent-color: var(--a);
-}
-
 </style>
 </head>
 <body>
@@ -776,22 +753,9 @@ const firebaseConfig = {
   measurementId: "G-4HLH7ZBS6E"
 };
 
-let auth = null;
-let db = null;
-let cloudOk = false;
-let localMode = false;
-
-try {
-  if (typeof firebase === "undefined") throw new Error("Firebase SDK failed to load (need internet).");
-  firebase.initializeApp(firebaseConfig);
-  auth = firebase.auth();
-  db = firebase.firestore();
-  cloudOk = true;
-} catch (e) {
-  console.warn("Firebase unavailable, using local mode:", e);
-  cloudOk = false;
-  localMode = true;
-}
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
 
 /* ============================================================
    CONSTANTS & HELPERS
@@ -952,89 +916,28 @@ function last(n) {
   return null;
 }
 
-function bodyFactor() {
-  // Adjust starting loads from age + height (on top of bodyweight & level)
-  const age = +S.p.age || 16;
-  const ht = +S.p.height || 68; // inches
-  let f = 1;
-  // Younger athletes: slightly lighter start; older teens/adults closer to 1
-  if (age <= 13) f *= 0.75;
-  else if (age <= 15) f *= 0.85;
-  else if (age <= 17) f *= 0.92;
-  else if (age >= 40) f *= 0.9;
-  else if (age >= 30) f *= 0.95;
-  // Height: very short or tall small tweaks (leverage / general size)
-  if (ht < 64) f *= 0.95;
-  else if (ht > 74) f *= 1.03;
-  return f;
-}
-
 function suggest(n) {
   const e = EX[n], lv = ["Beginner","Intermediate","Advanced"].indexOf(S.p.level), [ts,tr] = tgt(n), L = last(n);
-  const age = +S.p.age || 0, ht = +S.p.height || 0;
-  if (!e.inc && !e.bw && !e.pu) return L ? null : {t:"Do it with good form.", r: tr, sets: ts};
+  if (!e.inc && !e.bw && !e.pu) return L ? null : {t:"Do it with good form."};
   if (e.pu) {
-    if (!L) {
-      const tip = age && age <= 14 ? "Use a band or assisted machine if needed. " : "";
-      return {t: tip + "Start with bodyweight. Aim for " + tr + " reps each set.", w: 0, r: tr, sets: ts};
-    }
+    if (!L) return {t:"Start with bodyweight. Aim for 5-8 reps each set."};
     const mr = Math.min(...L.map(s => s.r)), w = Math.max(...L.map(s => +s.w || 0));
     return mr >= 12
-      ? {w:w+5, r: tr, sets: ts, t:`You hit ${mr} reps on every set. Add 5 lb (weighted) and aim for ${tr} reps each set.`}
-      : {w, r: Math.min(mr+1, 12), sets: ts, t:`Aim for ${Math.min(mr+1,12)} reps each set${w?" at +"+w+" lb":""} (reps first, weight later).`};
+      ? {w:w+5, t:`You hit ${mr} reps on every set. Add ${w?5:5} lb (weighted) and aim for 8 reps.`}
+      : {w, t:`Aim for ${mr+1} reps each set${w?" at +"+w+" lb":""} (reps first, weight later).`};
   }
   if (!L) {
-    const base = (S.p.bw || 150) * e.bw[Math.max(0, lv)];
-    const w = rnd(base * bodyFactor(), e.inc === 2.5 ? 2.5 : 5);
-    const bits = [];
-    if (age) bits.push(age + " yrs");
-    if (ht) bits.push(Math.floor(ht/12) + "'" + (ht%12) + '"');
-    if (S.p.bw) bits.push(S.p.bw + " lb");
-    const who = bits.length ? ` (${bits.join(", ")})` : "";
-    return {w, r: tr, sets: ts, t:`First time${who}: about ${w} lb × ${tr} reps for ${ts} sets — clean form.`};
+    const w = rnd(S.p.bw * e.bw[lv], e.inc === 2.5 ? 2.5 : 5);
+    return {w, t:`First time: start light at about ${w} lb and focus on clean reps.`};
   }
   const V = L.filter(s => +s.w > 0);
-  if (!V.length) return {r: tr, sets: ts, t: "Log weight next time for better suggestions."};
-  const w = Math.max(...V.map(s => +s.w));
+  if (!V.length) return null;
+  const w = Math.max(...V.map(s => +s.w)), top = V.filter(s => +s.w === w);
   const all = V.length >= ts && V.every(s => s.r >= tr), close = V.every(s => s.r >= tr-2);
-  const inc = (age && age <= 15 && e.inc >= 5) ? Math.max(2.5, e.inc / 2) : e.inc;
-  if (all) return {w:w+inc, r: tr, sets: ts, t:`Hit every rep last time. Try ${w+inc} lb × ${tr} for ${ts} sets.`};
-  if (close) return {w, r: tr, sets: ts, t:`Close. Stay at ${w} lb × ${tr} reps for ${ts} sets.`};
+  if (all) return {w:w+e.inc, t:`You hit every rep. Add ${e.inc} lb: try ${w+e.inc} lb.`};
+  if (close) return {w, t:`Close. Stay at ${w} lb and aim for one more rep.`};
   const d = rnd(w*.9, e.inc === 2.5 ? 2.5 : 5);
-  return {w:d, r: tr, sets: ts, t:`Reps were low. Rebuild at ${d} lb × ${tr} for ${ts} sets.`};
-}
-
-/** Per-set plan: weight + reps for each working set (and a light build-up if 3+ sets). */
-function setPlan(n) {
-  const e = EX[n] || {};
-  const [ts, tr] = tgt(n);
-  const g = suggest(n) || {};
-  const workR = g.r != null ? g.r : tr;
-  const workW = g.w;
-  const plan = [];
-  for (let i = 0; i < ts; i++) {
-    let w = workW;
-    let r = workR;
-    let tag = "Work";
-    // Mild ramp on first set when we have a loaded barbell movement
-    if (e.inc && workW != null && workW > 0 && ts >= 3 && i === 0) {
-      w = rnd(workW * 0.9, e.inc === 2.5 ? 2.5 : 5);
-      tag = "Build-up";
-    }
-    let line;
-    if (e.pu) {
-      line = (w && w > 0) ? `${w} lb × ${r} reps` : `Bodyweight × ${r} reps`;
-    } else if (!e.inc && !e.bw) {
-      line = `${r} reps / quality effort`;
-      w = null;
-    } else if (w == null) {
-      line = `${r} reps`;
-    } else {
-      line = `${w} lb × ${r} reps`;
-    }
-    plan.push({ w, r, tag, line });
-  }
-  return plan;
+  return {w:d, t:`Reps were low. Drop about 10% to ${d} lb and rebuild.`};
 }
 
 function prs() {
@@ -1112,62 +1015,22 @@ let authForm = { email: "", pass: "", pass2: "" }; // keep values across re-rend
 let chatDraft = ""; // keep chat text while messages update live
 let friendCodeDraft = ""; // keep friend-code field across friend-list updates
 
-function startLocalMode(msg) {
-  localMode = true;
+auth.onAuthStateChanged(async user => {
   authReady = true;
-  // Local guest session so the UI is usable when shared as a file
-  S.uid = S.uid || ("local_" + Math.random().toString(36).slice(2, 10));
-  try {
-    const raw = localStorage.getItem("liftlog_local");
-    if (raw) {
-      const data = JSON.parse(raw);
-      if (data.profile) S.p = data.profile;
-      if (data.code) S.code = data.code;
-      if (data.history) S.h = data.history;
-    }
-  } catch (_) {}
-  if (msg) statusMsg = msg;
-  if (msg) statusType = "info";
-  render();
-}
-
-function saveLocal() {
-  try {
-    localStorage.setItem("liftlog_local", JSON.stringify({
-      profile: S.p,
-      code: S.code,
-      history: S.h || []
-    }));
-  } catch (_) {}
-}
-
-if (cloudOk && auth) {
-  // Timeout: if auth never responds (common on file://), fall back to local
-  const authTimer = setTimeout(() => {
-    if (!authReady) startLocalMode("Opened offline / as a file — using local mode on this device. Cloud login needs the app hosted (not a shared file).");
-  }, 4000);
-
-  auth.onAuthStateChanged(async user => {
-    clearTimeout(authTimer);
-    authReady = true;
-    if (!user) {
-      S.uid = null;
-      S.p = null;
-      S.code = null;
-      S.h = [];
-      S.friends = [];
-      if (friendsUnsub) { friendsUnsub(); friendsUnsub = null; }
-      if (chatUnsub) { chatUnsub(); chatUnsub = null; }
-      render();
-      return;
-    }
-    localMode = false;
-    S.uid = user.uid;
-    await loadProfile();
-  });
-} else {
-  startLocalMode("Cloud services unavailable. Running in local mode — data stays on this device.");
-}
+  if (!user) {
+    S.uid = null;
+    S.p = null;
+    S.code = null;
+    S.h = [];
+    S.friends = [];
+    if (friendsUnsub) { friendsUnsub(); friendsUnsub = null; }
+    if (chatUnsub) { chatUnsub(); chatUnsub = null; }
+    render();
+    return;
+  }
+  S.uid = user.uid;
+  await loadProfile();
+});
 
 async function loadProfile() {
   try {
@@ -1274,18 +1137,17 @@ async function doLogout() {
 }
 
 async function doGuestLogin() {
-  if (!cloudOk || !auth || location.protocol === "file:") {
-    startLocalMode("Local guest mode — data stays on this phone. For cloud sync, host the app (not share as a file).");
-    return;
-  }
   try {
     setStatus("Starting guest session…", "info");
     const cred = await auth.signInAnonymously();
     await cred.user.getIdToken(true);
   } catch (e) {
     console.error(e);
-    // Fall back so the app is never blank / stuck
-    startLocalMode("Cloud guest login failed — using local mode on this device.");
+    let msg = e.message || "Guest login failed";
+    if (e.code === "auth/admin-restricted-operation" || e.code === "auth/operation-not-allowed") {
+      msg = "Guest login is turned off. Firebase → Authentication → Sign-in method → enable Anonymous (and Email/Password for email).";
+    }
+    setStatus(msg, "err");
   }
 }
 
@@ -1317,15 +1179,13 @@ function authUI() {
     </div>
     ${statusMsg ? `<div class="status ${statusType}">${esc(statusMsg)}</div>` : ""}
     <div class="c">
-      <b>Sharing this file?</b>
-      <div class="nt">
-        Opening a shared <b>.html</b> file works in <b>local mode</b> (tap Continue as guest). Cloud login, friends, and team chat need the app hosted on a website — a shared file alone stays on each phone separately.
-      </div>
-    </div>
-    <div class="c">
       <b>Seeing “restricted to administrators only”?</b>
       <div class="nt">
-        Firebase project setting. Enable Email/Password + Anonymous under Authentication → Sign-in method, and open via a real URL (not only a file).
+        That is a Firebase project setting, not an app bug. Do all of these:<br><br>
+        1. Authentication → Sign-in method → enable <b>Email/Password</b> AND <b>Anonymous</b> → Save<br>
+        2. Google Cloud Console (same project) → APIs &amp; Services → enable <b>Identity Toolkit API</b><br>
+        3. Identity Platform (if used) → Settings → allow account creation from the client SDK<br>
+        4. Open the app at <b>http://localhost</b> (run <code>npx serve .</code>), not as a file
       </div>
     </div>
   `;
@@ -1333,10 +1193,6 @@ function authUI() {
 
 async function saveProfile() {
   if (!S.uid || !S.p) return;
-  if (localMode || !cloudOk || !db) {
-    saveLocal();
-    return;
-  }
   try {
     await db.collection("users").doc(S.uid).set({
       profile: S.p,
@@ -1349,8 +1205,7 @@ async function saveProfile() {
     }, {merge: true});
   } catch (e) {
     console.error(e);
-    saveLocal();
-    setStatus("Cloud save failed — saved locally on this device.", "info");
+    setStatus("Save failed: " + e.message, "err");
   }
 }
 
@@ -1372,23 +1227,11 @@ async function finishSetup() {
     alert("Enter your name, a body weight (≥50), and what you're training for.");
     return;
   }
-  if (!(+su.h >= 48) || !(+su.h <= 90)) {
-    alert("Enter height in inches (about 48–90). Example: 5'10\" = 70.");
-    return;
-  }
-  if (!(+su.age >= 10) || !(+su.age <= 80)) {
-    alert("Enter a valid age (10–80).");
-    return;
-  }
-  // Normalize football positions to numbers
-  if (su.fb) {
-    su.fp = (Array.isArray(su.fp) ? su.fp : []).map(Number).filter(x => !isNaN(x));
-  }
   if (su.fb && (!Array.isArray(su.fp) || !su.fp.length)) {
     alert("Pick at least one football position.");
     return;
   }
-  if (!city && !localMode) {
+  if (!city) {
     alert("Enter your city so we can show nearby schools.");
     return;
   }
@@ -1403,30 +1246,19 @@ async function finishSetup() {
       alert("Enter a school name.");
       return;
     }
-    if (cloudOk && db && !localMode) {
-      try {
-        const ref = await db.collection("schools").add({
-          name: schoolName,
-          city: schoolCity,
-          createdBy: S.uid,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        schoolId = ref.id;
-      } catch (e) {
-        schoolId = "local_school_" + Date.now();
-      }
-    } else {
-      schoolId = "local_school_" + Date.now();
-    }
+    // Create new school with city so others nearby can find it
+    const ref = await db.collection("schools").add({
+      name: schoolName,
+      city: schoolCity,
+      createdBy: S.uid,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    schoolId = ref.id;
     schoolList.push({id: schoolId, name: schoolName, city: schoolCity});
   } else if (schoolId) {
     const found = schoolList.find(s => s.id === schoolId);
     schoolName = found ? found.name : "";
     schoolCity = found && found.city ? found.city : city;
-  } else if (localMode || !cloudOk) {
-    // Local mode: school optional-ish — use city as name if needed
-    schoolId = "local_school";
-    schoolName = city;
   } else {
     alert("Select or create a school.");
     return;
@@ -1436,16 +1268,8 @@ async function finishSetup() {
   let code, exists = true, tries = 0;
   while (exists && tries < 30) {
     code = generateCode();
-    if (localMode || !cloudOk || !db) {
-      exists = false;
-    } else {
-      try {
-        const check = await db.collection("codes").doc(code).get();
-        exists = check.exists;
-      } catch (_) {
-        exists = false;
-      }
-    }
+    const check = await db.collection("codes").doc(code).get();
+    exists = check.exists;
     tries++;
   }
   if (exists) {
@@ -1453,14 +1277,10 @@ async function finishSetup() {
     return;
   }
 
-  if (!S.uid) S.uid = "local_" + Math.random().toString(36).slice(2, 10);
-
   S.p = {
     id: code,
     name: n,
     bw: +su.w,
-    height: +su.h,
-    age: +su.age,
     goal: $("sg").value,
     level: $("sl").value,
     fb: su.fb ? {p: (Array.isArray(su.fp) ? su.fp.map(Number) : [+su.fp]).filter(n => !isNaN(n)), t: +su.ft} : null,
@@ -1476,33 +1296,26 @@ async function finishSetup() {
   S.code = code;
   savedSchedule = null;
 
-  if (cloudOk && db && !localMode) {
-    try {
-      await db.collection("users").doc(S.uid).set({
-        profile: S.p,
-        code,
-        history: [],
-        prs: {},
-        teamKeys: teamKeys(S.p),
-        schoolId,
-        city,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
-      await db.collection("codes").doc(code).set({uid: S.uid, name: n});
-      try {
-        if (auth && auth.currentUser) {
-          await auth.currentUser.updateProfile({ displayName: n });
-        }
-      } catch (e) {
-        console.warn("Could not update displayName", e);
-      }
-    } catch (e) {
-      console.warn(e);
-      localMode = true;
-      saveLocal();
+  // Write user + code mapping
+  await db.collection("users").doc(S.uid).set({
+    profile: S.p,
+    code,
+    history: [],
+    prs: {},
+    teamKeys: teamKeys(S.p),
+    schoolId,
+    city,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+  await db.collection("codes").doc(code).set({uid: S.uid, name: n});
+
+  // Use the name they typed as their Firebase display name (guest + email accounts)
+  try {
+    if (auth.currentUser) {
+      await auth.currentUser.updateProfile({ displayName: n });
     }
-  } else {
-    saveLocal();
+  } catch (e) {
+    console.warn("Could not update displayName", e);
   }
 
   setStatus("Profile created! Your friend code is " + code, "ok");
@@ -1513,7 +1326,6 @@ async function finishSetup() {
    FRIENDS
    ============================================================ */
 async function loadFriends() {
-  if (localMode || !db || !S.uid) return;
   if (friendsUnsub) friendsUnsub();
   friendsUnsub = db.collection("users").doc(S.uid).collection("friends")
     .onSnapshot(snap => {
@@ -1808,7 +1620,7 @@ async function finish() {
 /* ============================================================
    UI – SETUP
    ============================================================ */
-let su = {fb:0, pl:0, own:0, fp:[], ft:2, pw:5, pg:10, n:"", w:"", h:"", age:"", s:"", school:"", newSchool:"", city:""};
+let su = {fb:0, pl:0, own:0, fp:[], ft:2, pw:5, pg:10, n:"", w:"", s:"", school:"", newSchool:"", city:""};
 let schoolList = []; // [{id, name, city}]
 
 function normCity(c) {
@@ -1816,7 +1628,6 @@ function normCity(c) {
 }
 
 async function loadSchools() {
-  if (localMode || !db) { schoolList = []; return; }
   try {
     const snap = await db.collection("schools").orderBy("name").get();
     schoolList = [];
@@ -1856,8 +1667,6 @@ function tog(k) {
 function keep() {
   if ($("sn")) su.n = $("sn").value;
   if ($("sw")) su.w = $("sw").value;
-  if ($("sh")) su.h = $("sh").value;
-  if ($("sage")) su.age = $("sage").value;
   if ($("scity")) su.city = $("scity").value;
   if ($("sschool")) su.school = $("sschool").value;
   if ($("snewschool")) su.newSchool = $("snewschool").value;
@@ -1876,19 +1685,11 @@ function keep() {
 }
 
 function togglePos(i) {
+  // Only update the array — do NOT rebuild the form (keeps name/weight)
   i = +i;
   if (!Array.isArray(su.fp)) su.fp = [];
-  su.fp = su.fp.map(Number).filter(x => !isNaN(x));
-  const el = $("fpbtn" + i);
-  const wasOn = el ? el.classList.contains("on") : su.fp.includes(i);
-  if (wasOn) su.fp = su.fp.filter(x => x !== i);
-  else if (!su.fp.includes(i)) su.fp.push(i);
-  if (el) el.classList.toggle("on", !wasOn);
-  const count = $("fpCount");
-  if (count) {
-    const names = su.fp.map(x => POS[x]).filter(Boolean);
-    count.textContent = names.length ? names.join(", ") : "none";
-  }
+  if (su.fp.includes(i)) su.fp = su.fp.filter(x => x !== i);
+  else su.fp.push(i);
 }
 
 function schoolOptionsHtml() {
@@ -1948,8 +1749,6 @@ async function setupUI() {
   // Only full rebuild when switching Football / Powerlifting / Own — not on school pick
   if ($("sn")) su.n = $("sn").value;
   if ($("sw")) su.w = $("sw").value;
-  if ($("sh")) su.h = $("sh").value;
-  if ($("sage")) su.age = $("sage").value;
   if ($("scity")) su.city = $("scity").value;
   if ($("sschool")) su.school = $("sschool").value;
   if ($("snewschool")) su.newSchool = $("snewschool").value;
@@ -1959,10 +1758,12 @@ async function setupUI() {
   const opt = (a, v, f) => a.map((x,i) => `<option value="${f?x:i}" ${v==(f?x:i)?"selected":""}>${x}</option>`).join("");
   if (!Array.isArray(su.fp)) su.fp = typeof su.fp === "number" ? [su.fp] : [];
 
-  const fpSet = (Array.isArray(su.fp) ? su.fp : []).map(Number);
-  const posChecks = `<div class="pos-grid">` + POS.map((name, i) => `
-    <button type="button" id="fpbtn${i}" class="pos-chip ${fpSet.includes(i)?"on":""}"
-      onclick="event.preventDefault();togglePos(${i})">${esc(name)}</button>`).join("") + `</div>`;
+  const posChecks = POS.map((name, i) => `
+    <label style="display:flex;align-items:center;gap:10px;margin:6px 0;text-transform:none;letter-spacing:0;font-size:15px;color:var(--t);font-weight:600">
+      <input type="checkbox" id="fp${i}" ${su.fp.includes(i)?"checked":""}
+        onchange="togglePos(${i})" style="width:22px;height:22px;min-height:0;accent-color:var(--a)">
+      ${esc(name)}
+    </label>`).join("");
 
   $("setup").innerHTML = `
     <div class="c">
@@ -1977,11 +1778,6 @@ async function setupUI() {
         <input id="sn" maxlength="12" value="${esc(su.n)}" oninput="su.n=this.value">
         <label>Body weight (lb)</label>
         <input id="sw" type="number" inputmode="decimal" value="${esc(String(su.w ?? ""))}" oninput="su.w=this.value">
-        <label>Height (inches)</label>
-        <input id="sh" type="number" inputmode="decimal" placeholder="e.g. 70 for 5'10" value="${esc(String(su.h ?? ""))}" oninput="su.h=this.value">
-        <div class="nt">Total inches (5'10" = 70). Used with age to set starting weights.</div>
-        <label>Age</label>
-        <input id="sage" type="number" inputmode="numeric" placeholder="e.g. 16" value="${esc(String(su.age ?? ""))}" oninput="su.age=this.value">
 
         <label>Your city</label>
         <input id="scity" placeholder="e.g. Austin" value="${esc(su.city)}"
@@ -2002,9 +1798,9 @@ async function setupUI() {
         </div>
 
         ${su.fb ? `
-          <label>Football position(s) — tap all that apply</label>
-          ${posChecks}
-          <div class="nt">Selected: <b id="fpCount">${fpSet.length ? fpSet.map(i => POS[i]).filter(Boolean).join(", ") : "none"}</b>. Plan changes based on these.</div>
+          <label>Football position(s) — pick all that apply</label>
+          <div class="set" style="margin-top:4px">${posChecks}</div>
+          <div class="nt">Your workout plan changes based on these positions.</div>
           <label>Football team</label>
           <select id="ft" onchange="su.ft=this.value">${opt(FBT,su.ft)}</select>
         ` : ""}
@@ -2037,14 +1833,12 @@ function editProfile() {
     fb: p.fb ? 1 : 0,
     pl: p.pl ? 1 : 0,
     own: p.fb || p.pl ? 0 : 1,
-    fp: positions.slice().map(Number),
+    fp: positions.slice(),
     ft: p.fb ? p.fb.t : 2,
     pw: p.pl ? p.pl.w : 5,
     pg: p.pl ? p.pl.g : 10,
     n: p.name,
     w: p.bw,
-    h: p.height || "",
-    age: p.age || "",
     s: p.own || "",
     school: p.schoolId || "",
     newSchool: "",
@@ -2160,64 +1954,31 @@ function vWork() {
   const pr = prs();
   const exercises = d.ex.map(n => {
     const g = suggest(n);
-    const plan = setPlan(n);
+    const D = S.d[n] || (S.d[n] = {s:"", sets:[{w:"",r:0}]});
     const [ts,tr] = tgt(n);
-    const D = S.d[n] || (S.d[n] = {s:"", sets:[]});
-    // Ensure enough set rows for the plan; prefill empty weight/reps from suggestions
-    while (D.sets.length < plan.length) D.sets.push({w:"", r:0});
-    if (g && g.w != null && g.w !== "" && (D.s === "" || D.s == null)) D.s = String(g.w);
-    plan.forEach((p, i) => {
-      if (!D.sets[i]) D.sets[i] = {w:"", r:0};
-      if ((D.sets[i].w === "" || D.sets[i].w == null) && p.w != null) D.sets[i].w = String(p.w);
-      if ((!D.sets[i].r || D.sets[i].r === 0) && p.r) D.sets[i].r = p.r;
-    });
-    const planBox = `
-      <div class="sug" style="margin-top:10px">
-        <b>Per-set plan</b><br>
-        ${plan.map((p,i) => `Set ${i+1} (${p.tag}): ${esc(p.line)}`).join("<br>")}
-        ${g && g.t ? `<div style="margin-top:6px;opacity:.9">${esc(g.t)}</div>` : ""}
-      </div>`;
     return `
       <div class="c ex">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
           <div>
             <h3>${esc(n)}</h3>
-            <div class="m" style="margin-top:3px">${ts} sets × ${tr} reps</div>
+            <div class="m" style="margin-top:3px">Target ${ts} × ${tr}</div>
           </div>
           ${pr[n] ? `<div class="badge" style="flex-shrink:0">PR ${pr[n].w}×${pr[n].r}</div>` : ""}
         </div>
-        ${planBox}
+        ${g ? `<div class="sug" style="margin-top:10px">${esc(g.t)}</div>` : ""}
         <label>Starting weight (lb)</label>
         <input type="number" inputmode="decimal" value="${D.s}" oninput="S.d['${n}'].s=this.value" placeholder="0">
-        ${D.sets.map((s,i) => {
-          const p = plan[i];
-          const tip = p ? `Suggested: ${p.line}` : "";
-          return `
-          <div class="set">
-            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
-              <b class="set-num" style="padding:0">Set ${i+1}${p ? " · " + p.tag : ""}</b>
-              ${p ? `<span class="m" style="font-size:12px;color:var(--a)">${esc(p.line)}</span>` : ""}
-            </div>
-            ${tip ? `<div class="nt" style="margin:4px 0 0">Aim for <b>${esc(p.line)}</b></div>` : ""}
-            <div class="set-row">
-              <div class="set-num">#${i+1}</div>
-              <div>
-                <label>Weight</label>
-                <input type="number" inputmode="decimal" value="${s.w}" oninput="S.d['${n}'].sets[${i}].w=this.value" placeholder="${p && p.w != null ? p.w : "lb"}">
-              </div>
-              <div>
-                <label>Reps</label>
-                <input type="number" inputmode="numeric" value="${s.r||""}" oninput="S.d['${n}'].sets[${i}].r=+this.value||0" placeholder="${p ? p.r : "0"}">
-              </div>
-            </div>
-            <div class="rc" style="margin-top:10px">
+        ${D.sets.map((s,i) => `
+          <div class="set cset">
+            <div class="set-num">#${i+1}</div>
+            <input class="cw" type="number" inputmode="decimal" value="${s.w}" oninput="S.d['${n}'].sets[${i}].w=this.value" placeholder="lb">
+            <div class="crep">
               <button onclick="rep('${n}',${i},-1)">−</button>
-              <span class="big" style="font-size:28px">${s.r}</span>
-              <button class="plus" onclick="rep('${n}',${i},1)">+ Rep</button>
+              <input type="number" inputmode="numeric" value="${s.r||""}" oninput="S.d['${n}'].sets[${i}].r=+this.value||0" placeholder="0">
+              <button class="plus" onclick="rep('${n}',${i},1)">+</button>
             </div>
-            ${i ? `<button class="dn" style="width:100%;margin-top:8px" onclick="S.d['${n}'].sets.splice(${i},1);render()">Remove set</button>` : ""}
-          </div>`;
-        }).join("")}
+            ${i ? `<button class="dn cx" aria-label="Remove set" onclick="S.d['${n}'].sets.splice(${i},1);render()">×</button>` : `<span class="cx"></span>`}
+          </div>`).join("")}
         <button style="width:100%;margin-top:10px" onclick="S.d['${n}'].sets.push({w:S.d['${n}'].s||'',r:0});render()">+ Add set</button>
       </div>`;
   }).join("");
@@ -2614,7 +2375,7 @@ render();
 // Updates friends / PRs / history without a visible "page reload".
 // Chat already updates live via onSnapshot, so we only refresh other data.
 setInterval(async () => {
-  if (!S.uid || !S.p || localMode || !db) return;
+  if (!S.uid || !S.p) return;
   try {
     // Soft-refresh own profile + history (in case another device updated)
     const snap = await db.collection("users").doc(S.uid).get();
