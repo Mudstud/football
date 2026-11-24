@@ -50,7 +50,13 @@ button:active{transform:scale(.96)}
 </div><div class="nav hide" id="nav"></div>
 <script>
 // PASTE YOUR FIREBASE SETTINGS HERE (see SETUP.md, step 5)
-const FIREBASE_CONFIG={apiKey:"PASTE_API_KEY",authDomain:"PASTE_AUTH_DOMAIN",projectId:"PASTE_PROJECT_ID",appId:"PASTE_APP_ID"};
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBr6KkPC6WL9TDuRsPnHlaJH-TWkdMaQWQ",
+  authDomain: "lift-log-4955e.firebaseapp.com",
+  projectId: "lift-log-4955e",
+  appId: "1:105165663441:web:c3623e7a32a151a841e9f0"
+};
+
 const $=i=>document.getElementById(i),KEY="liftlog.v1";
 const esc=t=>String(t??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 let S=JSON.parse(localStorage.getItem(KEY)||"null")||{p:null,h:[],f:[],team:[],d:{}};
