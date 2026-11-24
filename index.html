@@ -146,33 +146,6 @@ button{border:0;border-radius:10px;padding:11px 14px;font-weight:750;cursor:poin
       </select>
     </div>
 
-    <div class="field">
-      <label for="setupBump">Normal bump (lb) — added when you hit the minimum reps</label>
-      <input id="setupBump" type="number" min="0" step="0.5" inputmode="decimal" placeholder="Auto">
-    </div>
-    <div class="field">
-      <label for="setupBigBump">Big bump (lb) — added when you hit the big-bump reps</label>
-      <input id="setupBigBump" type="number" min="0" step="0.5" inputmode="decimal" placeholder="Auto">
-    </div>
-    <div class="field">
-      <label for="setupMinReps">Minimum reps to add weight</label>
-      <input id="setupMinReps" type="number" min="1" max="30" step="1" inputmode="numeric" placeholder="5">
-    </div>
-    <div class="field">
-      <label for="setupBigReps">Reps needed for the big bump</label>
-      <input id="setupBigReps" type="number" min="1" max="30" step="1" inputmode="numeric" placeholder="8">
-    </div>
-    <div class="field">
-      <label for="setupRound">Round suggestions to nearest</label>
-      <select id="setupRound">
-        <option value="0.5">0.5 lb</option>
-        <option value="1">1 lb</option>
-        <option value="2.5" selected>2.5 lb</option>
-        <option value="5">5 lb</option>
-      </select>
-    </div>
-    <p class="notice">Leave a box blank to use automatic values for your level and goal.</p>
-
     <button class="primary full" id="saveProfile">Start lifting →</button>
     <p class="notice">Everything saves on this device. You can edit your profile later from the top of the app.</p>
   </div>
@@ -288,6 +261,17 @@ function getLastPerformance(exerciseName){
   return null;
 }
 
+/* ===== WEIGHT SUGGESTION SETTINGS (locked) =====
+   Only editable here in the code. Use null for automatic values
+   based on level and goal. */
+const SUGGESTION_SETTINGS = {
+  bump: null,      // lb added at minimum reps (auto: 5, or 2.5 for Advanced)
+  bigBump: null,   // lb added at big-bump reps (auto: 10, 5 for Advanced/Max strength/Hypertrophy)
+  minReps: 5,      // reps needed to add weight
+  bigReps: 8,      // reps needed for the big bump
+  round: 2.5       // round suggestions to nearest lb
+};
+
 /** Suggest next starting weight based on last session + your settings */
 function suggestNextWeight(exerciseName){
   const last = getLastPerformance(exerciseName);
@@ -295,7 +279,7 @@ function suggestNextWeight(exerciseName){
 
   const goal = (profile && profile.goal) || "Strength + muscle";
   const level = (profile && profile.level) || "Intermediate";
-  const st = (profile && profile.settings) || {};
+  const st = SUGGESTION_SETTINGS;
 
   // Automatic defaults by level/goal; your settings override them
   let bump = level === "Advanced" ? 2.5 : 5;
@@ -342,12 +326,6 @@ function showSetup(){
     $("setupWeight").value = profile.weight || "";
     $("setupLevel").value = profile.level || "Intermediate";
     $("setupGoal").value = profile.goal || "Strength + muscle";
-    const st = profile.settings || {};
-    $("setupBump").value = st.bump ?? "";
-    $("setupBigBump").value = st.bigBump ?? "";
-    $("setupMinReps").value = st.minReps ?? "";
-    $("setupBigReps").value = st.bigReps ?? "";
-    $("setupRound").value = st.round ?? "2.5";
     document.querySelectorAll('input[name="pos"]').forEach(cb => {
       cb.checked = (profile.positions || []).includes(cb.value);
     });
@@ -393,13 +371,7 @@ $("saveProfile").addEventListener("click", () => {
     return;
   }
 
-  const num = id => { const v = $(id).value.trim(); return v === "" ? null : Number(v); };
-  const settings = {
-    bump: num("setupBump"), bigBump: num("setupBigBump"),
-    minReps: num("setupMinReps"), bigReps: num("setupBigReps"),
-    round: Number($("setupRound").value) || 2.5
-  };
-  profile = { name, weight: Number(weight), level, goal, positions, settings };
+  profile = { name, weight: Number(weight), level, goal, positions };
   localStorage.setItem("linemanProfile", JSON.stringify(profile));
   showApp();
 });
