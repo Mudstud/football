@@ -160,32 +160,37 @@ h3 {
   margin-top: 10px;
 }
 
-/* ===== COMPACT SET ===== */
-.cset { padding: 10px 12px; margin-top: 8px; }
-.cs-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 8px;
-  font-size: 13px;
-  margin-bottom: 8px;
-}
-.cs-head b { font-weight: 750; }
-.cs-head span { color: var(--a); font-size: 12px; font-weight: 600; white-space: nowrap; }
-.cs-row { display: flex; align-items: center; gap: 8px; }
-.cset input { min-height: 42px; padding: 8px 10px; text-align: center; border-radius: 10px; }
-.cset .cw { flex: 1; min-width: 0; }
-.crep { display: flex; align-items: center; gap: 4px; flex: 1.5; min-width: 0; }
-.crep input { flex: 1; min-width: 0; width: 100%; }
-.crep button {
-  min-width: 40px; min-height: 42px; padding: 0; flex: none;
-  font-size: 20px; border-radius: 10px; background: var(--surface3);
-}
-.crep .plus {
-  background: linear-gradient(180deg, #c42a45, #9e1b32);
-  color: #fff; border: 0; font-weight: 750;
-}
-.cset .cx { width: 36px; min-width: 36px; min-height: 42px; padding: 0; flex: none; font-size: 20px; }
+/* ===== CLEARER WORKOUT LAYOUT ===== */
+.ex-head { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+.ex-head h3 { font-size:19px; letter-spacing:-0.03em; }
+.ex-sub { color:var(--text2); font-size:13px; font-weight:600; margin-top:3px; }
+.badge { font-size:11px; font-weight:750; padding:5px 10px; border-radius:999px; background:rgba(255,176,32,.1); color:#ffc86a; border:1px solid rgba(255,176,32,.35); white-space:nowrap; flex-shrink:0; }
+.tip { margin-top:12px; padding:10px 12px; border-radius:12px; background:var(--a-soft); color:#f4c6cd; font-size:13px; font-weight:550; line-height:1.4; }
+.set-cols, .srow { display:grid; grid-template-columns:54px 1fr 1.5fr 38px; gap:8px; align-items:center; }
+.set-cols { margin-top:16px; padding:0 2px 6px; font-size:10.5px; font-weight:750; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); border-bottom:1px solid var(--stroke); }
+.set-cols .c2, .set-cols .c3 { text-align:center; }
+.srow { padding:10px 0; border-bottom:1px solid rgba(255,255,255,.05); }
+.srow:last-of-type { border-bottom:0; }
+.snum { display:flex; flex-direction:column; align-items:center; gap:2px; }
+.snum b { width:30px; height:30px; border-radius:50%; background:var(--a-soft); color:#fff; display:grid; place-items:center; font-size:14px; font-weight:800; }
+.snum small { font-size:9px; font-weight:750; letter-spacing:.06em; text-transform:uppercase; color:var(--a); }
+.srow input { min-height:46px; padding:8px 6px; text-align:center; font-size:18px; font-weight:750; border-radius:12px; }
+.crep { display:flex; align-items:center; gap:4px; min-width:0; }
+.crep input { flex:1; min-width:0; width:100%; }
+.crep button { min-width:42px; min-height:46px; padding:0; flex:none; font-size:22px; border-radius:12px; background:var(--surface3); }
+.crep .plus { background:linear-gradient(180deg,#c42a45,#9e1b32); color:#fff; border:0; font-weight:750; }
+.srow .cx { width:38px; min-width:38px; min-height:46px; padding:0; font-size:20px; }
+.addset { width:100%; margin-top:8px; background:transparent; border:1.5px dashed var(--stroke); color:var(--text2); }
+.datebar { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:6px; padding:10px 14px; background:var(--surface); border:1px solid var(--stroke); border-radius:14px; }
+.datebar span { font-size:11px; font-weight:750; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
+.datebar input { width:auto; min-height:38px; padding:6px 10px; font-size:14px; }
+.day-pill { position:relative; }
+.day-pill .dot { width:5px; height:5px; border-radius:50%; background:var(--a); margin:5px auto 0; }
+.day-pill:not(.on) .abbr { color:var(--text2); }
+.tab { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; }
+.tab .ti { font-size:17px; line-height:1; filter:grayscale(1) brightness(1.3); opacity:.8; }
+.tab.on .ti { filter:none; opacity:1; }
+.m { color:var(--text2); }
 
 /* ===== FORMS ===== */
 label {
@@ -2085,12 +2090,12 @@ function editProfile() {
    UI – VIEWS
    ============================================================ */
 const TABS = () => [
-  ["workout","Workout"],
-  ["plan","Plan"],
-  ["history","History"],
-  ...(S.p && (S.p.fb || S.p.pl) ? [["team","Team"]] : []),
-  ["plates","Plates"],
-  ["friends","Friends"]
+  ["workout","Workout","🏋️"],
+  ["plan","Plan","📅"],
+  ["history","History","📈"],
+  ...(S.p && (S.p.fb || S.p.pl) ? [["team","Team","👥"]] : []),
+  ["plates","Plates","⚖️"],
+  ["friends","Friends","🤝"]
 ];
 
 function render() {
@@ -2118,8 +2123,8 @@ function render() {
   $("sub").textContent = `${S.p.name} · ${S.code}${S.p.schoolName ? " · " + S.p.schoolName : ""} · ${S.p.fb || S.p.pl ? specText(S.p) : S.p.own}`;
 
   if (!TABS().some(t => t[0] === tab)) tab = "workout";
-  $("nav").innerHTML = TABS().map(([k,n]) =>
-    `<button class="tab ${tab===k?"on":""}" onclick="tab='${k}';nextMsg=null;statusMsg='';editSchedule=false;if(chatWith)closeFriendChat();else render()">${n}</button>`
+  $("nav").innerHTML = TABS().map(([k,n,ic]) =>
+    `<button class="tab ${tab===k?"on":""}" onclick="tab='${k}';nextMsg=null;statusMsg='';editSchedule=false;if(chatWith)closeFriendChat();else render()"><span class="ti">${ic}</span><span>${n}</span></button>`
   ).join("");
 
   $("v").innerHTML = ({
@@ -2154,27 +2159,17 @@ function vWork() {
       ${DAYS.map(x => `
         <div class="day-pill ${x===day?"on":""} ${P[x]?"":"rest-pill"}" onclick="day='${x}';render()">
           <div class="abbr">${abbr[x]}</div>
+          ${P[x] ? '<div class="dot"></div>' : ""}
         </div>`).join("")}
     </div>`;
 
   const head = `
     <div class="page-hero">
       <div class="title">${day}</div>
-      <div class="meta">${d ? esc(d.title) : "Rest day · recover & hydrate"}</div>
+      <div class="meta">${d ? esc(d.title) + " · " + d.ex.length + " exercises · " + d.ex.reduce((a,n)=>a+tgt(n)[0],0) + " sets" : "Rest day · recover & hydrate"}</div>
     </div>
     ${strip}
-    <div class="c" style="margin-top:4px">
-      <div class="stat-grid">
-        <div class="stat-card">
-          <div class="label">Date</div>
-          <input type="date" id="wd" value="${today()}" style="min-height:40px;margin-top:6px;padding:8px 10px;font-size:14px">
-        </div>
-        <div class="stat-card">
-          <div class="label">Focus</div>
-          <div class="value" style="font-size:15px;margin-top:8px">${d ? esc(d.title.split(" ")[0]) : "Rest"}</div>
-        </div>
-      </div>
-    </div>`;
+    <div class="datebar"><span>Workout date</span><input type="date" id="wd" value="${today()}"></div>`;
 
   if (!d) {
     return head + `
@@ -2198,44 +2193,32 @@ function vWork() {
       if ((D.sets[i].w === "" || D.sets[i].w == null) && p.w != null) D.sets[i].w = String(p.w);
       if ((!D.sets[i].r || D.sets[i].r === 0) && p.r) D.sets[i].r = p.r;
     });
-    const planBox = `
-      <div class="sug" style="margin-top:10px">
-        <b>Per-set plan</b><br>
-        ${plan.map((p,i) => `Set ${i+1} (${p.tag}): ${esc(p.line)}`).join("<br>")}
-        ${g && g.t ? `<div style="margin-top:6px;opacity:.9">${esc(g.t)}</div>` : ""}
-      </div>`;
     return `
       <div class="c ex">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
+        <div class="ex-head">
           <div>
             <h3>${esc(n)}</h3>
-            <div class="m" style="margin-top:3px">${ts} sets × ${tr} reps</div>
+            <div class="ex-sub">${ts} sets × ${tr} reps</div>
           </div>
-          ${pr[n] ? `<div class="badge" style="flex-shrink:0">PR ${pr[n].w}×${pr[n].r}</div>` : ""}
+          ${pr[n] ? `<div class="badge">PR ${pr[n].w}×${pr[n].r}</div>` : ""}
         </div>
-        ${planBox}
-        <label>Starting weight (lb)</label>
-        <input type="number" inputmode="decimal" value="${D.s}" oninput="S.d['${n}'].s=this.value" placeholder="0">
+        ${g && g.t ? `<div class="tip">${esc(g.t)}</div>` : ""}
+        <div class="set-cols"><span>Set</span><span class="c2">Weight (lb)</span><span class="c3">Reps</span><span></span></div>
         ${D.sets.map((s,i) => {
           const p = plan[i];
           return `
-          <div class="set cset">
-            <div class="cs-head">
-              <b>Set ${i+1}${p ? " · " + p.tag : ""}</b>
-              ${p ? `<span>${esc(p.line)}</span>` : ""}
+          <div class="srow">
+            <div class="snum"><b>${i+1}</b>${p && p.tag !== "Work" ? `<small>${esc(p.tag)}</small>` : ""}</div>
+            <input type="number" inputmode="decimal" value="${s.w}" oninput="S.d['${n}'].sets[${i}].w=this.value" placeholder="${p && p.w != null ? p.w : "lb"}">
+            <div class="crep">
+              <button onclick="rep('${n}',${i},-1)">−</button>
+              <input type="number" inputmode="numeric" value="${s.r||""}" oninput="S.d['${n}'].sets[${i}].r=+this.value||0" placeholder="${p ? p.r : "0"}">
+              <button class="plus" onclick="rep('${n}',${i},1)">+</button>
             </div>
-            <div class="cs-row">
-              <input class="cw" type="number" inputmode="decimal" value="${s.w}" oninput="S.d['${n}'].sets[${i}].w=this.value" placeholder="${p && p.w != null ? p.w : "lb"}">
-              <div class="crep">
-                <button onclick="rep('${n}',${i},-1)">−</button>
-                <input type="number" inputmode="numeric" value="${s.r||""}" oninput="S.d['${n}'].sets[${i}].r=+this.value||0" placeholder="${p ? p.r : "0"}">
-                <button class="plus" onclick="rep('${n}',${i},1)">+</button>
-              </div>
-              ${i ? `<button class="dn cx" aria-label="Remove set" onclick="S.d['${n}'].sets.splice(${i},1);render()">×</button>` : ""}
-            </div>
+            ${i ? `<button class="dn cx" aria-label="Remove set" onclick="S.d['${n}'].sets.splice(${i},1);render()">×</button>` : "<span></span>"}
           </div>`;
         }).join("")}
-        <button style="width:100%;margin-top:10px" onclick="S.d['${n}'].sets.push({w:S.d['${n}'].s||'',r:0});render()">+ Add set</button>
+        <button class="addset" onclick="S.d['${n}'].sets.push({w:S.d['${n}'].sets.slice(-1)[0]?.w||'',r:0});render()">+ Add set</button>
       </div>`;
   }).join("");
 
