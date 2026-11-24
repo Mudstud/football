@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="theme-color" content="#101827">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Football</title>
+<style>
+:root{--bg:#0b1220;--panel:#131e30;--panel2:#1a2940;--text:#f4f7fb;--muted:#aab8ca;--line:#2a3a52;--accent:#f2a900;--green:#35c98a;--red:#ff6b6b;--safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);--safe-left:env(safe-area-inset-left,0px);--safe-right:env(safe-area-inset-right,0px)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;width:100%;overflow-x:hidden}
+body{background:linear-gradient(160deg,#0b1220,#111c2d 60%,#0b1220);color:var(--text);font:16px system-ui,-apple-system,Segoe UI,Roboto,sans-serif;min-height:100vh;min-height:100dvh;padding-left:var(--safe-left);padding-right:var(--safe-right)}
+header{padding:calc(16px + var(--safe-top)) 14px 12px;max-width:480px;margin:0 auto}
+h1{margin:0;font-size:clamp(22px,6.5vw,32px);letter-spacing:-.6px;line-height:1.15}
+.sub{color:var(--muted);margin-top:4px;font-size:13px;line-height:1.35}
+main{max-width:480px;margin:0 auto;padding:0 12px calc(40px + var(--safe-bottom))}
+.profile,.panel,.exercise,.history-card,.setup-card{background:var(--panel);border:1px solid var(--line);border-radius:14px}
+.profile{padding:12px;display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.stat small{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.6px}
+.stat strong{font-size:15px;line-height:1.25;word-break:break-word}
+.tabs{display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:2px 0 10px;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:0 0 auto;white-space:nowrap;border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:999px;padding:9px 14px;font-weight:700;font-size:14px;cursor:pointer}
+.tab.active{background:var(--accent);border-color:var(--accent);color:#171717}
+.panel{padding:14px;margin-bottom:12px}
+.panel h2{margin:0 0 4px;font-size:19px}
+.muted{color:var(--muted)}
+.day-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap}
+input,select,button,textarea{font:inherit}
+input,select,textarea{width:100%;background:#0d1726;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:12px;min-width:0;font-size:16px}
+label{font-size:12px;color:var(--muted);display:block;margin-bottom:4px}
+.field{margin:11px 0}
+.date-row{display:grid;grid-template-columns:1fr;gap:10px;margin-top:12px}
+.exercise{padding:12px;margin-top:10px}
+.exercise h3{margin:0 0 3px;font-size:17px}
+.focus{font-size:12px;color:var(--muted);margin-bottom:8px}
+.suggest{background:rgba(242,169,0,.12);border:1px solid rgba(242,169,0,.35);color:#f6d27a;border-radius:10px;padding:9px 11px;font-size:12.5px;margin-bottom:10px;line-height:1.4}
+.set{background:var(--panel2);border-radius:11px;padding:10px;margin-top:8px}
+.settop{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-weight:700;font-size:14px}
+.setgrid{display:grid;grid-template-columns:1fr;gap:8px}
+.rep-controls{display:flex;align-items:center;gap:10px;margin-top:6px}
+.rep-count{min-width:48px;text-align:center;font-weight:800;font-size:20px}
+button{border:0;border-radius:10px;padding:11px 14px;font-weight:750;cursor:pointer;font-size:15px}
+.primary{background:var(--accent);color:#171717}
+.secondary{background:#263852;color:var(--text);border:1px solid #3a506d}
+.good{background:#176b4b;color:white}
+.danger{background:#5b2932;color:#fff}
+.small{padding:8px 12px;font-size:13px}
+.full{width:100%;margin-top:10px}
+.actions{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.actions button{width:100%}
+.empty{text-align:center;padding:20px 12px;color:var(--muted);font-size:14px}
+.history-card{padding:12px;margin-top:8px}
+.history-card strong{display:block;font-size:15px}
+.history-card small{color:var(--muted);font-size:12px}
+.daylist{display:grid;grid-template-columns:1fr;gap:8px;margin-top:10px}
+.dayitem{background:var(--panel2);border-radius:11px;padding:12px;border:1px solid transparent;text-align:left;color:var(--text);width:100%}
+.dayitem.today{border-color:var(--accent)}
+.dayitem b{display:block;font-size:15px}
+.dayitem small{color:var(--muted);font-size:12px}
+.notice{font-size:12px;color:var(--muted);line-height:1.45;margin-top:10px}
+.hidden{display:none!important}
+.setup-wrap{max-width:480px;margin:0 auto;padding:12px 12px calc(32px + var(--safe-bottom))}
+.setup-card{padding:18px}
+.setup-card h2{margin:0 0 6px;font-size:22px}
+.setup-card .lead{color:var(--muted);margin:0 0 14px;line-height:1.45;font-size:14px}
+.pos-grid{display:grid;grid-template-columns:1fr;gap:7px}
+.pos-grid label{display:flex;align-items:center;gap:10px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px 12px;cursor:pointer;margin:0;color:var(--text);font-size:14px}
+.pos-grid input{width:auto;min-width:18px;height:18px;accent-color:var(--accent)}
+.profile-name{grid-column:1/-1}
+.profile-name strong{font-size:18px}
+.edit-profile-btn{font-size:12px;padding:6px 10px;margin-top:6px}
+/* Wider screens still look good but stay phone-first for 19.5:9 */
+@media(min-width:480px){
+  .date-row{grid-template-columns:1fr 1fr}
+  .setgrid{grid-template-columns:1fr 1fr}
+  .daylist{grid-template-columns:1fr 1fr}
+  .pos-grid{grid-template-columns:1fr 1fr}
+  .actions{flex-direction:row}
+  .actions button{width:auto}
+}
+@media(min-width:700px){
+  .profile{grid-template-columns:repeat(4,1fr)}
+  header,main,.setup-wrap{max-width:560px}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>🏈 Football</h1>
+  <div class="sub">Build strength for the line. Log every set, rep, and pound.</div>
+</header>
+
+<!-- SETUP / START PAGE -->
+<div id="setupView" class="setup-wrap">
+  <div class="setup-card">
+    <h2>Set up your profile</h2>
+    <p class="lead">Tell us who you are so the log can track your progress and suggest next weights.</p>
+
+    <div class="field">
+      <label for="setupName">Your name</label>
+      <input id="setupName" type="text" placeholder="e.g. Marcus" autocomplete="name">
+    </div>
+
+    <div class="field">
+      <label>Football position(s)</label>
+      <div class="pos-grid" id="posGrid">
+        <label><input type="checkbox" name="pos" value="OT"> Offensive Tackle (OT)</label>
+        <label><input type="checkbox" name="pos" value="OG"> Offensive Guard (OG)</label>
+        <label><input type="checkbox" name="pos" value="C"> Center (C)</label>
+        <label><input type="checkbox" name="pos" value="DE"> Defensive End (DE)</label>
+        <label><input type="checkbox" name="pos" value="DT"> Defensive Tackle (DT)</label>
+        <label><input type="checkbox" name="pos" value="NT"> Nose Tackle (NT)</label>
+        <label><input type="checkbox" name="pos" value="TE"> Tight End (TE)</label>
+        <label><input type="checkbox" name="pos" value="Other"> Other / Multiple</label>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="setupWeight">Body weight (lbs)</label>
+      <input id="setupWeight" type="number" min="80" max="400" step="1" placeholder="e.g. 175" inputmode="numeric">
+    </div>
+
+    <div class="field">
+      <label for="setupLevel">Experience level</label>
+      <select id="setupLevel">
+        <option value="Beginner">Beginner (new to lifting)</option>
+        <option value="Intermediate" selected>Intermediate (1–3 years)</option>
+        <option value="Advanced">Advanced (3+ years)</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="setupGoal">Main goal</label>
+      <select id="setupGoal">
+        <option value="Strength + muscle" selected>Strength + muscle</option>
+        <option value="Max strength">Max strength</option>
+        <option value="Power & explosiveness">Power & explosiveness</option>
+        <option value="Size / hypertrophy">Size / hypertrophy</option>
+        <option value="General athleticism">General athleticism</option>
+      </select>
+    </div>
+
+    <button class="primary full" id="saveProfile">Start lifting →</button>
+    <p class="notice">Everything saves on this device. You can edit your profile later from the top of the app.</p>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<main id="appView" class="hidden">
+  <section class="profile" id="profileBar">
+    <div class="stat profile-name"><small>Athlete</small><strong id="dispName">—</strong></div>
+    <div class="stat"><small>Position</small><strong id="dispPos">—</strong></div>
+    <div class="stat"><small>Body weight</small><strong id="dispWeight">—</strong></div>
+    <div class="stat"><small>Level / Goal</small><strong id="dispLevelGoal">—</strong>
+      <button class="secondary small edit-profile-btn" id="editProfileBtn">Edit profile</button>
+    </div>
+  </section>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="workout">Workout</button>
+    <button class="tab" data-tab="schedule">Weekly plan</button>
+    <button class="tab" data-tab="history">History & progress</button>
+  </div>
+
+  <section id="workoutView">
+    <div class="panel">
+      <div class="day-head">
+        <div><h2 id="dayTitle">Monday</h2><div class="muted" id="daySubtitle">Chest, shoulders & triceps</div></div>
+        <span id="todayBadge" class="muted"></span>
+      </div>
+      <div class="date-row">
+        <div><label for="workoutDate">Workout date</label><input id="workoutDate" type="date"></div>
+        <div><label for="daySelect">Choose day</label><select id="daySelect"></select></div>
+      </div>
+      <div id="exerciseList"></div>
+      <button class="primary full" id="finishWorkout">Save completed workout</button>
+      <div class="notice">Your entries save on this device. Use the same browser to see your log later. Suggestions for next weight are based on your last logged sets.</div>
+    </div>
+  </section>
+
+  <section id="scheduleView" class="hidden">
+    <div class="panel">
+      <h2>Weekly training plan</h2>
+      <div class="muted">Pick a day to open its plan in the Workout tab.</div>
+      <div id="weekList" class="daylist"></div>
+      <p class="notice">This is a basic template. Adjust it around football practices, games, and your coach's program. Recovery days are part of getting stronger.</p>
+    </div>
+  </section>
+
+  <section id="historyView" class="hidden">
+    <div class="panel">
+      <h2>History & progress</h2>
+      <div class="muted">Your saved workouts and exercise best logged weights. Next-session targets appear on the Workout tab.</div>
+      <div id="progressSummary"></div>
+      <div id="historyList"></div>
+      <div class="actions">
+        <button class="secondary" id="exportData">Export workout data</button>
+        <button class="danger" id="clearData">Clear all history</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+const plan = [
+ {day:"Monday",title:"Chest, shoulders & triceps",type:"lift",items:[
+  ["Bench Press","Upper-body pushing strength"],
+  ["Overhead Press","Shoulder strength and stability"],
+  ["Close-Grip Bench Press","Triceps and pressing strength"]]},
+ {day:"Tuesday",title:"Recovery",type:"rest",items:[]},
+ {day:"Wednesday",title:"Legs & lower-body strength",type:"lift",items:[
+  ["Squat","Leg strength and drive"],
+  ["Deadlift","Hip, back and posterior-chain strength"],
+  ["Romanian Deadlift","Hamstrings and hip strength"]]},
+ {day:"Thursday",title:"Recovery",type:"rest",items:[]},
+ {day:"Friday",title:"Back & pulling strength",type:"lift",items:[
+  ["Barbell Row","Upper-back strength for contact and posture"],
+  ["Pull-Ups","Back and upper-body pulling strength"]]},
+ {day:"Saturday",title:"Optional football conditioning",type:"optional",items:[
+  ["Football position drills","Stance, first-step technique and footwork"],
+  ["Short acceleration work","Brief, quality starts with full recovery"]]},
+ {day:"Sunday",title:"Rest day",type:"rest",items:[]}
+];
+
+const $ = id => document.getElementById(id);
+const todayISO = () => {const d=new Date();return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10)};
+
+let profile = JSON.parse(localStorage.getItem("linemanProfile")||"null");
+let entries = {};
+let history = JSON.parse(localStorage.getItem("linemanHistory")||"[]");
+let selectedDay = "Monday";
+
+function loadEntries(){
+  const saved = JSON.parse(localStorage.getItem("linemanDraft")||"{}");
+  entries = saved;
+}
+function saveDraft(){ localStorage.setItem("linemanDraft", JSON.stringify(entries)); }
+function getEntry(name){ return entries[name] || {start:"", sets:[{weight:"",reps:0}]}; }
+function setEntry(name,value){ entries[name]=value; saveDraft(); }
+
+/** Find last logged performance for an exercise across history */
+function getLastPerformance(exerciseName){
+  for(const h of history){
+    const item = h.items.find(e => e.name === exerciseName);
+    if(!item || !item.sets || !item.sets.length) continue;
+    const valid = item.sets
+      .map(s => ({ weight: Number(s.weight), reps: Number(s.reps)||0 }))
+      .filter(s => Number.isFinite(s.weight) && s.weight > 0);
+    if(!valid.length) continue;
+    const best = valid.reduce((a,b) => (b.weight > a.weight || (b.weight===a.weight && b.reps>a.reps)) ? b : a);
+    const topWeight = Math.max(...valid.map(s=>s.weight));
+    const avgReps = valid.reduce((s,x)=>s+x.reps,0) / valid.length;
+    return { topWeight, best, avgReps, date: h.date, day: h.day, sets: valid };
+  }
+  return null;
+}
+
+/** Suggest next starting weight based on last session + goal/level */
+function suggestNextWeight(exerciseName){
+  const last = getLastPerformance(exerciseName);
+  if(!last) return null;
+
+  const goal = (profile && profile.goal) || "Strength + muscle";
+  const level = (profile && profile.level) || "Intermediate";
+
+  // Base increment rules (lbs)
+  let increment = 5;
+  if(level === "Beginner") increment = 5;
+  if(level === "Advanced") increment = 2.5;
+
+  // If they hit solid reps on the top set, push a bit more; if low reps, hold or small bump
+  const topReps = last.best.reps;
+  let next = last.topWeight;
+  let reason = "";
+
+  if(topReps >= 8){
+    next = last.topWeight + (level === "Advanced" ? 5 : 10);
+    reason = `You hit ${topReps} reps at ${last.topWeight} lb — strong session. Try ~${next} lb next time.`;
+  } else if(topReps >= 5){
+    next = last.topWeight + increment;
+    reason = `Solid ${topReps} reps at ${last.topWeight} lb. Aim for about ${next} lb next session.`;
+  } else if(topReps >= 3){
+    next = last.topWeight;
+    reason = `Only ${topReps} reps at ${last.topWeight} lb. Repeat that weight and try to add reps.`;
+  } else {
+    next = Math.max(0, last.topWeight - increment);
+    reason = `Tough set (${topReps} reps). Drop to ~${next} lb and rebuild form/reps.`;
+  }
+
+  // Goal tweak
+  if(goal === "Max strength" && topReps >= 5){
+    next = last.topWeight + (level === "Advanced" ? 5 : 5);
+    reason = `Strength focus: last top was ${last.topWeight} lb × ${topReps}. Try ${next} lb.`;
+  }
+  if(goal === "Size / hypertrophy" && topReps >= 8){
+    next = last.topWeight + 5;
+    reason = `Hypertrophy: good volume at ${last.topWeight} lb. Nudge to ${next} lb.`;
+  }
+
+  // Round to nearest 2.5
+  next = Math.round(next * 2) / 2;
+
+  return { next, reason, last };
+}
+
+function showSetup(){
+  $("setupView").classList.remove("hidden");
+  $("appView").classList.add("hidden");
+  if(profile){
+    $("setupName").value = profile.name || "";
+    $("setupWeight").value = profile.weight || "";
+    $("setupLevel").value = profile.level || "Intermediate";
+    $("setupGoal").value = profile.goal || "Strength + muscle";
+    document.querySelectorAll('input[name="pos"]').forEach(cb => {
+      cb.checked = (profile.positions || []).includes(cb.value);
+    });
+  }
+}
+
+function showApp(){
+  $("setupView").classList.add("hidden");
+  $("appView").classList.remove("hidden");
+  renderProfile();
+  renderDay();
+}
+
+function renderProfile(){
+  if(!profile) return;
+  $("dispName").textContent = profile.name || "Athlete";
+  $("dispPos").textContent = (profile.positions && profile.positions.length)
+    ? profile.positions.join(" · ")
+    : "—";
+  $("dispWeight").textContent = profile.weight ? profile.weight + " lb" : "—";
+  $("dispLevelGoal").textContent = (profile.level || "—") + " · " + (profile.goal || "—");
+}
+
+$("saveProfile").addEventListener("click", () => {
+  const name = $("setupName").value.trim();
+  const weight = $("setupWeight").value;
+  const level = $("setupLevel").value;
+  const goal = $("setupGoal").value;
+  const positions = [...document.querySelectorAll('input[name="pos"]:checked')].map(c => c.value);
+
+  if(!name){
+    alert("Enter your name so the log knows who the athlete is.");
+    $("setupName").focus();
+    return;
+  }
+  if(!weight || Number(weight) < 80){
+    alert("Enter a realistic body weight in pounds.");
+    $("setupWeight").focus();
+    return;
+  }
+  if(!positions.length){
+    alert("Select at least one football position.");
+    return;
+  }
+
+  profile = { name, weight: Number(weight), level, goal, positions };
+  localStorage.setItem("linemanProfile", JSON.stringify(profile));
+  showApp();
+});
+
+$("editProfileBtn").addEventListener("click", showSetup);
+
+function renderDay(){
+  const d = plan.find(x => x.day === selectedDay);
+  $("dayTitle").textContent = d.day;
+  $("daySubtitle").textContent = d.title;
+  $("todayBadge").textContent = d.day === new Date().toLocaleDateString("en-US",{weekday:"long"}) ? "TODAY" : "";
+  $("daySelect").value = selectedDay;
+
+  const list = $("exerciseList");
+  list.innerHTML = "";
+
+  if(d.type !== "lift" && d.type !== "optional"){
+    list.innerHTML = '<div class="empty">Recovery day. Rest, hydrate, and do gentle mobility if it feels good. No lifting workout scheduled.</div>';
+    return;
+  }
+
+  d.items.forEach(([name, focus]) => {
+    const e = getEntry(name);
+    const suggestion = suggestNextWeight(name);
+
+    // Pre-fill starting weight from suggestion if empty
+    if(suggestion && (!e.start || e.start === "")){
+      e.start = String(suggestion.next);
+      setEntry(name, e);
+    }
+
+    const card = document.createElement("div");
+    card.className = "exercise";
+
+    let suggestHTML = "";
+    if(suggestion){
+      suggestHTML = `<div class="suggest">📈 Next target: <strong>${suggestion.next} lb</strong><br>${suggestion.reason}</div>`;
+    } else {
+      suggestHTML = `<div class="suggest">No history yet for this lift. Start with a weight you can control for 5–8 clean reps.</div>`;
+    }
+
+    card.innerHTML = `
+      <h3>${name}</h3>
+      <div class="focus">${focus}</div>
+      ${suggestHTML}
+      <div class="field"><label>Starting weight (lbs)</label>
+        <input type="number" min="0" step="0.5" inputmode="decimal" class="startWeight" placeholder="Enter starting weight">
+      </div>
+      <div class="sets"></div>
+      <button class="secondary full addSet">＋ Add Set</button>`;
+
+    const start = card.querySelector(".startWeight");
+    start.value = e.start;
+    start.addEventListener("input", () => {
+      const x = getEntry(name);
+      x.start = start.value;
+      setEntry(name, x);
+    });
+
+    const setsEl = card.querySelector(".sets");
+    function drawSets(){
+      setsEl.innerHTML = "";
+      getEntry(name).sets.forEach((s, i) => {
+        const box = document.createElement("div");
+        box.className = "set";
+        box.innerHTML = `
+          <div class="settop"><span>Set ${i+1}</span><span class="muted">${s.reps} reps</span></div>
+          <div class="setgrid">
+            <div>
+              <label>Weight for this set (lbs)</label>
+              <input type="number" min="0" step="0.5" inputmode="decimal" class="setWeight" placeholder="Weight">
+            </div>
+            <div>
+              <label>Reps completed</label>
+              <div class="rep-controls">
+                <button class="secondary small minus">−</button>
+                <span class="rep-count">${s.reps}</span>
+                <button class="good small plus">＋ Rep</button>
+              </div>
+            </div>
+          </div>
+          ${i > 0 ? '<button class="danger small removeSet" style="margin-top:9px">Remove set</button>' : ""}`;
+
+        const w = box.querySelector(".setWeight");
+        w.value = s.weight;
+        w.addEventListener("input", () => {
+          const x = getEntry(name);
+          x.sets[i].weight = w.value;
+          setEntry(name, x);
+        });
+        box.querySelector(".plus").addEventListener("click", () => {
+          const x = getEntry(name);
+          x.sets[i].reps++;
+          setEntry(name, x);
+          drawSets();
+        });
+        box.querySelector(".minus").addEventListener("click", () => {
+          const x = getEntry(name);
+          x.sets[i].reps = Math.max(0, x.sets[i].reps - 1);
+          setEntry(name, x);
+          drawSets();
+        });
+        const rm = box.querySelector(".removeSet");
+        if(rm) rm.addEventListener("click", () => {
+          const x = getEntry(name);
+          x.sets.splice(i, 1);
+          setEntry(name, x);
+          drawSets();
+        });
+        setsEl.appendChild(box);
+      });
+    }
+    drawSets();
+
+    card.querySelector(".addSet").addEventListener("click", () => {
+      const x = getEntry(name);
+      x.sets.push({ weight: x.start || "", reps: 0 });
+      setEntry(name, x);
+      drawSets();
+    });
+
+    list.appendChild(card);
+  });
+}
+
+function selectDay(day){
+  selectedDay = day;
+  $("daySelect").value = day;
+  renderDay();
+}
+
+$("daySelect").innerHTML = plan.map(d => `<option>${d.day}</option>`).join("");
+$("daySelect").addEventListener("change", e => selectDay(e.target.value));
+$("workoutDate").value = todayISO();
+
+function showTab(tab){
+  document.querySelectorAll(".tab").forEach(b => b.classList.toggle("active", b.dataset.tab === tab));
+  ["workout","schedule","history"].forEach(v => $(v+"View").classList.toggle("hidden", v !== tab));
+  if(tab === "schedule") renderWeek();
+  if(tab === "history") renderHistory();
+}
+document.querySelectorAll(".tab").forEach(b => b.addEventListener("click", () => showTab(b.dataset.tab)));
+
+function renderWeek(){
+  $("weekList").innerHTML = "";
+  const today = new Date().toLocaleDateString("en-US",{weekday:"long"});
+  plan.forEach(d => {
+    const item = document.createElement("button");
+    item.className = "dayitem" + (d.day === today ? " today" : "");
+    item.style.textAlign = "left";
+    item.style.color = "var(--text)";
+    item.innerHTML = `<b>${d.day}${d.day===today?" · Today":""}</b><small>${d.title}</small>`;
+    item.addEventListener("click", () => { selectDay(d.day); showTab("workout"); });
+    $("weekList").appendChild(item);
+  });
+}
+
+$("finishWorkout").addEventListener("click", () => {
+  const d = plan.find(x => x.day === selectedDay);
+  if(d.type === "rest"){
+    alert("Today is a recovery day. No lifting workout to save.");
+    return;
+  }
+  const record = {
+    date: $("workoutDate").value,
+    day: selectedDay,
+    title: d.title,
+    items: d.items.map(([name]) => ({ name, ...JSON.parse(JSON.stringify(getEntry(name))) })),
+    savedAt: new Date().toISOString()
+  };
+  history.unshift(record);
+  localStorage.setItem("linemanHistory", JSON.stringify(history));
+
+  // Clear draft for these exercises so next time starts fresh with new suggestion
+  d.items.forEach(([name]) => { delete entries[name]; });
+  saveDraft();
+
+  alert("Workout saved! Next time you do these lifts you’ll see suggested weights based on this session.");
+  showTab("history");
+});
+
+function renderHistory(){
+  const summary = $("progressSummary");
+  summary.innerHTML = "";
+  const best = {};
+  history.forEach(h => h.items.forEach(e => e.sets.forEach(s => {
+    const n = Number(s.weight);
+    if(Number.isFinite(n) && n > 0) best[e.name] = Math.max(best[e.name]||0, n);
+  })));
+
+  if(Object.keys(best).length){
+    const p = document.createElement("div");
+    p.className = "daylist";
+    Object.entries(best).forEach(([name, w]) => {
+      const sug = suggestNextWeight(name);
+      const el = document.createElement("div");
+      el.className = "dayitem";
+      el.innerHTML = `<b>${name}</b>
+        <small>Best logged: ${w} lb</small>
+        ${sug ? `<small style="color:#f6d27a;display:block;margin-top:4px">Next target ≈ ${sug.next} lb</small>` : ""}`;
+      p.appendChild(el);
+    });
+    summary.appendChild(p);
+  }
+
+  const list = $("historyList");
+  list.innerHTML = "";
+  if(!history.length){
+    list.innerHTML = '<div class="empty">No saved workouts yet. Finish a workout to start your history.</div>';
+    return;
+  }
+  history.forEach(h => {
+    const c = document.createElement("div");
+    c.className = "history-card";
+    const lines = h.items.map(e =>
+      `${e.name}: ${e.sets.map(s => `${s.weight||"—"} lb × ${s.reps}`).join(", ")}`
+    ).join("<br>");
+    c.innerHTML = `<strong>${h.day} · ${h.date}</strong><small>${h.title}</small>
+      <div style="margin-top:9px;line-height:1.7">${lines}</div>`;
+    list.appendChild(c);
+  });
+}
+
+$("exportData").addEventListener("click", () => {
+  const blob = new Blob([JSON.stringify({ profile, history }, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "lineman-workout-history.json";
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+$("clearData").addEventListener("click", () => {
+  if(confirm("Delete all saved workout history on this device? This cannot be undone.")){
+    history = [];
+    localStorage.removeItem("linemanHistory");
+    renderHistory();
+  }
+});
+
+// Boot
+loadEntries();
+const today = new Date().toLocaleDateString("en-US",{weekday:"long"});
+if(plan.some(d => d.day === today)) selectedDay = today;
+
+if(profile && profile.name){
+  showApp();
+} else {
+  showSetup();
+}
+</script>
+</body>
+</html>
