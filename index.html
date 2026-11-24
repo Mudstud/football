@@ -711,7 +711,7 @@ a { color: var(--a); font-weight: 650; text-decoration: none; }
   <div class="topbar">
     <div class="brand">
       <div class="brand-row">
-        <div class="brand-mark">â¡</div>
+        <div class="brand-mark">⚡</div>
         <h1>Lift Log</h1>
       </div>
       <div class="sub" id="sub">Log every set, rep and pound</div>
@@ -729,7 +729,7 @@ a { color: var(--a); font-weight: 650; text-decoration: none; }
 
 <script>
 /* ============================================================
-   FIREBASE CONFIG â REPLACE WITH YOUR PROJECT VALUES
+   FIREBASE CONFIG – REPLACE WITH YOUR PROJECT VALUES
    ============================================================ */
 const firebaseConfig = {
   apiKey: "AIzaSyBr6KkPC6WL9TDuRsPnHlaJH-TWkdMaQWQ",
@@ -785,8 +785,8 @@ function posList(p) {
   return [];
 }
 
-// Default: MonâFri training, Sat + Sun rest.
-// Schedule maps day name â template key (or missing/null = rest).
+// Default: Mon–Fri training, Sat + Sun rest.
+// Schedule maps day name → template key (or missing/null = rest).
 const DEFAULT_SCHEDULE = {
   Monday: "upper",
   Tuesday: "lower",
@@ -836,7 +836,7 @@ function plan() {
   const templates = getTemplates();
   const sched = S.p.schedule || DEFAULT_SCHEDULE;
   const result = {};
-  // Support both new (day â slot) and old (slot â day) shapes so existing profiles still work
+  // Support both new (day → slot) and old (slot → day) shapes so existing profiles still work
   const firstKey = Object.keys(sched)[0];
   const isDayKeyed = firstKey && DAYS.includes(firstKey);
   if (isDayKeyed) {
@@ -854,7 +854,7 @@ function plan() {
 function setDaySlot(day, slot) {
   if (!S.p || !DAYS.includes(day)) return;
   if (!S.p.schedule) S.p.schedule = { ...DEFAULT_SCHEDULE };
-  // Migrate old slotâday shape if needed
+  // Migrate old slot→day shape if needed
   const firstKey = Object.keys(S.p.schedule)[0];
   if (firstKey && !DAYS.includes(firstKey)) {
     S.p.schedule = { ...DEFAULT_SCHEDULE };
@@ -944,8 +944,8 @@ function modeName(p) {
 function specText(p) {
   if (!(p.fb || p.pl)) return p.own;
   const posNames = posList(p).map(i => POS[i]).filter(Boolean);
-  const fbPart = p.fb ? (posNames.length ? posNames.join(", ") : "Football") + " Â· " + FBT[p.fb.t] : null;
-  const plPart = p.pl ? WCS[p.pl.w] + " lb Â· Grade " + p.pl.g : null;
+  const fbPart = p.fb ? (posNames.length ? posNames.join(", ") : "Football") + " · " + FBT[p.fb.t] : null;
+  const plPart = p.pl ? WCS[p.pl.w] + " lb · Grade " + p.pl.g : null;
   return [fbPart, plPart].filter(Boolean).join(" | ");
 }
 function teamKeys(p) {
@@ -956,9 +956,9 @@ function teamKeys(p) {
 }
 function tname(k) {
   if (!k) return "";
-  if (k[0] === "F") return "Football Â· " + FBT[+k.slice(1)];
+  if (k[0] === "F") return "Football · " + FBT[+k.slice(1)];
   const parts = k.slice(1).split("-");
-  return "Powerlifting Â· " + WCS[+parts[0]] + " lb Â· Grade " + parts[1];
+  return "Powerlifting · " + WCS[+parts[0]] + " lb · Grade " + parts[1];
 }
 
 /* ============================================================
@@ -1038,14 +1038,14 @@ async function loadProfile() {
       await loadFriends();
       render();
     } else {
-      // Signed in but no profile yet â show setup
+      // Signed in but no profile yet → show setup
       S.p = null;
       render();
     }
   } catch (e) {
     console.error(e);
     const hint = (e.code === "permission-denied")
-      ? " Firestore rules are blocking this. In Firebase Console â Firestore â Rules, publish rules that allow read/write when request.auth != null (or temporarily if true for testing)."
+      ? " Firestore rules are blocking this. In Firebase Console → Firestore → Rules, publish rules that allow read/write when request.auth != null (or temporarily if true for testing)."
       : "";
     setStatus("Error loading profile: " + e.message + hint, "err");
     render();
@@ -1067,7 +1067,7 @@ async function doLogin() {
     return;
   }
   try {
-    setStatus("Signing inâ¦", "info");
+    setStatus("Signing in…", "info");
     const cred = await auth.signInWithEmailAndPassword(email.trim(), pass);
     await cred.user.getIdToken(true);
   } catch (e) {
@@ -1077,7 +1077,7 @@ async function doLogin() {
     if (e.code === "auth/wrong-password") msg = "Wrong password.";
     if (e.code === "auth/invalid-email") msg = "Invalid email address.";
     if (e.code === "auth/invalid-credential") msg = "Wrong email or password.";
-    if (e.code === "auth/admin-restricted-operation") msg = "Email/Password sign-in is not enabled. In Firebase Console â Authentication â Sign-in method â enable Email/Password.";
+    if (e.code === "auth/admin-restricted-operation") msg = "Email/Password sign-in is not enabled. In Firebase Console → Authentication → Sign-in method → enable Email/Password.";
     setStatus(msg, "err");
   }
 }
@@ -1100,7 +1100,7 @@ async function doSignup() {
     return;
   }
   try {
-    setStatus("Creating accountâ¦", "info");
+    setStatus("Creating account…", "info");
     const cred = await auth.createUserWithEmailAndPassword(email.trim(), pass);
     await cred.user.getIdToken(true);
   } catch (e) {
@@ -1109,7 +1109,7 @@ async function doSignup() {
     if (e.code === "auth/email-already-in-use") msg = "That email is already registered. Log in instead.";
     if (e.code === "auth/weak-password") msg = "Password is too weak (min 6 characters).";
     if (e.code === "auth/invalid-email") msg = "Invalid email address.";
-    if (e.code === "auth/admin-restricted-operation") msg = "Email/Password sign-in is not enabled. In Firebase Console â Authentication â Sign-in method â enable Email/Password.";
+    if (e.code === "auth/admin-restricted-operation") msg = "Email/Password sign-in is not enabled. In Firebase Console → Authentication → Sign-in method → enable Email/Password.";
     setStatus(msg, "err");
   }
 }
@@ -1126,14 +1126,14 @@ async function doLogout() {
 
 async function doGuestLogin() {
   try {
-    setStatus("Starting guest sessionâ¦", "info");
+    setStatus("Starting guest session…", "info");
     const cred = await auth.signInAnonymously();
     await cred.user.getIdToken(true);
   } catch (e) {
     console.error(e);
     let msg = e.message || "Guest login failed";
     if (e.code === "auth/admin-restricted-operation" || e.code === "auth/operation-not-allowed") {
-      msg = "Guest login is turned off. Firebase â Authentication â Sign-in method â enable Anonymous (and Email/Password for email).";
+      msg = "Guest login is turned off. Firebase → Authentication → Sign-in method → enable Anonymous (and Email/Password for email).";
     }
     setStatus(msg, "err");
   }
@@ -1148,11 +1148,11 @@ function authUI() {
       <input id="authEmail" type="email" inputmode="email" autocomplete="email" placeholder="you@school.edu"
         value="${esc(authForm.email)}" oninput="authForm.email=this.value">
       <label>Password</label>
-      <input id="authPass" type="password" autocomplete="${authMode === "login" ? "current-password" : "new-password"}" placeholder="â¢â¢â¢â¢â¢â¢â¢â¢"
+      <input id="authPass" type="password" autocomplete="${authMode === "login" ? "current-password" : "new-password"}" placeholder="••••••••"
         value="${esc(authForm.pass)}" oninput="authForm.pass=this.value">
       ${authMode === "signup" ? `
         <label>Confirm password</label>
-        <input id="authPass2" type="password" autocomplete="new-password" placeholder="â¢â¢â¢â¢â¢â¢â¢â¢"
+        <input id="authPass2" type="password" autocomplete="new-password" placeholder="••••••••"
           value="${esc(authForm.pass2)}" oninput="authForm.pass2=this.value">
       ` : ""}
       <button class="pri" onclick="${authMode === "login" ? "doLogin()" : "doSignup()"}">
@@ -1167,12 +1167,12 @@ function authUI() {
     </div>
     ${statusMsg ? `<div class="status ${statusType}">${esc(statusMsg)}</div>` : ""}
     <div class="c">
-      <b>Seeing ârestricted to administrators onlyâ?</b>
+      <b>Seeing “restricted to administrators only”?</b>
       <div class="nt">
         That is a Firebase project setting, not an app bug. Do all of these:<br><br>
-        1. Authentication â Sign-in method â enable <b>Email/Password</b> AND <b>Anonymous</b> â Save<br>
-        2. Google Cloud Console (same project) â APIs &amp; Services â enable <b>Identity Toolkit API</b><br>
-        3. Identity Platform (if used) â Settings â allow account creation from the client SDK<br>
+        1. Authentication → Sign-in method → enable <b>Email/Password</b> AND <b>Anonymous</b> → Save<br>
+        2. Google Cloud Console (same project) → APIs &amp; Services → enable <b>Identity Toolkit API</b><br>
+        3. Identity Platform (if used) → Settings → allow account creation from the client SDK<br>
         4. Open the app at <b>http://localhost</b> (run <code>npx serve .</code>), not as a file
       </div>
     </div>
@@ -1212,7 +1212,7 @@ async function finishSetup() {
   const city = (su.city || "").trim();
   if ($("sschool")) su.school = $("sschool").value;
   if (!n || !(+su.w >= 50) || (su.own && !su.s.trim())) {
-    alert("Enter your name, a body weight (â¥50), and what you're training for.");
+    alert("Enter your name, a body weight (≥50), and what you're training for.");
     return;
   }
   if (su.fb && (!Array.isArray(su.fp) || !su.fp.length)) {
@@ -1343,7 +1343,7 @@ async function loadFriends() {
 async function addFriendByCode(code) {
   code = code.trim().toUpperCase();
   if (!/^[A-Z0-9]{5,7}$/.test(code)) {
-    setStatus("Enter a valid 5â7 character friend code (letters and numbers).", "err");
+    setStatus("Enter a valid 5–7 character friend code (letters and numbers).", "err");
     return;
   }
   if (code === S.code) {
@@ -1500,7 +1500,7 @@ function loadChat(target) {
         });
       });
       S.messages.reverse();
-      // Only update the messages list â never touch the input (keeps keyboard open)
+      // Only update the messages list — never touch the input (keeps keyboard open)
       const box = $("chatmsgs");
       if (box) {
         const atBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 80;
@@ -1606,7 +1606,7 @@ async function finish() {
 }
 
 /* ============================================================
-   UI â SETUP
+   UI – SETUP
    ============================================================ */
 let su = {fb:0, pl:0, own:0, fp:[], ft:2, pw:5, pg:10, n:"", w:"", s:"", school:"", newSchool:"", city:""};
 let schoolList = []; // [{id, name, city}]
@@ -1673,7 +1673,7 @@ function keep() {
 }
 
 function togglePos(i) {
-  // Only update the array â do NOT rebuild the form (keeps name/weight)
+  // Only update the array — do NOT rebuild the form (keeps name/weight)
   i = +i;
   if (!Array.isArray(su.fp)) su.fp = [];
   if (su.fp.includes(i)) su.fp = su.fp.filter(x => x !== i);
@@ -1685,22 +1685,22 @@ function schoolOptionsHtml() {
   let schoolOpts = "";
   if (near.length) {
     schoolOpts += `<optgroup label="Near ${esc(su.city) || "you"}">`;
-    schoolOpts += near.map(s => `<option value="${esc(s.id)}" ${su.school===s.id?"selected":""}>${esc(s.name)}${s.city ? " Â· " + esc(s.city) : ""}</option>`).join("");
+    schoolOpts += near.map(s => `<option value="${esc(s.id)}" ${su.school===s.id?"selected":""}>${esc(s.name)}${s.city ? " · " + esc(s.city) : ""}</option>`).join("");
     schoolOpts += `</optgroup>`;
   }
   if (other.length) {
     schoolOpts += `<optgroup label="${near.length ? "Other schools" : "All schools"}">`;
-    schoolOpts += other.map(s => `<option value="${esc(s.id)}" ${su.school===s.id?"selected":""}>${esc(s.name)}${s.city ? " Â· " + esc(s.city) : ""}</option>`).join("");
+    schoolOpts += other.map(s => `<option value="${esc(s.id)}" ${su.school===s.id?"selected":""}>${esc(s.name)}${s.city ? " · " + esc(s.city) : ""}</option>`).join("");
     schoolOpts += `</optgroup>`;
   }
   if (!schoolList.length) {
-    schoolOpts = `<option value="" disabled>No schools yet â create one</option>`;
+    schoolOpts = `<option value="" disabled>No schools yet — create one</option>`;
   }
   return schoolOpts;
 }
 
 function onSchoolChange() {
-  // Save name/weight, update school, only toggle the "new school" field â no full form wipe
+  // Save name/weight, update school, only toggle the "new school" field — no full form wipe
   if ($("sn")) su.n = $("sn").value;
   if ($("sw")) su.w = $("sw").value;
   if ($("scity")) su.city = $("scity").value;
@@ -1723,7 +1723,7 @@ function onCityBlur() {
   const sel = $("sschool");
   if (!sel) return;
   const current = su.school;
-  sel.innerHTML = `<option value="">â Select a school â</option>${schoolOptionsHtml()}<option value="__new__" ${current==="__new__"?"selected":""}>+ Create new school</option>`;
+  sel.innerHTML = `<option value="">— Select a school —</option>${schoolOptionsHtml()}<option value="__new__" ${current==="__new__"?"selected":""}>+ Create new school</option>`;
   // restore selection if still valid
   if (current && current !== "__new__") {
     const stillThere = [...sel.options].some(o => o.value === current);
@@ -1734,7 +1734,7 @@ function onCityBlur() {
 }
 
 async function setupUI() {
-  // Only full rebuild when switching Football / Powerlifting / Own â not on school pick
+  // Only full rebuild when switching Football / Powerlifting / Own — not on school pick
   if ($("sn")) su.n = $("sn").value;
   if ($("sw")) su.w = $("sw").value;
   if ($("scity")) su.city = $("scity").value;
@@ -1771,11 +1771,11 @@ async function setupUI() {
         <input id="scity" placeholder="e.g. Austin" value="${esc(su.city)}"
           oninput="su.city=this.value"
           onblur="onCityBlur()">
-        <div class="nt">Type your city, then tap outside the box â nearby schools appear at the top.</div>
+        <div class="nt">Type your city, then tap outside the box — nearby schools appear at the top.</div>
 
         <label>School</label>
         <select id="sschool" onchange="onSchoolChange()">
-          <option value="">â Select a school â</option>
+          <option value="">— Select a school —</option>
           ${schoolOptionsHtml()}
           <option value="__new__" ${su.school==="__new__"?"selected":""}>+ Create new school</option>
         </select>
@@ -1786,7 +1786,7 @@ async function setupUI() {
         </div>
 
         ${su.fb ? `
-          <label>Football position(s) â pick all that apply</label>
+          <label>Football position(s) — pick all that apply</label>
           <div class="set" style="margin-top:4px">${posChecks}</div>
           <div class="nt">Your workout plan changes based on these positions.</div>
           <label>Football team</label>
@@ -1806,7 +1806,7 @@ async function setupUI() {
         <select id="sg">${GOALS.map(x => `<option>${x}</option>`).join("")}</select>
         <label>Lifting level</label>
         <select id="sl">${["Beginner","Intermediate","Advanced"].map(x => `<option>${x}</option>`).join("")}</select>
-        <button class="pri" onclick="finishSetup()">Start lifting â</button>
+        <button class="pri" onclick="finishSetup()">Start lifting →</button>
       ` : ""}
     </div>
     ${statusMsg ? `<div class="status ${statusType}">${esc(statusMsg)}</div>` : ""}
@@ -1837,7 +1837,7 @@ function editProfile() {
 }
 
 /* ============================================================
-   UI â VIEWS
+   UI – VIEWS
    ============================================================ */
 const TABS = () => [
   ["workout","Workout"],
@@ -1849,16 +1849,16 @@ const TABS = () => [
 ];
 
 function render() {
-  // Not signed in â login / signup
+  // Not signed in → login / signup
   if (!S.uid) {
     $("setup").classList.remove("hide");
     $("app").classList.add("hide");
     $("nav").classList.add("hide");
     $("sub").textContent = "Log in to track lifts & chat";
-    $("setup").innerHTML = authReady ? authUI() : `<div class="c"><div class="nt">Connectingâ¦</div></div>`;
+    $("setup").innerHTML = authReady ? authUI() : `<div class="c"><div class="nt">Connecting…</div></div>`;
     return;
   }
-  // Signed in but no profile â training setup
+  // Signed in but no profile → training setup
   if (!S.p) {
     $("setup").classList.remove("hide");
     $("app").classList.add("hide");
@@ -1870,7 +1870,7 @@ function render() {
   $("setup").classList.add("hide");
   $("app").classList.remove("hide");
   $("nav").classList.remove("hide");
-  $("sub").textContent = `${S.p.name} Â· ${S.code}${S.p.schoolName ? " Â· " + S.p.schoolName : ""} Â· ${S.p.fb || S.p.pl ? specText(S.p) : S.p.own}`;
+  $("sub").textContent = `${S.p.name} · ${S.code}${S.p.schoolName ? " · " + S.p.schoolName : ""} · ${S.p.fb || S.p.pl ? specText(S.p) : S.p.own}`;
 
   if (!TABS().some(t => t[0] === tab)) tab = "workout";
   $("nav").innerHTML = TABS().map(([k,n]) =>
@@ -1896,7 +1896,7 @@ function vWork() {
     return `
       <div class="page-hero">
         <div class="title">Workout saved</div>
-        <div class="meta">Hereâs what to aim for next time</div>
+        <div class="meta">Here’s what to aim for next time</div>
       </div>
       <div class="c">
         ${nextMsg.map(x => `<div class="sug"><b>${esc(x[0])}</b><br>${esc(x[1])}</div>`).join("")}
@@ -1915,7 +1915,7 @@ function vWork() {
   const head = `
     <div class="page-hero">
       <div class="title">${day}</div>
-      <div class="meta">${d ? esc(d.title) : "Rest day Â· recover & hydrate"}</div>
+      <div class="meta">${d ? esc(d.title) : "Rest day · recover & hydrate"}</div>
     </div>
     ${strip}
     <div class="c" style="margin-top:4px">
@@ -1949,9 +1949,9 @@ function vWork() {
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
           <div>
             <h3>${esc(n)}</h3>
-            <div class="m" style="margin-top:3px">Target ${ts} Ã ${tr}</div>
+            <div class="m" style="margin-top:3px">Target ${ts} × ${tr}</div>
           </div>
-          ${pr[n] ? `<div class="badge" style="flex-shrink:0">PR ${pr[n].w}Ã${pr[n].r}</div>` : ""}
+          ${pr[n] ? `<div class="badge" style="flex-shrink:0">PR ${pr[n].w}×${pr[n].r}</div>` : ""}
         </div>
         ${g ? `<div class="sug" style="margin-top:10px">${esc(g.t)}</div>` : ""}
         <label>Starting weight (lb)</label>
@@ -1970,7 +1970,7 @@ function vWork() {
               </div>
             </div>
             <div class="rc" style="margin-top:10px">
-              <button onclick="rep('${n}',${i},-1)">â</button>
+              <button onclick="rep('${n}',${i},-1)">−</button>
               <span class="big" style="font-size:28px">${s.r}</span>
               <button class="plus" onclick="rep('${n}',${i},1)">+ Rep</button>
             </div>
@@ -2000,7 +2000,7 @@ function vPlan() {
     return `
       <div class="page-hero">
         <div class="title">Edit schedule</div>
-        <div class="meta">Tap a day to cycle workout Â· rest</div>
+        <div class="meta">Tap a day to cycle workout · rest</div>
       </div>
 
       <div class="c">
@@ -2021,14 +2021,14 @@ function vPlan() {
         </div>
         <div class="nt">Keep tapping a day to switch between Rest and each workout type.</div>
         <button class="pri" onclick="editSchedule=false;render()">Done</button>
-        <button style="width:100%;margin-top:8px" onclick="resetSchedule()">Reset to MonâFri default</button>
+        <button style="width:100%;margin-top:8px" onclick="resetSchedule()">Reset to Mon–Fri default</button>
       </div>`;
   }
 
   return `
     <div class="page-hero">
       <div class="title">Plan</div>
-      <div class="meta">${trainCount} training days Â· ${7 - trainCount} rest</div>
+      <div class="meta">${trainCount} training days · ${7 - trainCount} rest</div>
     </div>
 
     <div class="c">
@@ -2074,7 +2074,7 @@ function vHist() {
               <div class="name">${esc(n)}</div>
               <div class="sub">${g ? esc(g.t) : "Keep training"}</div>
             </div>
-            <div class="pr-nums">${pr[n].w}<span style="font-size:12px;font-weight:600;color:var(--muted)"> Ã ${pr[n].r}</span></div>
+            <div class="pr-nums">${pr[n].w}<span style="font-size:12px;font-weight:600;color:var(--muted)"> × ${pr[n].r}</span></div>
           </div>`;
       }).join("") : '<div class="m">No PRs yet. Save a workout first.</div>'}
     </div>
@@ -2083,10 +2083,10 @@ function vHist() {
       <h2>History</h2>
       ${S.h.length ? S.h.map(h => `
         <div class="hist-item">
-          <div class="when">${esc(h.day)} Â· ${esc(h.date)}</div>
+          <div class="when">${esc(h.day)} · ${esc(h.date)}</div>
           <div class="what">${esc(h.title)}</div>
           <div class="lifts">
-            ${h.items.map(i => esc(i.name) + ": " + i.sets.map(s => s.w + " lb Ã " + s.r).join(", ")).join("<br>")}
+            ${h.items.map(i => esc(i.name) + ": " + i.sets.map(s => s.w + " lb × " + s.r).join(", ")).join("<br>")}
           </div>
         </div>`).join("") : '<div class="m">No workouts saved yet.</div>'}
       <div class="row" style="margin-top:14px">
@@ -2130,7 +2130,7 @@ function vTeam() {
   return `
     <div class="page-hero">
       <div class="title">Team</div>
-      <div class="meta">${esc(tname(curTeam))} Â· ${esc(S.p.schoolName || "your school")}</div>
+      <div class="meta">${esc(tname(curTeam))} · ${esc(S.p.schoolName || "your school")}</div>
     </div>
 
     <div class="c">
@@ -2153,10 +2153,10 @@ function vTeam() {
           <div class="pr-row">
             <div class="pr-rank ${i < 3 ? "top" : ""}">${i+1}</div>
             <div class="pr-info">
-              <div class="name">${esc(o.name)}${o.uid===S.uid?" Â· you":""}</div>
+              <div class="name">${esc(o.name)}${o.uid===S.uid?" · you":""}</div>
               <div class="sub">#${esc(o.id)}</div>
             </div>
-            <div class="pr-nums">${o.prs[lift].w}<span style="font-size:12px;font-weight:600;color:var(--muted)"> Ã ${o.prs[lift].r}</span></div>
+            <div class="pr-nums">${o.prs[lift].w}<span style="font-size:12px;font-weight:600;color:var(--muted)"> × ${o.prs[lift].r}</span></div>
           </div>`).join("") || '<div class="m" style="margin-top:10px">No numbers for this lift yet.</div>'}
       ` : '<div class="m">Log a lift and add friends to start the board.</div>'}
     </div>
@@ -2189,10 +2189,10 @@ function vFriends() {
     return `
       <div class="page-hero">
         <div class="title">${esc(friendName)}</div>
-        <div class="meta">Private chat Â· only you two</div>
+        <div class="meta">Private chat · only you two</div>
       </div>
       <div class="c">
-        <button onclick="closeFriendChat()" style="width:auto;min-width:80px;margin-bottom:10px">â Back</button>
+        <button onclick="closeFriendChat()" style="width:auto;min-width:80px;margin-bottom:10px">← Back</button>
         <div id="chatmsgs" style="max-height:360px;overflow-y:auto">
           ${S.messages.length ? S.messages.map(m => `
             <div class="msg">
@@ -2221,7 +2221,7 @@ function vFriends() {
   return `
     <div class="page-hero">
       <div class="title">Friends</div>
-      <div class="meta">${accepted.length} connected Â· ${pending.length} requests</div>
+      <div class="meta">${accepted.length} connected · ${pending.length} requests</div>
     </div>
 
     <div class="c">
@@ -2248,7 +2248,7 @@ function vFriends() {
           <div class="friend-head">
             <div class="avatar">${initial(f.name)}</div>
             <div class="friend-meta">
-              <div class="nm">${esc(f.name)} Â· #${esc(f.id)}</div>
+              <div class="nm">${esc(f.name)} · #${esc(f.id)}</div>
               <div class="sp">Wants to be friends</div>
             </div>
           </div>
@@ -2265,7 +2265,7 @@ function vFriends() {
         <div class="friend-head">
           <div class="avatar">${initial(f.name)}</div>
           <div class="friend-meta">
-            <div class="nm">${esc(f.name)} Â· #${esc(f.id)}</div>
+            <div class="nm">${esc(f.name)} · #${esc(f.id)}</div>
             <div class="sp">Waiting for them to accept</div>
           </div>
         </div>
@@ -2278,17 +2278,17 @@ function vFriends() {
           <div class="friend-head">
             <div class="avatar">${initial(f.name)}</div>
             <div class="friend-meta">
-              <div class="nm">${esc(f.name)} Â· #${esc(f.id)}</div>
-              <div class="sp">${esc(f.mode || "")}${f.spec ? " Â· " + esc(f.spec) : ""}</div>
+              <div class="nm">${esc(f.name)} · #${esc(f.id)}</div>
+              <div class="sp">${esc(f.mode || "")}${f.spec ? " · " + esc(f.spec) : ""}</div>
             </div>
           </div>
           ${Object.entries(f.prs || {}).length ? Object.entries(f.prs).map(([n,b]) => `
-            <div class="ln"><span>${esc(n)}</span><b>${b.w} lb Ã ${b.r}</b></div>
+            <div class="ln"><span>${esc(n)}</span><b>${b.w} lb × ${b.r}</b></div>
           `).join("") : '<div class="nt">No lifts shared yet</div>'}
           ${f.recent ? `
             <div class="nt">
-              <b>Latest Â· ${esc(f.recent.date)}</b><br>
-              ${f.recent.items.map(i => esc(i.name) + ": " + i.sets.map(s => s.w + "Ã" + s.r).join(", ")).join("<br>")}
+              <b>Latest · ${esc(f.recent.date)}</b><br>
+              ${f.recent.items.map(i => esc(i.name) + ": " + i.sets.map(s => s.w + "×" + s.r).join(", ")).join("<br>")}
             </div>` : ""}
           <div class="row">
             <button class="pri" style="margin:0" onclick="openFriendChat('${f.uid}')">Chat</button>
@@ -2335,7 +2335,7 @@ function vPlates() {
   return `
     <div class="page-hero">
       <div class="title">Plates</div>
-      <div class="meta">Build the bar Â· both sides load the same</div>
+      <div class="meta">Build the bar · both sides load the same</div>
     </div>
 
     <div class="c">
@@ -2344,7 +2344,7 @@ function vPlates() {
         <div class="unit">lb total</div>
       </div>
       <svg viewBox="0 0 2200 520" width="100%" style="margin:8px 0">${bs}${L}${R}</svg>
-      <div class="nt" style="text-align:center;margin-top:0">${bar ? "45 lb bar" : "No bar"}${list.length ? " Â· each side: " + list.join(" + ") : ""}</div>
+      <div class="nt" style="text-align:center;margin-top:0">${bar ? "45 lb bar" : "No bar"}${list.length ? " · each side: " + list.join(" + ") : ""}</div>
     </div>
 
     <div class="c">
@@ -2396,7 +2396,7 @@ setInterval(async () => {
     }
     // Friends list is already live via onSnapshot, no need to poll it
   } catch (e) {
-    // silent â background only
+    // silent – background only
   }
 }, 5000);
 </script>
