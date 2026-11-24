@@ -778,7 +778,7 @@ input[type=checkbox] {
   <div class="topbar">
     <div class="brand">
       <div class="brand-row">
-        <div class="brand-mark">⚡</div>
+        <div class="brand-mark">â¡</div>
         <h1>Lift Log</h1>
       </div>
       <div class="sub" id="sub">Log every set, rep and pound</div>
@@ -796,7 +796,7 @@ input[type=checkbox] {
 
 <script>
 /* ============================================================
-   FIREBASE CONFIG – REPLACE WITH YOUR PROJECT VALUES
+   FIREBASE CONFIG â REPLACE WITH YOUR PROJECT VALUES
    ============================================================ */
 const firebaseConfig = {
   apiKey: "AIzaSyBr6KkPC6WL9TDuRsPnHlaJH-TWkdMaQWQ",
@@ -843,19 +843,276 @@ const WCS = ["105","114","123","132","148","165","181","198","220","242","275","
 const GRADES = [9,10,11,12];
 
 const EX = {
-  "Bench Press":{inc:5,t:[3,8],bw:[.35,.5,.75],pl:1},
-  "Overhead Press":{inc:2.5,t:[3,8],bw:[.25,.35,.5]},
-  "Close-Grip Bench Press":{inc:5,t:[3,8],bw:[.3,.45,.65]},
   "Squat":{inc:10,t:[3,5],bw:[.5,.75,1],pl:1},
+  "Front Squat":{inc:5,t:[3,6],bw:[.4,.6,.8],pl:1},
+  "Box Squat":{inc:10,t:[3,5],bw:[.45,.7,.95],pl:1},
   "Deadlift":{inc:10,t:[3,5],bw:[.6,.9,1.25],pl:1},
-  "Romanian Deadlift":{inc:5,t:[3,8],bw:[.4,.6,.85]},
-  "Barbell Row":{inc:5,t:[3,8],bw:[.35,.5,.7]},
+  "Romanian Deadlift":{inc:5,t:[3,8],bw:[.4,.6,.85],pl:1},
+  "Sumo Deadlift":{inc:10,t:[3,5],bw:[.55,.85,1.15],pl:1},
+  "Bench Press":{inc:5,t:[3,8],bw:[.35,.5,.75],pl:1},
+  "Incline Bench Press":{inc:5,t:[3,8],bw:[.3,.45,.65],pl:1},
+  "Close-Grip Bench Press":{inc:5,t:[3,8],bw:[.3,.45,.65],pl:1},
+  "Dumbbell Bench":{inc:5,t:[3,10],bw:[.15,.25,.35]},
+  "Overhead Press":{inc:2.5,t:[3,8],bw:[.25,.35,.5],pl:1},
+  "Push Press":{inc:5,t:[3,5],bw:[.3,.45,.6],pl:1},
+  "Barbell Row":{inc:5,t:[3,8],bw:[.35,.5,.7],pl:1},
+  "Pendlay Row":{inc:5,t:[3,6],bw:[.3,.45,.6],pl:1},
+  "Dumbbell Row":{inc:5,t:[3,10],bw:[.15,.25,.4]},
   "Pull-Ups":{inc:5,t:[3,8],pu:1},
+  "Chin-Ups":{inc:5,t:[3,8],pu:1},
+  "Lat Pulldown":{inc:5,t:[3,10],bw:[.3,.45,.6]},
   "Face Pulls":{inc:5,t:[3,12],bw:[.1,.15,.2]},
+  "Lunges":{inc:5,t:[3,8],bw:[.2,.3,.4]},
+  "Bulgarian Split Squat":{inc:5,t:[3,8],bw:[.15,.25,.35]},
+  "Hip Thrust":{inc:10,t:[3,8],bw:[.4,.6,.85],pl:1},
+  "Good Morning":{inc:5,t:[3,8],bw:[.25,.4,.55],pl:1},
+  "Leg Press":{inc:10,t:[3,10],bw:[.8,1.2,1.6]},
+  "Leg Curl":{inc:5,t:[3,10],bw:[.2,.35,.5]},
+  "Calf Raises":{inc:5,t:[3,12],bw:[.3,.5,.7]},
+  "Shrugs":{inc:5,t:[3,12],bw:[.3,.5,.7],pl:1},
+  "Farmer's Walk":{inc:10,t:[3,1],bw:[.3,.5,.7]},
+  "Box Jump":{inc:0,t:[3,5]},
+  "Medicine Ball Slam":{inc:0,t:[3,8]},
   "Plank":{inc:0,t:[3,1]},
-  "Hip & thoracic mobility":{inc:0,t:[1,1]}
+  "Side Plank":{inc:0,t:[3,1]},
+  "Hip & thoracic mobility":{inc:0,t:[1,1]},
+  "Bicep Curls":{inc:2.5,t:[3,10],bw:[.1,.15,.25]},
+  "Hammer Curls":{inc:2.5,t:[3,10],bw:[.1,.15,.25]},
+  "Tricep Extensions":{inc:2.5,t:[3,10],bw:[.1,.15,.25]},
+  "Tricep Pushdowns":{inc:2.5,t:[3,12],bw:[.1,.2,.3]},
+  "Lateral Raises":{inc:2.5,t:[3,12],bw:[.05,.1,.15]},
+  "Front Raises":{inc:2.5,t:[3,12],bw:[.05,.1,.15]},
+  "Cable Fly":{inc:2.5,t:[3,12],bw:[.1,.15,.25]}
 };
 const LIFTS = Object.keys(EX);
+
+/* Real form photos from free-exercise-db (free to use) */
+const IMG_BASE = "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/";
+const FORM_IMG = {
+  "Squat": "Barbell_Squat/0.jpg",
+  "Front Squat": "Front_Barbell_Squat/0.jpg",
+  "Box Squat": "Barbell_Squat_To_A_Bench/0.jpg",
+  "Deadlift": "Barbell_Deadlift/0.jpg",
+  "Romanian Deadlift": "Romanian_Deadlift/0.jpg",
+  "Sumo Deadlift": "Sumo_Deadlift/0.jpg",
+  "Bench Press": "Barbell_Bench_Press_-_Medium_Grip/0.jpg",
+  "Incline Bench Press": "Barbell_Incline_Bench_Press_-_Medium_Grip/0.jpg",
+  "Close-Grip Bench Press": "Close-Grip_Barbell_Bench_Press/0.jpg",
+  "Dumbbell Bench": "Dumbbell_Bench_Press/0.jpg",
+  "Overhead Press": "Standing_Military_Press/0.jpg",
+  "Push Press": "Push_Press/0.jpg",
+  "Barbell Row": "Bent_Over_Barbell_Row/0.jpg",
+  "Pendlay Row": "Bent_Over_Barbell_Row/0.jpg",
+  "Dumbbell Row": "One-Arm_Dumbbell_Row/0.jpg",
+  "Pull-Ups": "Pullups/0.jpg",
+  "Chin-Ups": "Chin-Up/0.jpg",
+  "Lat Pulldown": "Wide-Grip_Lat_Pulldown/0.jpg",
+  "Face Pulls": "Face_Pull/0.jpg",
+  "Lunges": "Barbell_Lunges/0.jpg",
+  "Bulgarian Split Squat": "Dumbbell_Lunges/0.jpg",
+  "Hip Thrust": "Barbell_Hip_Thrust/0.jpg",
+  "Good Morning": "Good_Morning/0.jpg",
+  "Leg Press": "Leg_Press/0.jpg",
+  "Leg Curl": "Lying_Leg_Curls/0.jpg",
+  "Calf Raises": "Standing_Calf_Raises/0.jpg",
+  "Shrugs": "Barbell_Shrug/0.jpg",
+  "Farmer's Walk": "Farmers_Walk/0.jpg",
+  "Box Jump": "Box_Jump_Multiple_Response_/0.jpg",
+  "Medicine Ball Slam": "Medicine_Ball_Slam/0.jpg",
+  "Plank": "Plank/0.jpg",
+  "Side Plank": "Side_Bridge/0.jpg",
+  "Bicep Curls": "Barbell_Curl/0.jpg",
+  "Hammer Curls": "Hammer_Curls/0.jpg",
+  "Tricep Extensions": "Standing_Dumbbell_Triceps_Extension/0.jpg",
+  "Tricep Pushdowns": "Triceps_Pushdown/0.jpg",
+  "Lateral Raises": "Side_Lateral_Raise/0.jpg",
+  "Front Raises": "Front_Dumbbell_Raise/0.jpg",
+  "Cable Fly": "Cable_Crossover/0.jpg"
+};
+
+/* Simple SVG stick figures for form guides (fallback) */
+function formSVG(type) {
+  const c = "#f0b8c0", s = "#9e1b32", g = "#666";
+  const svgs = {
+    squat: `<svg viewBox="0 0 120 140" width="100%" style="max-width:160px;margin:8px auto;display:block"><circle cx="60" cy="22" r="10" fill="${c}"/><rect x="52" y="32" width="16" height="28" rx="4" fill="${c}"/><line x1="52" y1="38" x2="30" y2="55" stroke="${c}" stroke-width="5" stroke-linecap="round"/><line x1="68" y1="38" x2="90" y2="55" stroke="${c}" stroke-width="5" stroke-linecap="round"/><line x1="56" y1="58" x2="40" y2="100" stroke="${c}" stroke-width="5" stroke-linecap="round"/><line x1="64" y1="58" x2="80" y2="100" stroke="${c}" stroke-width="5" stroke-linecap="round"/><line x1="40" y1="100" x2="28" y2="100" stroke="${c}" stroke-width="4" stroke-linecap="round"/><line x1="80" y1="100" x2="92" y2="100" stroke="${c}" stroke-width="4" stroke-linecap="round"/><line x1="25" y1="48" x2="95" y2="48" stroke="${s}" stroke-width="4" stroke-linecap="round"/><text x="60" y="128" text-anchor="middle" fill="${g}" font-size="11" font-family="system-ui">Bar on back Â· sit down</text></svg>`,
+    deadlift: `<svg viewBox="0 0 120 140" width="100%" style="max-width:160px;margin:8px auto;display:block"><circle cx="60" cy="28" r="10" fill="${c}"/><rect x="52" y="38" width="16" height="30" rx="4" fill="${c}"/><line x1="52" y1="48" x2="35" y2="70" stroke="${c}" stroke-width="5" stroke-linecap="round"/><line x1="68" y1="48" x2="85" y2="70" stroke="${c}" stroke-width="5" stroke-linecap="round"/><line x1="56" y1="66" x2="48" y2="105" stroke="${c}" stroke-width="5" stroke-linecap="round"/><line x1="64" y1="66" x2="72" y2="105" stroke="${c}" stroke-width="5" stroke-linecap="round"/><line x1="48" y1="105" x2="38" y2="105" stroke="${c}" stroke-width="4" stroke-linecap="round"/><line x1="72" y1="105" x2="82" y2="105" stroke="${c}" stroke-width="4" stroke-linecap="round"/><line x1="30" y1="72" x2="90" y2="72" stroke="${s}" stroke-width="5" stroke-linecap="round"/><text x="60" y="128" text-anchor="middle" fill="${g}" font-size="11" font-family="system-ui">Hinge Â· bar close Â· stand</text></svg>`,
+    bench: `<svg viewBox="0 0 140 100" width="100%" style="max-width:180px;margin:8px auto;display:block"><rect x="20" y="55" width="100" height="10" rx="3" fill="#444"/><circle cx="70" cy="35" r="9" fill="${c}"/><rect x="55" y="42" width="30" height="14" rx="3" fill="${c}"/><line x1="55" y1="48" x2="25" y2="40" stroke="${c}" stroke-width="4" stroke-linecap="round"/><line x1="85" y1="48" x2="115" y2="40" stroke="${c}" stroke-width="4" stroke-linecap="round"/><line x1="20" y1="38" x2="120" y2="38" stroke="${s}" stroke-width="4" stroke-linecap="round"/><text x="70" y="88" text-anchor="middle" fill="${g}" font-size="11" font-family="system-ui">Lie flat Â· press up</text></svg>`,
+    ohp: `<svg viewBox="0 0 120 140" width="100%" style="max-width:160px;margin:8px auto;display:block"><circle cx="60" cy="22" r="10" fill="${c}"/><rect x="52" y="32" width="16" height="30" rx="4" fill="${c}"/><line x1="52" y1="40" x2="40" y2="20" stroke="${c}" stroke-width="5" stroke-linecap="round"/><line x1="68" y1="40" x2="80" y2="20" stroke="${c}" stroke-width="5" stroke-linecap="round"/><line x1="56" y1="60" x2="48" y2="100" stroke="${c}" stroke-width="5" stroke-linecap="round"/><line x1="64" y1="60" x2="72" y2="100" stroke="${c}" stroke-width="5" stroke-linecap="round"/><line x1="48" y1="100" x2="38" y2="100" stroke="${c}" stroke-width="4" stroke-linecap="round"/><line x1="72" y1="100" x2="82" y2="100" stroke="${c}" stroke-width="4" stroke-linecap="round"/><line x1="25" y1="18" x2="95" y2="18" stroke="${s}" stroke-width="4" stroke-linecap="round"/><text x="60" y="128" text-anchor="middle" fill="${g}" font-size="11" font-family="system-ui">Press bar overhead</text></svg>`,
+    row: `<svg viewBox="0 0 120 140" width="100%" style="max-width:160px;margin:8px auto;display:block"><circle cx="60" cy="30" r="10" fill="${c}"/><rect x="48" y="40" width="24" height="20" rx="4" fill="${c}" transform="rotate(-25 60 50)"/><line x1="50" y1="55" x2="30" y2="70" stroke="${c}" stroke-width="5" stroke-linecap="round"/><line x1="70" y1="55" x2="90" y2="70" stroke="${c}" stroke-width="5" stroke-linecap="round"/><line x1="55" y1="60" x2="50" y2="105" stroke="${c}" stroke-width="5" stroke-linecap="round"/><line x1="65" y1="60" x2="70" y2="105" stroke="${c}" stroke-width="5" stroke-linecap="round"/><line x1="25" y1="72" x2="95" y2="72" stroke="${s}" stroke-width="4" stroke-linecap="round"/><text x="60" y="128" text-anchor="middle" fill="${g}" font-size="11" font-family="system-ui">Hinge Â· pull to torso</text></svg>`,
+    pullup: `<svg viewBox="0 0 120 140" width="100%" style="max-width:160px;margin:8px auto;display:block"><line x1="20" y1="20" x2="100" y2="20" stroke="${s}" stroke-width="5" stroke-linecap="round"/><circle cx="60" cy="50" r="10" fill="${c}"/><rect x="52" y="60" width="16" height="28" rx="4" fill="${c}"/><line x1="52" y1="65" x2="30" y2="25" stroke="${c}" stroke-width="5" stroke-linecap="round"/><line x1="68" y1="65" x2="90" y2="25" stroke="${c}" stroke-width="5" stroke-linecap="round"/><line x1="56" y1="86" x2="50" y2="115" stroke="${c}" stroke-width="5" stroke-linecap="round"/><line x1="64" y1="86" x2="70" y2="115" stroke="${c}" stroke-width="5" stroke-linecap="round"/><text x="60" y="132" text-anchor="middle" fill="${g}" font-size="11" font-family="system-ui">Pull chin over bar</text></svg>`,
+    lunge: `<svg viewBox="0 0 120 140" width="100%" style="max-width:160px;margin:8px auto;display:block"><circle cx="55" cy="22" r="10" fill="${c}"/><rect x="47" y="32" width="16" height="28" rx="4" fill="${c}"/><line x1="47" y1="40" x2="30" y2="55" stroke="${c}" stroke-width="4" stroke-linecap="round"/><line x1="63" y1="40" x2="80" y2="55" stroke="${c}" stroke-width="4" stroke-linecap="round"/><line x1="52" y1="58" x2="35" y2="100" stroke="${c}" stroke-width="5" stroke-linecap="round"/><line x1="60" y1="58" x2="85" y2="90" stroke="${c}" stroke-width="5" stroke-linecap="round"/><line x1="35" y1="100" x2="25" y2="100" stroke="${c}" stroke-width="4" stroke-linecap="round"/><line x1="85" y1="90" x2="95" y2="90" stroke="${c}" stroke-width="4" stroke-linecap="round"/><text x="60" y="128" text-anchor="middle" fill="${g}" font-size="11" font-family="system-ui">Step Â· drop back knee</text></svg>`,
+    hipthrust: `<svg viewBox="0 0 140 110" width="100%" style="max-width:180px;margin:8px auto;display:block"><rect x="10" y="50" width="40" height="12" rx="3" fill="#444"/><circle cx="70" cy="30" r="9" fill="${c}"/><rect x="55" y="38" width="30" height="14" rx="3" fill="${c}"/><line x1="70" y1="52" x2="70" y2="70" stroke="${c}" stroke-width="5" stroke-linecap="round"/><line x1="55" y1="70" x2="45" y2="95" stroke="${c}" stroke-width="4" stroke-linecap="round"/><line x1="85" y1="70" x2="95" y2="95" stroke="${c}" stroke-width="4" stroke-linecap="round"/><line x1="40" y1="55" x2="100" y2="55" stroke="${s}" stroke-width="5" stroke-linecap="round"/><text x="70" y="105" text-anchor="middle" fill="${g}" font-size="11" font-family="system-ui">Drive hips up Â· squeeze</text></svg>`,
+    plank: `<svg viewBox="0 0 140 90" width="100%" style="max-width:180px;margin:8px auto;display:block"><circle cx="30" cy="35" r="9" fill="${c}"/><rect x="38" y="30" width="60" height="12" rx="3" fill="${c}"/><line x1="30" y1="44" x2="25" y2="65" stroke="${c}" stroke-width="4" stroke-linecap="round"/><line x1="98" y1="42" x2="110" y2="65" stroke="${c}" stroke-width="4" stroke-linecap="round"/><line x1="20" y1="65" x2="115" y2="65" stroke="#333" stroke-width="2"/><text x="70" y="82" text-anchor="middle" fill="${g}" font-size="11" font-family="system-ui">Straight line Â· brace core</text></svg>`,
+    curl: `<svg viewBox="0 0 100 140" width="100%" style="max-width:140px;margin:8px auto;display:block"><circle cx="50" cy="22" r="10" fill="${c}"/><rect x="42" y="32" width="16" height="30" rx="4" fill="${c}"/><line x1="42" y1="42" x2="25" y2="30" stroke="${c}" stroke-width="5" stroke-linecap="round"/><line x1="58" y1="42" x2="75" y2="55" stroke="${c}" stroke-width="5" stroke-linecap="round"/><circle cx="75" cy="60" r="6" fill="${s}"/><line x1="46" y1="60" x2="40" y2="100" stroke="${c}" stroke-width="5" stroke-linecap="round"/><line x1="54" y1="60" x2="60" y2="100" stroke="${c}" stroke-width="5" stroke-linecap="round"/><text x="50" y="125" text-anchor="middle" fill="${g}" font-size="11" font-family="system-ui">Curl up Â· no swing</text></svg>`,
+    generic: `<svg viewBox="0 0 100 100" width="100%" style="max-width:120px;margin:8px auto;display:block"><circle cx="50" cy="25" r="10" fill="${c}"/><rect x="42" y="35" width="16" height="28" rx="4" fill="${c}"/><line x1="42" y1="42" x2="25" y2="55" stroke="${c}" stroke-width="4" stroke-linecap="round"/><line x1="58" y1="42" x2="75" y2="55" stroke="${c}" stroke-width="4" stroke-linecap="round"/><line x1="46" y1="62" x2="40" y2="90" stroke="${c}" stroke-width="4" stroke-linecap="round"/><line x1="54" y1="62" x2="60" y2="90" stroke="${c}" stroke-width="4" stroke-linecap="round"/></svg>`
+  };
+  return svgs[type] || svgs.generic;
+}
+
+/* Form guides â steps + tip for every lift */
+const FORM = {
+  "Squat": { visual:"squat", steps:["Bar on upper back (not neck)","Feet roughly shoulder-width, toes slightly out","Brace core, sit hips back and down","Knees track over toes","Drive up through mid-foot"], tip:"Keep chest up. Depth: hip crease below top of knee if mobility allows." },
+  "Front Squat": { visual:"squat", steps:["Bar on front of shoulders, elbows high","Feet shoulder-width","Sit straight down between the legs","Keep torso upright","Drive up hard"], tip:"Elbows stay high the whole time so the bar doesnât roll." },
+  "Box Squat": { visual:"squat", steps:["Set box at parallel or slightly above","Sit back onto the box with control","Pause briefly without relaxing","Drive up hard from the box"], tip:"Great for learning depth and building power out of the hole." },
+  "Deadlift": { visual:"deadlift", steps:["Bar over mid-foot","Hinge and grip just outside legs","Chest up, hips down until shins touch bar","Push the floor away, keep bar close","Lock out hips and knees together"], tip:"Donât yank. Bar leaves the floor only when your whole body is tight." },
+  "Romanian Deadlift": { visual:"deadlift", steps:["Start standing, slight knee bend","Push hips back, bar slides down thighs","Feel stretch in hamstrings","Keep back flat","Drive hips forward to stand"], tip:"Stop when the bar is just below the knees or you feel a strong hamstring stretch." },
+  "Sumo Deadlift": { visual:"deadlift", steps:["Wide stance, toes out","Grip inside the knees","Hips down, chest up","Push the floor apart and stand"], tip:"More hips and quads than conventional. Keep knees tracking over toes." },
+  "Bench Press": { visual:"bench", steps:["Lie flat, eyes under the bar","Feet planted, slight arch is fine","Grip a bit wider than shoulders","Lower to mid-chest with control","Press up and slightly back"], tip:"Keep scapulae pinched. Donât bounce the bar off your chest." },
+  "Incline Bench Press": { visual:"bench", steps:["Set bench 30â45Â°","Same setup as flat bench","Lower to upper chest","Press up in a slight arc"], tip:"Elbows about 45â60Â° from torso, not flared straight out." },
+  "Close-Grip Bench Press": { visual:"bench", steps:["Hands roughly shoulder-width or slightly inside","Elbows stay closer to the body","Lower to lower chest / sternum","Press up"], tip:"More triceps emphasis. Donât go extremely narrow or wrists will hurt." },
+  "Dumbbell Bench": { visual:"bench", steps:["Lie flat, dumbbells over chest","Lower with elbows ~45Â°","Press up and slightly together at the top"], tip:"Greater range of motion than barbell. Control the bottom." },
+  "Overhead Press": { visual:"ohp", steps:["Bar at shoulder height, elbows slightly in front","Brace core hard","Press straight up","Head moves back slightly then through","Lock out overhead"], tip:"Donât lean back excessively. Glutes and abs stay tight." },
+  "Push Press": { visual:"ohp", steps:["Dip the knees slightly","Drive up hard with the legs","Press the bar overhead as you extend","Lock out and stand tall"], tip:"Uses leg drive to move heavier weight than a strict press." },
+  "Barbell Row": { visual:"row", steps:["Hinge to ~45Â° torso angle","Pull bar to lower chest / upper abs","Elbows drive back","Squeeze shoulder blades","Lower with control"], tip:"Donât use momentum. Keep the lower back flat." },
+  "Pendlay Row": { visual:"row", steps:["Bar starts on the floor each rep","Explosive pull to lower chest","Torso stays parallel-ish","Lower the bar fully to the floor"], tip:"Reset every rep. Power from the back, not a hip-hinge bounce." },
+  "Dumbbell Row": { visual:"row", steps:["One knee and hand on bench","Pull dumbbell to hip","Squeeze at the top","Lower with control"], tip:"Keep hips square. Donât twist the torso." },
+  "Pull-Ups": { visual:"pullup", steps:["Hang from bar, hands slightly wider than shoulders","Pull elbows down and back","Chin over the bar","Lower all the way under control"], tip:"Full range. If you canât do bodyweight yet, use a band or assisted machine." },
+  "Chin-Ups": { visual:"pullup", steps:["Underhand grip, hands about shoulder-width","Pull up until chin clears bar","Lower fully"], tip:"More biceps involvement than pull-ups. Same full-range rule." },
+  "Lat Pulldown": { visual:"pullup", steps:["Sit tall, slight lean back","Pull the bar to upper chest","Elbows drive down","Squeeze lats at bottom","Control the return"], tip:"Think of pulling your elbows into your pockets." },
+  "Face Pulls": { visual:"row", steps:["Cable or band at face height","Pull toward face / forehead","External rotation at the end","Squeeze rear delts"], tip:"Great for shoulder health. Donât go too heavy." },
+  "Lunges": { visual:"lunge", steps:["Step forward into a long stride","Front knee tracks over mid-foot","Back knee drops toward floor","Push through front heel to stand"], tip:"Keep torso upright. Alternate legs or finish one side then the other." },
+  "Bulgarian Split Squat": { visual:"lunge", steps:["Rear foot elevated on bench","Front foot far enough forward","Drop the back knee toward the floor","Drive up through the front heel"], tip:"This one burns. Keep most of the weight on the front leg." },
+  "Hip Thrust": { visual:"hipthrust", steps:["Upper back on bench, bar over hips","Feet flat, knees ~90Â° at top","Drive hips up hard","Squeeze glutes at the top","Lower with control"], tip:"Chin tucked slightly. Donât hyperextend the lower back." },
+  "Good Morning": { visual:"deadlift", steps:["Bar on upper back like a squat","Soft knees, hinge at the hips","Torso leans forward","Feel hamstrings, then stand"], tip:"Light weight. Keep the back flat the whole time." },
+  "Leg Press": { visual:"squat", steps:["Feet mid-platform, shoulder-width","Lower until knees are ~90Â°","Drive through mid-foot","Donât lock out hard"], tip:"Keep lower back pressed into the pad." },
+  "Leg Curl": { visual:"generic", steps:["Lie or sit on the machine","Curl the pad toward your glutes","Squeeze hamstrings","Lower under control"], tip:"Donât use momentum. Full range of motion." },
+  "Calf Raises": { visual:"generic", steps:["Balls of feet on edge or platform","Drop heels for a stretch","Rise onto toes as high as possible","Pause briefly at the top"], tip:"Slow and controlled beats bouncing." },
+  "Shrugs": { visual:"ohp", steps:["Stand tall with bar or dumbbells","Elevate shoulders straight up","Pause at the top","Lower under control"], tip:"Donât roll the shoulders. Straight up and down." },
+  "Farmer's Walk": { visual:"generic", steps:["Pick up heavy dumbbells or implements","Stand tall, brace core","Walk with controlled steps","Keep shoulders packed"], tip:"Grip and core strength builder. Donât lean to one side." },
+  "Box Jump": { visual:"squat", steps:["Stand facing a sturdy box","Load the hips, swing arms","Explode up onto the box","Stand tall, then step down"], tip:"Land soft. Step down â donât jump down." },
+  "Medicine Ball Slam": { visual:"ohp", steps:["Hold ball overhead","Brace core","Slam the ball into the floor hard","Pick up and repeat"], tip:"Use the whole body. Exhale on the slam." },
+  "Plank": { visual:"plank", steps:["Forearms and toes on floor","Body in a straight line","Brace abs and glutes","Hold without sagging or piking"], tip:"Breathe steadily. Quality over time." },
+  "Side Plank": { visual:"plank", steps:["On one forearm, feet stacked or staggered","Hips up so body is straight","Hold, then switch sides"], tip:"Donât let the top hip sag." },
+  "Hip & thoracic mobility": { visual:"generic", steps:["Gentle hip openers, 90/90, worldâs greatest stretch","Thoracic rotations and cat-cow","Move slowly and breathe"], tip:"Recovery / prep work, not a strength set." },
+  "Bicep Curls": { visual:"curl", steps:["Stand tall, elbows pinned to sides","Curl the weight up without swinging","Squeeze at the top","Lower slowly"], tip:"Control the negative. No hip drive." },
+  "Hammer Curls": { visual:"curl", steps:["Neutral grip (palms face each other)","Curl up without swinging","Squeeze at the top","Lower slowly"], tip:"Hits the brachialis more than regular curls." },
+  "Tricep Extensions": { visual:"ohp", steps:["Overhead or lying","Only the forearms move","Full extension, then controlled return"], tip:"Keep elbows stable. Feel the triceps working." },
+  "Tricep Pushdowns": { visual:"generic", steps:["Elbows pinned at sides","Push the cable or band down","Squeeze at the bottom","Return with control"], tip:"Donât lean into it. Arms do the work." },
+  "Lateral Raises": { visual:"generic", steps:["Slight bend in elbows","Raise arms out to the sides to shoulder height","Lead with elbows, not hands","Lower under control"], tip:"Light weight, strict form. No swinging." },
+  "Front Raises": { visual:"generic", steps:["Raise arms in front to shoulder height","Slight elbow bend","Lower under control"], tip:"Donât use momentum. Front delts only." },
+  "Cable Fly": { visual:"bench", steps:["Slight forward lean","Arms open wide with soft elbows","Bring hands together in front","Squeeze chest at the middle"], tip:"Think of hugging a tree. Control the stretch." }
+};
+
+/* Plate calculator â plates for ONE side */
+function platesFor(weight, bar = 45) {
+  const target = Math.max(0, (+weight || 0) - bar);
+  const each = target / 2;
+  const available = [45, 25, 10, 5, 2.5];
+  const out = [];
+  let left = each;
+  for (const p of available) {
+    while (left >= p - 0.01) {
+      out.push(p);
+      left -= p;
+    }
+  }
+  return out;
+}
+
+function plateText(weight) {
+  const w = +weight || 0;
+  if (w < 45) return "Use a lighter bar or dumbbells if under 45 lb.";
+  const side = platesFor(w);
+  if (!side.length) return "Just the 45 lb bar (no plates).";
+  const counts = {};
+  side.forEach(p => counts[p] = (counts[p] || 0) + 1);
+  const parts = Object.entries(counts)
+    .sort((a,b) => b[0] - a[0])
+    .map(([p,c]) => c > 1 ? `${c}Ã${p}` : `${p}`);
+  return `45 bar + ${parts.join(" + ")} each side`;
+}
+
+/* Colored plate sizes for visual (matches common gym colors) */
+const PLATE_VIS = {
+  45:  { h: 52, w: 14, color: "#d62828", label: "45" },
+  25:  { h: 44, w: 12, color: "#f2c200", label: "25", dark: 1 },
+  10:  { h: 36, w: 10, color: "#1f9d55", label: "10" },
+  5:   { h: 28, w: 8,  color: "#2a2a2a", label: "5",  stroke: "#888" },
+  2.5: { h: 22, w: 7,  color: "#2a2a2a", label: "2.5", stroke: "#888", small: 1 }
+};
+
+/** Compact SVG of a loaded barbell â both sides mirrored */
+function plateVisual(weight) {
+  const w = +weight || 0;
+  if (w < 45) {
+    return `<div style="text-align:center;padding:12px 0;color:var(--muted);font-size:13px">No 45 lb bar needed</div>`;
+  }
+  const side = platesFor(w); // largest first
+  // Layout: left plates | sleeve | bar | sleeve | right plates
+  const barH = 10;
+  const sleeveW = 8;
+  const barMidW = 80;
+  const gap = 2;
+  let leftW = 0;
+  side.forEach(p => { leftW += (PLATE_VIS[p] ? PLATE_VIS[p].w : 10) + gap; });
+  const totalW = leftW + sleeveW + barMidW + sleeveW + leftW;
+  const maxH = 60;
+  const cy = maxH / 2;
+  const viewH = maxH + 8;
+
+  let x = 0;
+  let leftPlates = "";
+  // Left side: draw outer â inner (reverse of load order so biggest is outside)
+  const leftOrder = side.slice().reverse();
+  leftOrder.forEach(p => {
+    const pv = PLATE_VIS[p] || { h: 30, w: 10, color: "#666", label: String(p) };
+    const px = x;
+    const py = cy - pv.h / 2;
+    const stroke = pv.stroke ? `stroke="${pv.stroke}" stroke-width="1.5"` : `stroke="rgba(0,0,0,.35)" stroke-width="1"`;
+    const textFill = pv.dark ? "#111" : "#fff";
+    const fs = pv.small ? 7 : 9;
+    leftPlates += `<rect x="${px}" y="${py}" width="${pv.w}" height="${pv.h}" rx="3" fill="${pv.color}" ${stroke}/>`;
+    leftPlates += `<text x="${px + pv.w / 2}" y="${cy + 3}" text-anchor="middle" fill="${textFill}" font-size="${fs}" font-weight="700" font-family="system-ui">${pv.label}</text>`;
+    x += pv.w + gap;
+  });
+
+  // Left sleeve
+  const sleeveL = `<rect x="${x}" y="${cy - 14}" width="${sleeveW}" height="28" rx="2" fill="#6a7280"/>`;
+  x += sleeveW;
+
+  // Bar middle
+  const barMid = `<rect x="${x}" y="${cy - barH / 2}" width="${barMidW}" height="${barH}" rx="3" fill="#aeb6c2"/>`;
+  x += barMidW;
+
+  // Right sleeve
+  const sleeveR = `<rect x="${x}" y="${cy - 14}" width="${sleeveW}" height="28" rx="2" fill="#6a7280"/>`;
+  x += sleeveW;
+
+  // Right plates (same order as left load â biggest outside)
+  let rightPlates = "";
+  side.forEach(p => {
+    const pv = PLATE_VIS[p] || { h: 30, w: 10, color: "#666", label: String(p) };
+    const px = x;
+    const py = cy - pv.h / 2;
+    const stroke = pv.stroke ? `stroke="${pv.stroke}" stroke-width="1.5"` : `stroke="rgba(0,0,0,.35)" stroke-width="1"`;
+    const textFill = pv.dark ? "#111" : "#fff";
+    const fs = pv.small ? 7 : 9;
+    rightPlates += `<rect x="${px}" y="${py}" width="${pv.w}" height="${pv.h}" rx="3" fill="${pv.color}" ${stroke}/>`;
+    rightPlates += `<text x="${px + pv.w / 2}" y="${cy + 3}" text-anchor="middle" fill="${textFill}" font-size="${fs}" font-weight="700" font-family="system-ui">${pv.label}</text>`;
+    x += pv.w + gap;
+  });
+
+  return `
+    <svg viewBox="0 0 ${totalW} ${viewH}" width="100%" style="max-width:340px;margin:10px auto 4px;display:block">
+      ${leftPlates}${sleeveL}${barMid}${sleeveR}${rightPlates}
+    </svg>`;
+}
+
+/** Chip row of plates per side (e.g. [45] [10] [5]) */
+function plateChips(weight) {
+  const w = +weight || 0;
+  if (w < 45) return "";
+  const side = platesFor(w);
+  if (!side.length) {
+    return `<div style="text-align:center;font-size:12px;color:var(--muted);margin-top:4px">No plates â bar only</div>`;
+  }
+  const chips = side.map(p => {
+    const pv = PLATE_VIS[p] || { color: "#666", label: String(p) };
+    const text = pv.dark ? "#111" : "#fff";
+    return `<span style="display:inline-block;min-width:36px;padding:6px 8px;margin:2px;border-radius:10px;background:${pv.color};color:${text};font-size:12px;font-weight:800;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.35)">${pv.label}</span>`;
+  }).join("");
+  return `<div style="text-align:center;margin-top:6px"><span style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase">Each side</span><div style="margin-top:6px">${chips}</div></div>`;
+}
 
 function posList(p) {
   // Support old single position (number) and new multi (array)
@@ -865,8 +1122,8 @@ function posList(p) {
   return [];
 }
 
-// Default: Mon–Fri training, Sat + Sun rest.
-// Schedule maps day name → template key (or missing/null = rest).
+// Default: MonâFri training, Sat + Sun rest.
+// Schedule maps day name â template key (or missing/null = rest).
 const DEFAULT_SCHEDULE = {
   Monday: "upper",
   Tuesday: "lower",
@@ -884,30 +1141,30 @@ function getTemplates() {
   const isSkill = positions.some(i => i === 6 || i === 7); // TE, LB
   if (fb && isOL) {
     return {
-      upper: {title:"Upper power (OL)",ex:["Bench Press","Close-Grip Bench Press","Overhead Press"]},
-      lower: {title:"Lower power (OL)",ex:["Squat","Deadlift","Romanian Deadlift"]},
-      back: {title:"Back & core (OL)",ex:["Barbell Row","Pull-Ups","Plank"]}
+      upper: {title:"Upper power (OL)",ex:["Bench Press","Close-Grip Bench Press","Overhead Press","Shrugs","Tricep Pushdowns"]},
+      lower: {title:"Lower power (OL)",ex:["Squat","Box Squat","Deadlift","Romanian Deadlift","Hip Thrust"]},
+      back: {title:"Back & core (OL)",ex:["Barbell Row","Pull-Ups","Face Pulls","Farmer's Walk","Plank"]}
     };
   }
   if (fb && isDL) {
     return {
-      upper: {title:"Upper strength (DL)",ex:["Bench Press","Overhead Press","Barbell Row"]},
-      lower: {title:"Lower strength (DL)",ex:["Squat","Deadlift","Romanian Deadlift"]},
-      back: {title:"Power & back (DL)",ex:["Close-Grip Bench Press","Pull-Ups","Face Pulls"]}
+      upper: {title:"Upper strength (DL)",ex:["Bench Press","Overhead Press","Barbell Row","Pull-Ups","Shrugs"]},
+      lower: {title:"Lower strength (DL)",ex:["Squat","Deadlift","Sumo Deadlift","Romanian Deadlift","Lunges"]},
+      back: {title:"Power & back (DL)",ex:["Close-Grip Bench Press","Pendlay Row","Face Pulls","Medicine Ball Slam","Plank"]}
     };
   }
   if (fb && isSkill) {
     return {
-      upper: {title:"Upper + explosiveness",ex:["Bench Press","Overhead Press","Pull-Ups"]},
-      lower: {title:"Legs + power",ex:["Squat","Deadlift","Romanian Deadlift"]},
-      back: {title:"Back & athleticism",ex:["Barbell Row","Face Pulls","Plank"]}
+      upper: {title:"Upper + explosiveness",ex:["Bench Press","Push Press","Pull-Ups","Lateral Raises","Medicine Ball Slam"]},
+      lower: {title:"Legs + power",ex:["Squat","Box Jump","Deadlift","Lunges","Bulgarian Split Squat"]},
+      back: {title:"Back & athleticism",ex:["Barbell Row","Chin-Ups","Face Pulls","Farmer's Walk","Plank"]}
     };
   }
-  // Default / powerlifting / own
+  // Default / powerlifting / own â Squat always first on lower days
   return {
-    upper: {title:"Chest, shoulders & triceps",ex:["Bench Press","Overhead Press","Close-Grip Bench Press"]},
-    lower: {title:"Legs",ex:["Squat","Deadlift","Romanian Deadlift"]},
-    back: {title:"Back",ex:["Barbell Row","Pull-Ups"]}
+    upper: {title:"Chest, shoulders & triceps",ex:["Bench Press","Incline Bench Press","Dumbbell Bench","Overhead Press","Close-Grip Bench Press","Lateral Raises","Cable Fly"]},
+    lower: {title:"Legs",ex:["Squat","Front Squat","Box Squat","Deadlift","Romanian Deadlift","Hip Thrust","Lunges","Bulgarian Split Squat"]},
+    back: {title:"Back & arms",ex:["Barbell Row","Pendlay Row","Dumbbell Row","Pull-Ups","Lat Pulldown","Face Pulls","Bicep Curls","Hammer Curls"]}
   };
 }
 
@@ -916,7 +1173,7 @@ function plan() {
   const templates = getTemplates();
   const sched = S.p.schedule || DEFAULT_SCHEDULE;
   const result = {};
-  // Support both new (day → slot) and old (slot → day) shapes so existing profiles still work
+  // Support both new (day â slot) and old (slot â day) shapes so existing profiles still work
   const firstKey = Object.keys(sched)[0];
   const isDayKeyed = firstKey && DAYS.includes(firstKey);
   if (isDayKeyed) {
@@ -934,7 +1191,7 @@ function plan() {
 function setDaySlot(day, slot) {
   if (!S.p || !DAYS.includes(day)) return;
   if (!S.p.schedule) S.p.schedule = { ...DEFAULT_SCHEDULE };
-  // Migrate old slot→day shape if needed
+  // Migrate old slotâday shape if needed
   const firstKey = Object.keys(S.p.schedule)[0];
   if (firstKey && !DAYS.includes(firstKey)) {
     S.p.schedule = { ...DEFAULT_SCHEDULE };
@@ -1023,17 +1280,17 @@ function suggest(n) {
     if (ht) bits.push(Math.floor(ht/12) + "'" + (ht%12) + '"');
     if (S.p.bw) bits.push(S.p.bw + " lb");
     const who = bits.length ? ` (${bits.join(", ")})` : "";
-    return {w, r: tr, sets: ts, t:`First time${who}: about ${w} lb × ${tr} reps for ${ts} sets — clean form.`};
+    return {w, r: tr, sets: ts, t:`First time${who}: about ${w} lb Ã ${tr} reps for ${ts} sets â clean form.`};
   }
   const V = L.filter(s => +s.w > 0);
   if (!V.length) return {r: tr, sets: ts, t: "Log weight next time for better suggestions."};
   const w = Math.max(...V.map(s => +s.w));
   const all = V.length >= ts && V.every(s => s.r >= tr), close = V.every(s => s.r >= tr-2);
   const inc = (age && age <= 15 && e.inc >= 5) ? Math.max(2.5, e.inc / 2) : e.inc;
-  if (all) return {w:w+inc, r: tr, sets: ts, t:`Hit every rep last time. Try ${w+inc} lb × ${tr} for ${ts} sets.`};
-  if (close) return {w, r: tr, sets: ts, t:`Close. Stay at ${w} lb × ${tr} reps for ${ts} sets.`};
+  if (all) return {w:w+inc, r: tr, sets: ts, t:`Hit every rep last time. Try ${w+inc} lb Ã ${tr} for ${ts} sets.`};
+  if (close) return {w, r: tr, sets: ts, t:`Close. Stay at ${w} lb Ã ${tr} reps for ${ts} sets.`};
   const d = rnd(w*.9, e.inc === 2.5 ? 2.5 : 5);
-  return {w:d, r: tr, sets: ts, t:`Reps were low. Rebuild at ${d} lb × ${tr} for ${ts} sets.`};
+  return {w:d, r: tr, sets: ts, t:`Reps were low. Rebuild at ${d} lb Ã ${tr} for ${ts} sets.`};
 }
 
 /** Per-set plan: weight + reps for each working set (and a light build-up if 3+ sets). */
@@ -1055,14 +1312,14 @@ function setPlan(n) {
     }
     let line;
     if (e.pu) {
-      line = (w && w > 0) ? `${w} lb × ${r} reps` : `Bodyweight × ${r} reps`;
+      line = (w && w > 0) ? `${w} lb Ã ${r} reps` : `Bodyweight Ã ${r} reps`;
     } else if (!e.inc && !e.bw) {
       line = `${r} reps / quality effort`;
       w = null;
     } else if (w == null) {
       line = `${r} reps`;
     } else {
-      line = `${w} lb × ${r} reps`;
+      line = `${w} lb Ã ${r} reps`;
     }
     plan.push({ w, r, tag, line });
   }
@@ -1085,8 +1342,8 @@ function modeName(p) {
 function specText(p) {
   if (!(p.fb || p.pl)) return p.own;
   const posNames = posList(p).map(i => POS[i]).filter(Boolean);
-  const fbPart = p.fb ? (posNames.length ? posNames.join(", ") : "Football") + " · " + FBT[p.fb.t] : null;
-  const plPart = p.pl ? WCS[p.pl.w] + " lb · Grade " + p.pl.g : null;
+  const fbPart = p.fb ? (posNames.length ? posNames.join(", ") : "Football") + " Â· " + FBT[p.fb.t] : null;
+  const plPart = p.pl ? WCS[p.pl.w] + " lb Â· Grade " + p.pl.g : null;
   return [fbPart, plPart].filter(Boolean).join(" | ");
 }
 function teamKeys(p) {
@@ -1097,9 +1354,9 @@ function teamKeys(p) {
 }
 function tname(k) {
   if (!k) return "";
-  if (k[0] === "F") return "Football · " + FBT[+k.slice(1)];
+  if (k[0] === "F") return "Football Â· " + FBT[+k.slice(1)];
   const parts = k.slice(1).split("-");
-  return "Powerlifting · " + WCS[+parts[0]] + " lb · Grade " + parts[1];
+  return "Powerlifting Â· " + WCS[+parts[0]] + " lb Â· Grade " + parts[1];
 }
 
 /* ============================================================
@@ -1128,6 +1385,11 @@ let friendsUnsub = null;
 let statusMsg = "";
 let statusType = "info";
 let savedSchedule = null; // preserves schedule when editing profile
+
+/* Guided workout â one exercise at a time, start with first (usually Squat) */
+let guidedIdx = 0;
+let showForm = null;     // exercise name whose form guide is open
+let setJustDone = false; // after logging a set, only show "what's next"
 
 function setStatus(msg, type = "info") {
   statusMsg = msg;
@@ -1176,7 +1438,7 @@ function saveLocal() {
 if (cloudOk && auth) {
   // Timeout: if auth never responds (common on file://), fall back to local
   const authTimer = setTimeout(() => {
-    if (!authReady) startLocalMode("Opened offline / as a file — using local mode on this device. Cloud login needs the app hosted (not a shared file).");
+    if (!authReady) startLocalMode("Opened offline / as a file â using local mode on this device. Cloud login needs the app hosted (not a shared file).");
   }, 4000);
 
   auth.onAuthStateChanged(async user => {
@@ -1198,7 +1460,7 @@ if (cloudOk && auth) {
     await loadProfile();
   });
 } else {
-  startLocalMode("Cloud services unavailable. Running in local mode — data stays on this device.");
+  startLocalMode("Cloud services unavailable. Running in local mode â data stays on this device.");
 }
 
 async function loadProfile() {
@@ -1219,14 +1481,14 @@ async function loadProfile() {
       await loadFriends();
       render();
     } else {
-      // Signed in but no profile yet → show setup
+      // Signed in but no profile yet â show setup
       S.p = null;
       render();
     }
   } catch (e) {
     console.error(e);
     const hint = (e.code === "permission-denied")
-      ? " Firestore rules are blocking this. In Firebase Console → Firestore → Rules, publish rules that allow read/write when request.auth != null (or temporarily if true for testing)."
+      ? " Firestore rules are blocking this. In Firebase Console â Firestore â Rules, publish rules that allow read/write when request.auth != null (or temporarily if true for testing)."
       : "";
     setStatus("Error loading profile: " + e.message + hint, "err");
     render();
@@ -1248,7 +1510,7 @@ async function doLogin() {
     return;
   }
   try {
-    setStatus("Signing in…", "info");
+    setStatus("Signing inâ¦", "info");
     const cred = await auth.signInWithEmailAndPassword(email.trim(), pass);
     await cred.user.getIdToken(true);
   } catch (e) {
@@ -1258,7 +1520,7 @@ async function doLogin() {
     if (e.code === "auth/wrong-password") msg = "Wrong password.";
     if (e.code === "auth/invalid-email") msg = "Invalid email address.";
     if (e.code === "auth/invalid-credential") msg = "Wrong email or password.";
-    if (e.code === "auth/admin-restricted-operation") msg = "Email/Password sign-in is not enabled. In Firebase Console → Authentication → Sign-in method → enable Email/Password.";
+    if (e.code === "auth/admin-restricted-operation") msg = "Email/Password sign-in is not enabled. In Firebase Console â Authentication â Sign-in method â enable Email/Password.";
     setStatus(msg, "err");
   }
 }
@@ -1281,7 +1543,7 @@ async function doSignup() {
     return;
   }
   try {
-    setStatus("Creating account…", "info");
+    setStatus("Creating accountâ¦", "info");
     const cred = await auth.createUserWithEmailAndPassword(email.trim(), pass);
     await cred.user.getIdToken(true);
   } catch (e) {
@@ -1290,7 +1552,7 @@ async function doSignup() {
     if (e.code === "auth/email-already-in-use") msg = "That email is already registered. Log in instead.";
     if (e.code === "auth/weak-password") msg = "Password is too weak (min 6 characters).";
     if (e.code === "auth/invalid-email") msg = "Invalid email address.";
-    if (e.code === "auth/admin-restricted-operation") msg = "Email/Password sign-in is not enabled. In Firebase Console → Authentication → Sign-in method → enable Email/Password.";
+    if (e.code === "auth/admin-restricted-operation") msg = "Email/Password sign-in is not enabled. In Firebase Console â Authentication â Sign-in method â enable Email/Password.";
     setStatus(msg, "err");
   }
 }
@@ -1307,17 +1569,17 @@ async function doLogout() {
 
 async function doGuestLogin() {
   if (!cloudOk || !auth || location.protocol === "file:") {
-    startLocalMode("Local guest mode — data stays on this phone. For cloud sync, host the app (not share as a file).");
+    startLocalMode("Local guest mode â data stays on this phone. For cloud sync, host the app (not share as a file).");
     return;
   }
   try {
-    setStatus("Starting guest session…", "info");
+    setStatus("Starting guest sessionâ¦", "info");
     const cred = await auth.signInAnonymously();
     await cred.user.getIdToken(true);
   } catch (e) {
     console.error(e);
     // Fall back so the app is never blank / stuck
-    startLocalMode("Cloud guest login failed — using local mode on this device.");
+    startLocalMode("Cloud guest login failed â using local mode on this device.");
   }
 }
 
@@ -1330,11 +1592,11 @@ function authUI() {
       <input id="authEmail" type="email" inputmode="email" autocomplete="email" placeholder="you@school.edu"
         value="${esc(authForm.email)}" oninput="authForm.email=this.value">
       <label>Password</label>
-      <input id="authPass" type="password" autocomplete="${authMode === "login" ? "current-password" : "new-password"}" placeholder="••••••••"
+      <input id="authPass" type="password" autocomplete="${authMode === "login" ? "current-password" : "new-password"}" placeholder="â¢â¢â¢â¢â¢â¢â¢â¢"
         value="${esc(authForm.pass)}" oninput="authForm.pass=this.value">
       ${authMode === "signup" ? `
         <label>Confirm password</label>
-        <input id="authPass2" type="password" autocomplete="new-password" placeholder="••••••••"
+        <input id="authPass2" type="password" autocomplete="new-password" placeholder="â¢â¢â¢â¢â¢â¢â¢â¢"
           value="${esc(authForm.pass2)}" oninput="authForm.pass2=this.value">
       ` : ""}
       <button class="pri" onclick="${authMode === "login" ? "doLogin()" : "doSignup()"}">
@@ -1351,13 +1613,13 @@ function authUI() {
     <div class="c">
       <b>Sharing this file?</b>
       <div class="nt">
-        Opening a shared <b>.html</b> file works in <b>local mode</b> (tap Continue as guest). Cloud login, friends, and team chat need the app hosted on a website — a shared file alone stays on each phone separately.
+        Opening a shared <b>.html</b> file works in <b>local mode</b> (tap Continue as guest). Cloud login, friends, and team chat need the app hosted on a website â a shared file alone stays on each phone separately.
       </div>
     </div>
     <div class="c">
-      <b>Seeing “restricted to administrators only”?</b>
+      <b>Seeing ârestricted to administrators onlyâ?</b>
       <div class="nt">
-        Firebase project setting. Enable Email/Password + Anonymous under Authentication → Sign-in method, and open via a real URL (not only a file).
+        Firebase project setting. Enable Email/Password + Anonymous under Authentication â Sign-in method, and open via a real URL (not only a file).
       </div>
     </div>
   `;
@@ -1382,7 +1644,7 @@ async function saveProfile() {
   } catch (e) {
     console.error(e);
     saveLocal();
-    setStatus("Cloud save failed — saved locally on this device.", "info");
+    setStatus("Cloud save failed â saved locally on this device.", "info");
   }
 }
 
@@ -1401,15 +1663,15 @@ async function finishSetup() {
   const city = (su.city || "").trim();
   if ($("sschool")) su.school = $("sschool").value;
   if (!n || !(+su.w >= 50) || (su.own && !su.s.trim())) {
-    alert("Enter your name, a body weight (≥50), and what you're training for.");
+    alert("Enter your name, a body weight (â¥50), and what you're training for.");
     return;
   }
   if (!(+su.h >= 48) || !(+su.h <= 90)) {
-    alert("Enter height in inches (about 48–90). Example: 5'10\" = 70.");
+    alert("Enter height in inches (about 48â90). Example: 5'10\" = 70.");
     return;
   }
   if (!(+su.age >= 10) || !(+su.age <= 80)) {
-    alert("Enter a valid age (10–80).");
+    alert("Enter a valid age (10â80).");
     return;
   }
   // Normalize football positions to numbers
@@ -1456,7 +1718,7 @@ async function finishSetup() {
     schoolName = found ? found.name : "";
     schoolCity = found && found.city ? found.city : city;
   } else if (localMode || !cloudOk) {
-    // Local mode: school optional-ish — use city as name if needed
+    // Local mode: school optional-ish â use city as name if needed
     schoolId = "local_school";
     schoolName = city;
   } else {
@@ -1575,7 +1837,7 @@ async function loadFriends() {
 async function addFriendByCode(code) {
   code = code.trim().toUpperCase();
   if (!/^[A-Z0-9]{5,7}$/.test(code)) {
-    setStatus("Enter a valid 5–7 character friend code (letters and numbers).", "err");
+    setStatus("Enter a valid 5â7 character friend code (letters and numbers).", "err");
     return;
   }
   if (code === S.code) {
@@ -1732,7 +1994,7 @@ function loadChat(target) {
         });
       });
       S.messages.reverse();
-      // Only update the messages list — never touch the input (keeps keyboard open)
+      // Only update the messages list â never touch the input (keeps keyboard open)
       const box = $("chatmsgs");
       if (box) {
         const atBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 80;
@@ -1838,7 +2100,7 @@ async function finish() {
 }
 
 /* ============================================================
-   UI – SETUP
+   UI â SETUP
    ============================================================ */
 let su = {fb:0, pl:0, own:0, fp:[], ft:2, pw:5, pg:10, n:"", w:"", h:"", age:"", s:"", school:"", newSchool:"", city:""};
 let schoolList = []; // [{id, name, city}]
@@ -1928,22 +2190,22 @@ function schoolOptionsHtml() {
   let schoolOpts = "";
   if (near.length) {
     schoolOpts += `<optgroup label="Near ${esc(su.city) || "you"}">`;
-    schoolOpts += near.map(s => `<option value="${esc(s.id)}" ${su.school===s.id?"selected":""}>${esc(s.name)}${s.city ? " · " + esc(s.city) : ""}</option>`).join("");
+    schoolOpts += near.map(s => `<option value="${esc(s.id)}" ${su.school===s.id?"selected":""}>${esc(s.name)}${s.city ? " Â· " + esc(s.city) : ""}</option>`).join("");
     schoolOpts += `</optgroup>`;
   }
   if (other.length) {
     schoolOpts += `<optgroup label="${near.length ? "Other schools" : "All schools"}">`;
-    schoolOpts += other.map(s => `<option value="${esc(s.id)}" ${su.school===s.id?"selected":""}>${esc(s.name)}${s.city ? " · " + esc(s.city) : ""}</option>`).join("");
+    schoolOpts += other.map(s => `<option value="${esc(s.id)}" ${su.school===s.id?"selected":""}>${esc(s.name)}${s.city ? " Â· " + esc(s.city) : ""}</option>`).join("");
     schoolOpts += `</optgroup>`;
   }
   if (!schoolList.length) {
-    schoolOpts = `<option value="" disabled>No schools yet — create one</option>`;
+    schoolOpts = `<option value="" disabled>No schools yet â create one</option>`;
   }
   return schoolOpts;
 }
 
 function onSchoolChange() {
-  // Save name/weight, update school, only toggle the "new school" field — no full form wipe
+  // Save name/weight, update school, only toggle the "new school" field â no full form wipe
   if ($("sn")) su.n = $("sn").value;
   if ($("sw")) su.w = $("sw").value;
   if ($("scity")) su.city = $("scity").value;
@@ -1966,7 +2228,7 @@ function onCityBlur() {
   const sel = $("sschool");
   if (!sel) return;
   const current = su.school;
-  sel.innerHTML = `<option value="">— Select a school —</option>${schoolOptionsHtml()}<option value="__new__" ${current==="__new__"?"selected":""}>+ Create new school</option>`;
+  sel.innerHTML = `<option value="">â Select a school â</option>${schoolOptionsHtml()}<option value="__new__" ${current==="__new__"?"selected":""}>+ Create new school</option>`;
   // restore selection if still valid
   if (current && current !== "__new__") {
     const stillThere = [...sel.options].some(o => o.value === current);
@@ -1977,7 +2239,7 @@ function onCityBlur() {
 }
 
 async function setupUI() {
-  // Only full rebuild when switching Football / Powerlifting / Own — not on school pick
+  // Only full rebuild when switching Football / Powerlifting / Own â not on school pick
   if ($("sn")) su.n = $("sn").value;
   if ($("sw")) su.w = $("sw").value;
   if ($("sh")) su.h = $("sh").value;
@@ -2019,11 +2281,11 @@ async function setupUI() {
         <input id="scity" placeholder="e.g. Austin" value="${esc(su.city)}"
           oninput="su.city=this.value"
           onblur="onCityBlur()">
-        <div class="nt">Type your city, then tap outside the box — nearby schools appear at the top.</div>
+        <div class="nt">Type your city, then tap outside the box â nearby schools appear at the top.</div>
 
         <label>School</label>
         <select id="sschool" onchange="onSchoolChange()">
-          <option value="">— Select a school —</option>
+          <option value="">â Select a school â</option>
           ${schoolOptionsHtml()}
           <option value="__new__" ${su.school==="__new__"?"selected":""}>+ Create new school</option>
         </select>
@@ -2034,7 +2296,7 @@ async function setupUI() {
         </div>
 
         ${su.fb ? `
-          <label>Football position(s) — tap all that apply</label>
+          <label>Football position(s) â tap all that apply</label>
           ${posChecks}
           <div class="nt">Selected: <b id="fpCount">${fpSet.length ? fpSet.map(i => POS[i]).filter(Boolean).join(", ") : "none"}</b>. Plan changes based on these.</div>
           <label>Football team</label>
@@ -2054,7 +2316,7 @@ async function setupUI() {
         <select id="sg">${GOALS.map(x => `<option>${x}</option>`).join("")}</select>
         <label>Lifting level</label>
         <select id="sl">${["Beginner","Intermediate","Advanced"].map(x => `<option>${x}</option>`).join("")}</select>
-        <button class="pri" onclick="finishSetup()">Start lifting →</button>
+        <button class="pri" onclick="finishSetup()">Start lifting â</button>
       ` : ""}
     </div>
     ${statusMsg ? `<div class="status ${statusType}">${esc(statusMsg)}</div>` : ""}
@@ -2087,28 +2349,28 @@ function editProfile() {
 }
 
 /* ============================================================
-   UI – VIEWS
+   UI â VIEWS
    ============================================================ */
 const TABS = () => [
-  ["workout","Workout","🏋️"],
-  ["plan","Plan","📅"],
-  ["history","History","📈"],
-  ...(S.p && (S.p.fb || S.p.pl) ? [["team","Team","👥"]] : []),
-  ["plates","Plates","⚖️"],
-  ["friends","Friends","🤝"]
+  ["workout","Workout","ðï¸"],
+  ["plan","Plan","ð"],
+  ["history","History","ð"],
+  ...(S.p && (S.p.fb || S.p.pl) ? [["team","Team","ð¥"]] : []),
+  ["plates","Plates","âï¸"],
+  ["friends","Friends","ð¤"]
 ];
 
 function render() {
-  // Not signed in → login / signup
+  // Not signed in â login / signup
   if (!S.uid) {
     $("setup").classList.remove("hide");
     $("app").classList.add("hide");
     $("nav").classList.add("hide");
     $("sub").textContent = "Log in to track lifts & chat";
-    $("setup").innerHTML = authReady ? authUI() : `<div class="c"><div class="nt">Connecting…</div></div>`;
+    $("setup").innerHTML = authReady ? authUI() : `<div class="c"><div class="nt">Connectingâ¦</div></div>`;
     return;
   }
-  // Signed in but no profile → training setup
+  // Signed in but no profile â training setup
   if (!S.p) {
     $("setup").classList.remove("hide");
     $("app").classList.add("hide");
@@ -2120,7 +2382,7 @@ function render() {
   $("setup").classList.add("hide");
   $("app").classList.remove("hide");
   $("nav").classList.remove("hide");
-  $("sub").textContent = `${S.p.name} · ${S.code}${S.p.schoolName ? " · " + S.p.schoolName : ""} · ${S.p.fb || S.p.pl ? specText(S.p) : S.p.own}`;
+  $("sub").textContent = `${S.p.name} Â· ${S.code}${S.p.schoolName ? " Â· " + S.p.schoolName : ""} Â· ${S.p.fb || S.p.pl ? specText(S.p) : S.p.own}`;
 
   if (!TABS().some(t => t[0] === tab)) tab = "workout";
   $("nav").innerHTML = TABS().map(([k,n,ic]) =>
@@ -2137,6 +2399,40 @@ function render() {
   })[tab]();
 }
 
+function resetGuided() {
+  guidedIdx = 0;
+  setJustDone = false;
+  showForm = null;
+}
+
+function advanceAfterSet(n) {
+  const D = S.d[n];
+  if (!D || !D.sets.length) return;
+  const last = D.sets[D.sets.length - 1];
+  if (!(last.r > 0 || +last.w > 0)) {
+    last.r = Math.max(1, last.r || 0);
+  }
+  setJustDone = true;
+  render();
+}
+
+function goNextExercise() {
+  const P = plan();
+  const d = P[day];
+  if (!d) return;
+  guidedIdx = Math.min(guidedIdx + 1, d.ex.length);
+  setJustDone = false;
+  showForm = null;
+  render();
+}
+
+function goPrevExercise() {
+  guidedIdx = Math.max(0, guidedIdx - 1);
+  setJustDone = false;
+  showForm = null;
+  render();
+}
+
 function vWork() {
   const P = plan();
   const d = P[day];
@@ -2146,86 +2442,212 @@ function vWork() {
     return `
       <div class="page-hero">
         <div class="title">Workout saved</div>
-        <div class="meta">Here’s what to aim for next time</div>
+        <div class="meta">Hereâs what to aim for next time</div>
       </div>
       <div class="c">
         ${nextMsg.map(x => `<div class="sug"><b>${esc(x[0])}</b><br>${esc(x[1])}</div>`).join("")}
-        <button class="pri" onclick="nextMsg=null;render()">Back to workout</button>
+        <button class="pri" onclick="nextMsg=null;resetGuided();render()">Back to workout</button>
       </div>`;
   }
 
   const strip = `
     <div class="day-strip">
       ${DAYS.map(x => `
-        <div class="day-pill ${x===day?"on":""} ${P[x]?"":"rest-pill"}" onclick="day='${x}';render()">
+        <div class="day-pill ${x===day?"on":""} ${P[x]?"":"rest-pill"}" onclick="day='${x}';resetGuided();render()">
           <div class="abbr">${abbr[x]}</div>
           ${P[x] ? '<div class="dot"></div>' : ""}
         </div>`).join("")}
     </div>`;
 
-  const head = `
-    <div class="page-hero">
-      <div class="title">${day}</div>
-      <div class="meta">${d ? esc(d.title) + " · " + d.ex.length + " exercises · " + d.ex.reduce((a,n)=>a+tgt(n)[0],0) + " sets" : "Rest day · recover & hydrate"}</div>
-    </div>
-    ${strip}
-    <div class="datebar"><span>Workout date</span><input type="date" id="wd" value="${today()}"></div>`;
-
   if (!d) {
-    return head + `
+    return `
+      <div class="page-hero">
+        <div class="title">${day}</div>
+        <div class="meta">Rest day Â· recover & hydrate</div>
+      </div>
+      ${strip}
       <div class="c">
         <h2>Recovery</h2>
         <div class="m">No lifts scheduled. Sleep, eat, light mobility if it feels good. Strength is built on rest days too.</div>
       </div>`;
   }
 
-  const pr = prs();
-  const exercises = d.ex.map(n => {
-    const g = suggest(n);
-    const plan = setPlan(n);
-    const [ts,tr] = tgt(n);
-    const D = S.d[n] || (S.d[n] = {s:"", sets:[]});
-    // Ensure enough set rows for the plan; prefill empty weight/reps from suggestions
-    while (D.sets.length < plan.length) D.sets.push({w:"", r:0});
-    if (g && g.w != null && g.w !== "" && (D.s === "" || D.s == null)) D.s = String(g.w);
-    plan.forEach((p, i) => {
-      if (!D.sets[i]) D.sets[i] = {w:"", r:0};
-      if ((D.sets[i].w === "" || D.sets[i].w == null) && p.w != null) D.sets[i].w = String(p.w);
-      if ((!D.sets[i].r || D.sets[i].r === 0) && p.r) D.sets[i].r = p.r;
-    });
-    return `
-      <div class="c ex">
-        <div class="ex-head">
-          <div>
-            <h3>${esc(n)}</h3>
-            <div class="ex-sub">${ts} sets × ${tr} reps</div>
-          </div>
-          ${pr[n] ? `<div class="badge">PR ${pr[n].w}×${pr[n].r}</div>` : ""}
-        </div>
-        ${g && g.t ? `<div class="tip">${esc(g.t)}</div>` : ""}
-        <div class="set-cols"><span>Set</span><span class="c2">Weight (lb)</span><span class="c3">Reps</span><span></span></div>
-        ${D.sets.map((s,i) => {
-          const p = plan[i];
-          return `
-          <div class="srow">
-            <div class="snum"><b>${i+1}</b>${p && p.tag !== "Work" ? `<small>${esc(p.tag)}</small>` : ""}</div>
-            <input type="number" inputmode="decimal" value="${s.w}" oninput="S.d['${n}'].sets[${i}].w=this.value" placeholder="${p && p.w != null ? p.w : "lb"}">
-            <div class="crep">
-              <button onclick="rep('${n}',${i},-1)">−</button>
-              <input type="number" inputmode="numeric" value="${s.r||""}" oninput="S.d['${n}'].sets[${i}].r=+this.value||0" placeholder="${p ? p.r : "0"}">
-              <button class="plus" onclick="rep('${n}',${i},1)">+</button>
-            </div>
-            ${i ? `<button class="dn cx" aria-label="Remove set" onclick="S.d['${n}'].sets.splice(${i},1);render()">×</button>` : "<span></span>"}
-          </div>`;
-        }).join("")}
-        <button class="addset" onclick="S.d['${n}'].sets.push({w:S.d['${n}'].sets.slice(-1)[0]?.w||'',r:0});render()">+ Add set</button>
-      </div>`;
-  }).join("");
+  if (guidedIdx >= d.ex.length) guidedIdx = d.ex.length;
+  if (guidedIdx < 0) guidedIdx = 0;
 
-  return head + exercises + `
-    <div class="sticky-save">
-      <button class="pri" onclick="finish()">Save workout</button>
-    </div>`;
+  // ===== ALL EXERCISES DONE =====
+  if (guidedIdx >= d.ex.length) {
+    const lastIdx = d.ex.length - 1;
+    return `
+      <div class="page-hero">
+        <div class="title">All done</div>
+        <div class="meta">${esc(d.title)} Â· ${day}</div>
+      </div>
+      ${strip}
+      <div class="datebar"><span>Workout date</span><input type="date" id="wd" value="${today()}"></div>
+      <div class="c">
+        <div class="sug" style="margin:0">You finished every exercise for today. Save the workout to lock in your numbers and get next-session targets.</div>
+        <button class="pri" onclick="finish()">Save workout</button>
+        <button style="width:100%;margin-top:10px" onclick="guidedIdx=${lastIdx};setJustDone=false;render()">Back to last exercise</button>
+      </div>`;
+  }
+
+  const n = d.ex[guidedIdx];
+  const g = suggest(n);
+  const planSets = setPlan(n);
+  const [ts, tr] = tgt(n);
+  const D = S.d[n] || (S.d[n] = {s:"", sets:[]});
+  // Prefill from plan / suggestion
+  while (D.sets.length < 1) D.sets.push({w:"", r:0});
+  if (g && g.w != null && g.w !== "" && (D.s === "" || D.s == null)) D.s = String(g.w);
+  if ((D.sets[0].w === "" || D.sets[0].w == null) && D.s) D.sets[0].w = D.s;
+  if ((!D.sets[0].r || D.sets[0].r === 0) && planSets[0] && planSets[0].r) D.sets[0].r = planSets[0].r;
+
+  const pr = prs();
+  const e = EX[n] || {};
+  const isPlate = !!e.pl;
+  const startW = D.s || (g && g.w) || "";
+  const form = FORM[n];
+  const setCount = D.sets.filter(s => s.r > 0 || +s.w > 0).length;
+  const currentSetIdx = Math.max(0, D.sets.length - 1);
+  const currentSet = D.sets[currentSetIdx];
+
+  // ===== SET JUST DONE â only show what's next =====
+  if (setJustDone) {
+    const moreSets = setCount < ts;
+    const isLastEx = guidedIdx >= d.ex.length - 1;
+    let nextText = "";
+    if (moreSets) {
+      nextText = `Rest 2â3 min, then do set ${setCount + 1} of ${ts}. Aim for ${tr} reps.`;
+    } else if (!isLastEx) {
+      nextText = `Nice. ${ts} sets of ${esc(n)} done. Next up: ${esc(d.ex[guidedIdx + 1])}.`;
+    } else {
+      nextText = `Last exercise finished. Save the workout when you're ready.`;
+    }
+    return `
+      <div class="page-hero">
+        <div class="title">Set logged</div>
+        <div class="meta">${esc(n)} Â· set ${setCount}</div>
+      </div>
+      <div class="c">
+        <div class="sug" style="margin:0;font-size:15px">${esc(nextText)}</div>
+        ${moreSets ? `
+          <button class="pri" onclick="setJustDone=false;S.d['${n}'].sets.push({w:S.d['${n}'].s||'',r:0});render()">Next set â</button>
+        ` : isLastEx ? `
+          <button class="pri" onclick="setJustDone=false;guidedIdx=${d.ex.length};render()">Finish workout â</button>
+        ` : `
+          <button class="pri" onclick="goNextExercise()">Next exercise â</button>
+        `}
+        <button style="width:100%;margin-top:10px" onclick="setJustDone=false;render()">Stay on this exercise</button>
+      </div>`;
+  }
+
+  // ===== MAIN GUIDED VIEW â only current exercise =====
+  const loadW = startW || currentSet.w || 0;
+  const plateBlock = isPlate ? `
+    <div class="c" style="background:var(--a-soft);border-color:rgba(158,27,50,.4);margin-top:10px">
+      <div style="font-size:11px;font-weight:750;letter-spacing:.08em;text-transform:uppercase;color:#f0b8c0">Load the bar</div>
+      <div style="font-size:18px;font-weight:800;margin-top:6px;letter-spacing:-0.02em;text-align:center">${esc(plateText(loadW))}</div>
+      ${plateVisual(loadW)}
+      ${plateChips(loadW)}
+      <div class="nt" style="margin-top:8px;text-align:center">Change the start weight below and the plates update.</div>
+    </div>` : "";
+
+  const formImgPath = FORM_IMG[n];
+  const formImgHtml = formImgPath
+    ? `<img src="${IMG_BASE}${formImgPath}" alt="${esc(n)} form"
+        style="width:100%;max-width:280px;margin:10px auto;display:block;border-radius:12px;background:#1a1214;border:1px solid rgba(255,255,255,.08)"
+        onerror="this.style.display='none';this.nextElementSibling&&(this.nextElementSibling.style.display='block')">
+       <div style="display:none">${formSVG(form.visual || "generic")}</div>`
+    : formSVG(form.visual || "generic");
+  // Labeled cue cards (setup / action / finish) â original instructional layout
+  const cues = form.steps || [];
+  const third = Math.ceil(cues.length / 3) || 1;
+  const setupCues = cues.slice(0, third);
+  const actionCues = cues.slice(third, third * 2);
+  const finishCues = cues.slice(third * 2);
+  const cueCard = (title, list) => list.length ? `
+    <div style="flex:1;min-width:90px;background:rgba(0,0,0,.25);border-radius:12px;padding:10px;border:1px solid rgba(255,255,255,.06)">
+      <div style="font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#a0bfff;margin-bottom:6px">${title}</div>
+      ${list.map(s => `<div style="font-size:12px;color:var(--text2);line-height:1.35;margin-bottom:4px">â¢ ${esc(s)}</div>`).join("")}
+    </div>` : "";
+  const formBlock = showForm === n && form ? `
+    <div class="c" style="margin-top:10px;border-color:rgba(100,150,255,.35);background:rgba(100,150,255,.08)">
+      <div style="font-size:11px;font-weight:750;letter-spacing:.08em;text-transform:uppercase;color:#a0bfff">How to do it</div>
+      ${formImgHtml}
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px">
+        ${cueCard("Setup", setupCues)}
+        ${cueCard("Action", actionCues)}
+        ${cueCard("Finish", finishCues)}
+      </div>
+      <div class="nt" style="margin-top:10px;color:#a0bfff">${esc(form.tip)}</div>
+      <button style="width:100%;margin-top:12px" onclick="showForm=null;render()">Close guide</button>
+    </div>` : "";
+
+  return `
+    <div class="page-hero">
+      <div class="title">${esc(n)}</div>
+      <div class="meta">${guidedIdx + 1} of ${d.ex.length} Â· ${esc(d.title)} Â· ${day}</div>
+    </div>
+    ${strip}
+    <div class="datebar"><span>Workout date</span><input type="date" id="wd" value="${today()}"></div>
+
+    <div class="c ex">
+      <div class="ex-head">
+        <div>
+          <div class="ex-sub">Target ${ts} sets Ã ${tr} reps</div>
+          ${pr[n] ? `<div class="ex-sub" style="margin-top:2px">PR ${pr[n].w} lb Ã ${pr[n].r}</div>` : ""}
+        </div>
+        <button onclick="showForm=showForm==='${n}'?null:'${n}';render()" style="min-width:auto;padding:8px 12px;font-size:13px;border-radius:10px;background:rgba(100,150,255,.15);border:1px solid rgba(100,150,255,.35);color:#a0bfff">
+          ${showForm === n ? "Hide form" : "Form ?"}
+        </button>
+      </div>
+
+      ${g && g.t ? `<div class="tip" style="margin-top:12px">${esc(g.t)}</div>` : ""}
+
+      <label>Start weight (lb) â change anytime</label>
+      <input type="number" inputmode="decimal" value="${esc(String(D.s))}"
+        oninput="S.d['${n}'].s=this.value;if(S.d['${n}'].sets.length)S.d['${n}'].sets[S.d['${n}'].sets.length-1].w=this.value;render()"
+        placeholder="Enter weight">
+
+      ${plateBlock}
+      ${formBlock}
+
+      <div class="sec-label" style="margin-top:16px">Current set Â· #${currentSetIdx + 1}</div>
+      <div class="set" style="margin-top:4px">
+        <div class="set-row">
+          <div class="set-num">#${currentSetIdx + 1}</div>
+          <div>
+            <label>Weight</label>
+            <input type="number" inputmode="decimal" value="${esc(String(currentSet.w))}"
+              oninput="S.d['${n}'].sets[${currentSetIdx}].w=this.value;render()" placeholder="lb">
+          </div>
+          <div>
+            <label>Reps</label>
+            <input type="number" inputmode="numeric" value="${currentSet.r || ""}"
+              oninput="S.d['${n}'].sets[${currentSetIdx}].r=+this.value||0" placeholder="0">
+          </div>
+        </div>
+        <div class="rc" style="margin-top:10px">
+          <button onclick="rep('${n}',${currentSetIdx},-1)">â</button>
+          <span class="big" style="font-size:28px">${currentSet.r}</span>
+          <button class="plus" onclick="rep('${n}',${currentSetIdx},1)">+ Rep</button>
+        </div>
+      </div>
+
+      <button class="pri" onclick="advanceAfterSet('${n}')">Set done â</button>
+
+      ${setCount > 0 ? `
+        <div class="nt" style="margin-top:12px">Logged so far: ${D.sets.filter(s=>s.r>0||+s.w>0).map((s,i)=>`#${i+1} ${s.w||0}Ã${s.r}`).join(" Â· ")}</div>
+      ` : ""}
+    </div>
+
+    <div class="row" style="margin-top:12px">
+      <button ${guidedIdx===0?"disabled style='opacity:.4'":""} onclick="goPrevExercise()">â Prev</button>
+      <button onclick="goNextExercise()">Skip â</button>
+    </div>
+    <div class="nt" style="text-align:center;margin-top:8px">Only the current lift is shown. Finish sets to move on.</div>
+  `;
 }
 
 function vPlan() {
@@ -2242,7 +2664,7 @@ function vPlan() {
     return `
       <div class="page-hero">
         <div class="title">Edit schedule</div>
-        <div class="meta">Tap a day to cycle workout · rest</div>
+        <div class="meta">Tap a day to cycle workout Â· rest</div>
       </div>
 
       <div class="c">
@@ -2263,14 +2685,14 @@ function vPlan() {
         </div>
         <div class="nt">Keep tapping a day to switch between Rest and each workout type.</div>
         <button class="pri" onclick="editSchedule=false;render()">Done</button>
-        <button style="width:100%;margin-top:8px" onclick="resetSchedule()">Reset to Mon–Fri default</button>
+        <button style="width:100%;margin-top:8px" onclick="resetSchedule()">Reset to MonâFri default</button>
       </div>`;
   }
 
   return `
     <div class="page-hero">
       <div class="title">Plan</div>
-      <div class="meta">${trainCount} training days · ${7 - trainCount} rest</div>
+      <div class="meta">${trainCount} training days Â· ${7 - trainCount} rest</div>
     </div>
 
     <div class="c">
@@ -2316,7 +2738,7 @@ function vHist() {
               <div class="name">${esc(n)}</div>
               <div class="sub">${g ? esc(g.t) : "Keep training"}</div>
             </div>
-            <div class="pr-nums">${pr[n].w}<span style="font-size:12px;font-weight:600;color:var(--muted)"> × ${pr[n].r}</span></div>
+            <div class="pr-nums">${pr[n].w}<span style="font-size:12px;font-weight:600;color:var(--muted)"> Ã ${pr[n].r}</span></div>
           </div>`;
       }).join("") : '<div class="m">No PRs yet. Save a workout first.</div>'}
     </div>
@@ -2325,10 +2747,10 @@ function vHist() {
       <h2>History</h2>
       ${S.h.length ? S.h.map(h => `
         <div class="hist-item">
-          <div class="when">${esc(h.day)} · ${esc(h.date)}</div>
+          <div class="when">${esc(h.day)} Â· ${esc(h.date)}</div>
           <div class="what">${esc(h.title)}</div>
           <div class="lifts">
-            ${h.items.map(i => esc(i.name) + ": " + i.sets.map(s => s.w + " lb × " + s.r).join(", ")).join("<br>")}
+            ${h.items.map(i => esc(i.name) + ": " + i.sets.map(s => s.w + " lb Ã " + s.r).join(", ")).join("<br>")}
           </div>
         </div>`).join("") : '<div class="m">No workouts saved yet.</div>'}
       <div class="row" style="margin-top:14px">
@@ -2372,7 +2794,7 @@ function vTeam() {
   return `
     <div class="page-hero">
       <div class="title">Team</div>
-      <div class="meta">${esc(tname(curTeam))} · ${esc(S.p.schoolName || "your school")}</div>
+      <div class="meta">${esc(tname(curTeam))} Â· ${esc(S.p.schoolName || "your school")}</div>
     </div>
 
     <div class="c">
@@ -2395,10 +2817,10 @@ function vTeam() {
           <div class="pr-row">
             <div class="pr-rank ${i < 3 ? "top" : ""}">${i+1}</div>
             <div class="pr-info">
-              <div class="name">${esc(o.name)}${o.uid===S.uid?" · you":""}</div>
+              <div class="name">${esc(o.name)}${o.uid===S.uid?" Â· you":""}</div>
               <div class="sub">#${esc(o.id)}</div>
             </div>
-            <div class="pr-nums">${o.prs[lift].w}<span style="font-size:12px;font-weight:600;color:var(--muted)"> × ${o.prs[lift].r}</span></div>
+            <div class="pr-nums">${o.prs[lift].w}<span style="font-size:12px;font-weight:600;color:var(--muted)"> Ã ${o.prs[lift].r}</span></div>
           </div>`).join("") || '<div class="m" style="margin-top:10px">No numbers for this lift yet.</div>'}
       ` : '<div class="m">Log a lift and add friends to start the board.</div>'}
     </div>
@@ -2431,10 +2853,10 @@ function vFriends() {
     return `
       <div class="page-hero">
         <div class="title">${esc(friendName)}</div>
-        <div class="meta">Private chat · only you two</div>
+        <div class="meta">Private chat Â· only you two</div>
       </div>
       <div class="c">
-        <button onclick="closeFriendChat()" style="width:auto;min-width:80px;margin-bottom:10px">← Back</button>
+        <button onclick="closeFriendChat()" style="width:auto;min-width:80px;margin-bottom:10px">â Back</button>
         <div id="chatmsgs" style="max-height:360px;overflow-y:auto">
           ${S.messages.length ? S.messages.map(m => `
             <div class="msg">
@@ -2463,7 +2885,7 @@ function vFriends() {
   return `
     <div class="page-hero">
       <div class="title">Friends</div>
-      <div class="meta">${accepted.length} connected · ${pending.length} requests</div>
+      <div class="meta">${accepted.length} connected Â· ${pending.length} requests</div>
     </div>
 
     <div class="c">
@@ -2490,7 +2912,7 @@ function vFriends() {
           <div class="friend-head">
             <div class="avatar">${initial(f.name)}</div>
             <div class="friend-meta">
-              <div class="nm">${esc(f.name)} · #${esc(f.id)}</div>
+              <div class="nm">${esc(f.name)} Â· #${esc(f.id)}</div>
               <div class="sp">Wants to be friends</div>
             </div>
           </div>
@@ -2507,7 +2929,7 @@ function vFriends() {
         <div class="friend-head">
           <div class="avatar">${initial(f.name)}</div>
           <div class="friend-meta">
-            <div class="nm">${esc(f.name)} · #${esc(f.id)}</div>
+            <div class="nm">${esc(f.name)} Â· #${esc(f.id)}</div>
             <div class="sp">Waiting for them to accept</div>
           </div>
         </div>
@@ -2520,17 +2942,17 @@ function vFriends() {
           <div class="friend-head">
             <div class="avatar">${initial(f.name)}</div>
             <div class="friend-meta">
-              <div class="nm">${esc(f.name)} · #${esc(f.id)}</div>
-              <div class="sp">${esc(f.mode || "")}${f.spec ? " · " + esc(f.spec) : ""}</div>
+              <div class="nm">${esc(f.name)} Â· #${esc(f.id)}</div>
+              <div class="sp">${esc(f.mode || "")}${f.spec ? " Â· " + esc(f.spec) : ""}</div>
             </div>
           </div>
           ${Object.entries(f.prs || {}).length ? Object.entries(f.prs).map(([n,b]) => `
-            <div class="ln"><span>${esc(n)}</span><b>${b.w} lb × ${b.r}</b></div>
+            <div class="ln"><span>${esc(n)}</span><b>${b.w} lb Ã ${b.r}</b></div>
           `).join("") : '<div class="nt">No lifts shared yet</div>'}
           ${f.recent ? `
             <div class="nt">
-              <b>Latest · ${esc(f.recent.date)}</b><br>
-              ${f.recent.items.map(i => esc(i.name) + ": " + i.sets.map(s => s.w + "×" + s.r).join(", ")).join("<br>")}
+              <b>Latest Â· ${esc(f.recent.date)}</b><br>
+              ${f.recent.items.map(i => esc(i.name) + ": " + i.sets.map(s => s.w + "Ã" + s.r).join(", ")).join("<br>")}
             </div>` : ""}
           <div class="row">
             <button class="pri" style="margin:0" onclick="openFriendChat('${f.uid}')">Chat</button>
@@ -2577,7 +2999,7 @@ function vPlates() {
   return `
     <div class="page-hero">
       <div class="title">Plates</div>
-      <div class="meta">Build the bar · both sides load the same</div>
+      <div class="meta">Build the bar Â· both sides load the same</div>
     </div>
 
     <div class="c">
@@ -2586,7 +3008,7 @@ function vPlates() {
         <div class="unit">lb total</div>
       </div>
       <svg viewBox="0 0 2200 520" width="100%" style="margin:8px 0">${bs}${L}${R}</svg>
-      <div class="nt" style="text-align:center;margin-top:0">${bar ? "45 lb bar" : "No bar"}${list.length ? " · each side: " + list.join(" + ") : ""}</div>
+      <div class="nt" style="text-align:center;margin-top:0">${bar ? "45 lb bar" : "No bar"}${list.length ? " Â· each side: " + list.join(" + ") : ""}</div>
     </div>
 
     <div class="c">
@@ -2638,7 +3060,7 @@ setInterval(async () => {
     }
     // Friends list is already live via onSnapshot, no need to poll it
   } catch (e) {
-    // silent – background only
+    // silent â background only
   }
 }, 5000);
 </script>
