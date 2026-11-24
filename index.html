@@ -1,849 +1,235 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
-<meta name="theme-color" content="#07090d">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Football</title>
-<style>
-:root{--bg:#0b1220;--panel:#131e30;--panel2:#1a2940;--text:#f4f7fb;--muted:#aab8ca;--line:#2a3a52;--accent:#f2a900;--green:#35c98a;--red:#ff6b6b;--safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);--safe-left:env(safe-area-inset-left,0px);--safe-right:env(safe-area-inset-right,0px)}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;padding:0;width:100%;overflow-x:hidden}
-body{background:linear-gradient(160deg,#0b1220,#111c2d 60%,#0b1220);color:var(--text);font:16px system-ui,-apple-system,Segoe UI,Roboto,sans-serif;min-height:100vh;min-height:100dvh;padding-left:var(--safe-left);padding-right:var(--safe-right)}
-header{padding:calc(16px + var(--safe-top)) 14px 12px;max-width:480px;margin:0 auto}
-h1{margin:0;font-size:clamp(22px,6.5vw,32px);letter-spacing:-.6px;line-height:1.15}
-.sub{color:var(--muted);margin-top:4px;font-size:13px;line-height:1.35}
-main{max-width:480px;margin:0 auto;padding:0 12px calc(40px + var(--safe-bottom))}
-.profile,.panel,.exercise,.history-card,.setup-card{background:var(--panel);border:1px solid var(--line);border-radius:14px}
-.profile{padding:12px;display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
-.stat small{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.6px}
-.stat strong{font-size:15px;line-height:1.25;word-break:break-word}
-.tabs{display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:2px 0 10px;scrollbar-width:none}
-.tabs::-webkit-scrollbar{display:none}
-.tab{flex:0 0 auto;white-space:nowrap;border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:999px;padding:9px 14px;font-weight:700;font-size:14px;cursor:pointer}
-.tab.active{background:var(--accent);border-color:var(--accent);color:#171717}
-.panel{padding:14px;margin-bottom:12px}
-.panel h2{margin:0 0 4px;font-size:19px}
-.muted{color:var(--muted)}
-.day-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap}
-input,select,button,textarea{font:inherit}
-input,select,textarea{width:100%;background:#0d1726;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:12px;min-width:0;font-size:16px}
-label{font-size:12px;color:var(--muted);display:block;margin-bottom:4px}
-.field{margin:11px 0}
-.date-row>div{min-width:0}
-input[type=date]{-webkit-appearance:none;appearance:none;display:block;width:100%;max-width:100%;min-width:0;min-height:48px;text-align:left}
-input[type=date]::-webkit-date-and-time-value{text-align:left}
-.date-row{display:grid;grid-template-columns:1fr;gap:10px;margin-top:12px}
-.exercise{padding:12px;margin-top:10px}
-.exercise h3{margin:0 0 3px;font-size:17px}
-.focus{font-size:12px;color:var(--muted);margin-bottom:8px}
-.suggest{background:rgba(242,169,0,.12);border:1px solid rgba(242,169,0,.35);color:#f6d27a;border-radius:10px;padding:9px 11px;font-size:12.5px;margin-bottom:10px;line-height:1.4}
-.set{background:var(--panel2);border-radius:11px;padding:10px;margin-top:8px}
-.settop{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-weight:700;font-size:14px}
-.setgrid{display:grid;grid-template-columns:1fr;gap:8px}
-.rep-controls{display:flex;align-items:center;gap:10px;margin-top:6px}
-.rep-count{min-width:48px;text-align:center;font-weight:800;font-size:20px}
-button{border:0;border-radius:10px;padding:11px 14px;font-weight:750;cursor:pointer;font-size:15px}
-.primary{background:var(--accent);color:#171717}
-.secondary{background:#263852;color:var(--text);border:1px solid #3a506d}
-.good{background:#176b4b;color:white}
-.danger{background:#5b2932;color:#fff}
-.small{padding:8px 12px;font-size:13px}
-.full{width:100%;margin-top:10px}
-.actions{display:flex;flex-direction:column;gap:8px;margin-top:10px}
-.actions button{width:100%}
-.empty{text-align:center;padding:20px 12px;color:var(--muted);font-size:14px}
-.history-card{padding:12px;margin-top:8px}
-.history-card strong{display:block;font-size:15px}
-.history-card small{color:var(--muted);font-size:12px}
-.daylist{display:grid;grid-template-columns:1fr;gap:8px;margin-top:10px}
-.dayitem{background:var(--panel2);border-radius:11px;padding:12px;border:1px solid transparent;text-align:left;color:var(--text);width:100%}
-.dayitem.today{border-color:var(--accent)}
-.dayitem b{display:block;font-size:15px}
-.dayitem small{color:var(--muted);font-size:12px}
-.notice{font-size:12px;color:var(--muted);line-height:1.45;margin-top:10px}
-.hidden{display:none!important}
-.setup-wrap{max-width:480px;margin:0 auto;padding:12px 12px calc(32px + var(--safe-bottom))}
-.setup-card{padding:18px}
-.setup-card h2{margin:0 0 6px;font-size:22px}
-.setup-card .lead{color:var(--muted);margin:0 0 14px;line-height:1.45;font-size:14px}
-.pos-grid{display:grid;grid-template-columns:1fr;gap:7px}
-.pos-grid label{display:flex;align-items:center;gap:10px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px 12px;cursor:pointer;margin:0;color:var(--text);font-size:14px}
-.pos-grid input{width:auto;min-width:18px;height:18px;accent-color:var(--accent)}
-.profile-name{grid-column:1/-1}
-.profile-name strong{font-size:18px}
-.edit-profile-btn{font-size:12px;padding:6px 10px;margin-top:6px}
-/* Wider screens still look good but stay phone-first for 19.5:9 */
-@media(min-width:480px){
-  .date-row{grid-template-columns:1fr 1fr}
-  .setgrid{grid-template-columns:1fr 1fr}
-  .daylist{grid-template-columns:1fr 1fr}
-  .pos-grid{grid-template-columns:1fr 1fr}
-  .actions{flex-direction:row}
-  .actions button{width:auto}
-}
-@media(min-width:700px){
-  .profile{grid-template-columns:repeat(4,1fr)}
-  header,main,.setup-wrap{max-width:560px}
-}
-
-/* ===== GYM REDESIGN ===== */
-.rep-controls .plus{flex:1;background:var(--accent)!important;color:#0b0f00;border:0!important;font-size:20px!important;font-family:Impact,system-ui,sans-serif;text-transform:uppercase;letter-spacing:.05em}
-:root{--bg:#07090d;--panel:#0f1319;--panel2:#161b23;--text:#f5f7fa;--muted:#8d98a8;--line:#222a35;--accent:#c6ff00;--green:#c6ff00;--red:#ff4d4d;--hot:#ff6a00}
-html{background:#07090d;overscroll-behavior:none}
-body{background:radial-gradient(120% 60% at 50% -10%,#1b2a0a 0%,#07090d 55%) fixed,#07090d;overscroll-behavior:none;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-h1,h2,h3,.rep-count,.tab,.primary,.settop,.stat strong,.dayitem b{font-family:Impact,"Haettenschweiler","Arial Narrow Bold","Arial Black",system-ui,sans-serif;text-transform:uppercase;letter-spacing:.04em;font-weight:400}
-h1{font-size:clamp(34px,11vw,52px);font-style:italic;line-height:1;letter-spacing:.02em;text-shadow:0 0 24px rgba(198,255,0,.35)}
-.sub{color:var(--muted);text-transform:uppercase;letter-spacing:.12em;font-size:11px;margin-top:6px}
-.profile,.panel,.exercise,.history-card,.setup-card{background:linear-gradient(180deg,#121720,#0d1117);border:1px solid var(--line);border-radius:18px;box-shadow:0 8px 24px rgba(0,0,0,.45)}
-.profile{border-left:4px solid var(--accent)}
-.stat small{color:var(--accent);letter-spacing:.14em;font-size:10px}
-.stat strong{font-size:17px;letter-spacing:.05em}
-.panel h2,.setup-card h2{font-size:26px;letter-spacing:.05em}
-.exercise{border-left:4px solid var(--accent);padding:14px}
-.exercise h3{font-size:22px;letter-spacing:.05em}
-.focus{text-transform:uppercase;letter-spacing:.1em;font-size:10.5px}
-.suggest{background:rgba(198,255,0,.08);border:1px solid rgba(198,255,0,.4);color:#e4ff8a;border-radius:12px}
-.set{background:#0a0d12;border:1px solid var(--line);border-radius:14px;padding:12px}
-.settop{font-size:17px;color:var(--accent)}
-input,select,textarea{background:#0a0d12;border:1px solid var(--line);border-radius:12px;min-height:50px;font-size:17px;font-weight:600}
-input:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(198,255,0,.18)}
-label{text-transform:uppercase;letter-spacing:.1em;font-size:10.5px}
-button{border-radius:12px;min-height:48px;transition:transform .08s}
-button:active{transform:scale(.96)}
-.primary{background:var(--accent);color:#0b0f00;font-size:18px;box-shadow:0 0 22px rgba(198,255,0,.35)}
-.secondary{background:#1a212b;border:1px solid #2c3644}
-.good{background:var(--accent);color:#0b0f00;font-family:Impact,system-ui,sans-serif;text-transform:uppercase;letter-spacing:.05em;font-weight:400;font-size:18px;box-shadow:0 0 22px rgba(198,255,0,.35)}
-.danger{background:#2a1214;color:#ff8d8d;border:1px solid #5b2932}
-.rep-controls{gap:12px}
-.rep-controls button{min-width:60px;min-height:56px;font-size:26px;background:#1a212b;border:1px solid #2c3644}
-.rep-count{font-size:44px;color:var(--text);min-width:72px;text-shadow:0 0 18px rgba(198,255,0,.4)}
-.dayitem{background:#0a0d12;border:1px solid var(--line);border-radius:14px}
-.dayitem b{font-size:18px}
-.dayitem.today{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),0 0 18px rgba(198,255,0,.2)}
-.pos-grid label{background:#0a0d12;border-radius:12px}
-.pos-grid input{accent-color:var(--accent)}
-main{padding-bottom:calc(118px + var(--safe-bottom))}
-.tabs{position:fixed;left:0;right:0;bottom:0;margin:0 auto;max-width:560px;z-index:50;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:8px 10px calc(10px + var(--safe-bottom));overflow:visible;background:rgba(7,9,13,.88);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border-top:1px solid var(--line)}
-.tab{white-space:normal;text-align:center;border:1px solid transparent;background:transparent;color:var(--muted);border-radius:12px;padding:11px 2px;font-size:12px;line-height:1.1;letter-spacing:.06em;min-height:48px}
-.tab.active{background:rgba(198,255,0,.12);border-color:var(--accent);color:var(--accent);box-shadow:0 0 16px rgba(198,255,0,.25)}
-</style>
+<html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<meta name="theme-color" content="#07090d"><meta name="apple-mobile-web-app-capable" content="yes">
+<title>Lift Log</title>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-</head>
-<body>
-<header>
-  <h1>🏈 Football</h1>
-  <div class="sub">Build strength for the line. Log every set, rep, and pound.</div>
-</header>
-
-<!-- SETUP / START PAGE -->
-<div id="setupView" class="setup-wrap">
-  <div class="setup-card">
-    <h2>Set up your profile</h2>
-    <p class="lead">Tell us who you are so the log can track your progress and suggest next weights.</p>
-
-    <div class="field">
-      <label for="setupName">Your name</label>
-      <input id="setupName" type="text" placeholder="e.g. Marcus" autocomplete="name">
-    </div>
-
-    <div class="field">
-      <label>Football position(s)</label>
-      <div class="pos-grid" id="posGrid">
-        <label><input type="checkbox" name="pos" value="OT"> Offensive Tackle (OT)</label>
-        <label><input type="checkbox" name="pos" value="OG"> Offensive Guard (OG)</label>
-        <label><input type="checkbox" name="pos" value="C"> Center (C)</label>
-        <label><input type="checkbox" name="pos" value="DE"> Defensive End (DE)</label>
-        <label><input type="checkbox" name="pos" value="DT"> Defensive Tackle (DT)</label>
-        <label><input type="checkbox" name="pos" value="NT"> Nose Tackle (NT)</label>
-        <label><input type="checkbox" name="pos" value="TE"> Tight End (TE)</label>
-        <label><input type="checkbox" name="pos" value="Other"> Other / Multiple</label>
-      </div>
-    </div>
-
-    <div class="field">
-      <label for="setupWeight">Body weight (lbs)</label>
-      <input id="setupWeight" type="number" min="80" max="400" step="1" placeholder="e.g. 175" inputmode="numeric">
-    </div>
-
-    <div class="field">
-      <label for="setupLevel">Experience level</label>
-      <select id="setupLevel">
-        <option value="Beginner">Beginner (new to lifting)</option>
-        <option value="Intermediate" selected>Intermediate (1–3 years)</option>
-        <option value="Advanced">Advanced (3+ years)</option>
-      </select>
-    </div>
-
-    <div class="field">
-      <label for="setupGoal">Main goal</label>
-      <select id="setupGoal">
-        <option value="Strength + muscle" selected>Strength + muscle</option>
-        <option value="Max strength">Max strength</option>
-        <option value="Power & explosiveness">Power & explosiveness</option>
-        <option value="Size / hypertrophy">Size / hypertrophy</option>
-        <option value="General athleticism">General athleticism</option>
-      </select>
-    </div>
-
-    <div class="field">
-      <label style="display:flex;gap:8px;align-items:center;font-size:14px;color:var(--text)"><input type="checkbox" id="setupShare" checked style="width:auto"> Share my lifts on the team leaderboard</label>
-    </div>
-
-    <button class="primary full" id="saveProfile">Start lifting →</button>
-    <p class="notice">Everything saves on this device. You can edit your profile later from the top of the app.</p>
-  </div>
-</div>
-
-<!-- MAIN APP -->
-<main id="appView" class="hidden">
-  <section class="profile" id="profileBar">
-    <div class="stat profile-name"><small>Athlete</small><strong id="dispName">—</strong></div>
-    <div class="stat"><small>Position</small><strong id="dispPos">—</strong></div>
-    <div class="stat"><small>Body weight</small><strong id="dispWeight">—</strong></div>
-    <div class="stat"><small>Level / Goal</small><strong id="dispLevelGoal">—</strong>
-      <button class="secondary small edit-profile-btn" id="editProfileBtn">Edit profile</button>
-    </div>
-  </section>
-
-  <div class="tabs">
-    <button class="tab active" data-tab="workout">Workout</button>
-    <button class="tab" data-tab="schedule">Weekly plan</button>
-    <button class="tab" data-tab="history">History & progress</button>
-    <button class="tab" data-tab="team">Team</button>
-  </div>
-
-  <section id="workoutView">
-    <div class="panel">
-      <div class="day-head">
-        <div><h2 id="dayTitle">Monday</h2><div class="muted" id="daySubtitle">Chest, shoulders & triceps</div></div>
-        <span id="todayBadge" class="muted"></span>
-      </div>
-      <div class="date-row">
-        <div><label for="workoutDate">Workout date</label><input id="workoutDate" type="date"></div>
-        <div><label for="daySelect">Choose day</label><select id="daySelect"></select></div>
-      </div>
-      <div id="exerciseList"></div>
-      <button class="primary full" id="finishWorkout">Save completed workout</button>
-      <div class="notice">Your entries save on this device. Use the same browser to see your log later. Suggestions for next weight are based on your last logged sets.</div>
-    </div>
-  </section>
-
-  <section id="scheduleView" class="hidden">
-    <div class="panel">
-      <h2>Weekly training plan</h2>
-      <div class="muted">Choose the workout for each day, or tap Open to log it.</div>
-      <div id="weekList" class="daylist"></div>
-      <button class="secondary full" id="resetWeek" style="margin-top:10px">Reset to default (Mon-Fri workouts, Sat/Sun rest)</button>
-      <p class="notice">Your changes save on this device. Adjust around football practices, games, and your coach's program. Recovery days are part of getting stronger.</p>
-    </div>
-  </section>
-
-  <section id="teamView" class="hidden">
-    <div class="panel">
-      <h2>Team leaderboard</h2>
-      <div class="muted" id="teamStatus">Everyone's best lifts, live.</div>
-      <div class="field"><label for="teamLift">Lift</label><select id="teamLift"></select></div>
-      <div id="teamList" class="daylist"></div>
-    </div>
-  </section>
-
-  <section id="historyView" class="hidden">
-    <div class="panel">
-      <h2>History & progress</h2>
-      <div class="muted">Your saved workouts and exercise best logged weights. Next-session targets appear on the Workout tab.</div>
-      <div id="progressSummary"></div>
-      <div id="historyList"></div>
-      <div class="actions">
-        <button class="secondary" id="exportData">Export workout data</button>
-        <button class="danger" id="clearData">Clear all history</button>
-      </div>
-    </div>
-  </section>
-</main>
-
+<style>
+:root{--a:#c6ff00;--p:#0f1319;--p2:#161b23;--l:#222a35;--m:#8d98a8;--t:#f5f7fa}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{background:#07090d;overscroll-behavior:none}
+body{margin:0;background:radial-gradient(120% 60% at 50% -10%,#1b2a0a,#07090d 55%) fixed #07090d;color:var(--t);font:16px system-ui,-apple-system,sans-serif;padding:env(safe-area-inset-top) 12px 0;overscroll-behavior:none}
+.w{max-width:520px;margin:0 auto;padding-bottom:120px}
+h1,h2,h3,.big,.tab,.pri{font-family:Impact,"Arial Narrow Bold",system-ui,sans-serif;text-transform:uppercase;letter-spacing:.04em;font-weight:400}
+h1{font-size:46px;font-style:italic;margin:16px 0 0;line-height:1;text-shadow:0 0 24px rgba(198,255,0,.35)}
+h2{font-size:24px;margin:0 0 6px}h3{font-size:20px;margin:0}
+.sub,.m{color:var(--m)}.sub{font-size:11px;letter-spacing:.12em;text-transform:uppercase;margin:6px 0 12px}
+.c{background:linear-gradient(180deg,#121720,#0d1117);border:1px solid var(--l);border-radius:18px;padding:14px;margin-top:12px}
+.ex{border-left:4px solid var(--a)}
+label{display:block;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--m);margin:10px 0 4px}
+input,select,textarea{width:100%;background:#0a0d12;color:var(--t);border:1px solid var(--l);border-radius:12px;padding:12px;min-height:50px;font:600 17px system-ui}
+textarea{font-size:12px;min-height:70px;word-break:break-all}
+input:focus,select:focus{outline:0;border-color:var(--a)}
+button{border:0;border-radius:12px;min-height:48px;padding:10px 14px;font:700 15px system-ui;background:#1a212b;color:var(--t);border:1px solid #2c3644;cursor:pointer}
+button:active{transform:scale(.96)}
+.pri{background:var(--a);color:#0b0f00;font-size:18px;border:0;box-shadow:0 0 22px rgba(198,255,0,.35);width:100%;margin-top:12px}
+.dn{background:#2a1214;color:#ff8d8d;border-color:#5b2932}
+.row{display:flex;gap:8px;align-items:center}.row>*{flex:1}
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.set{background:#0a0d12;border:1px solid var(--l);border-radius:14px;padding:12px;margin-top:8px}
+.rc{display:flex;gap:10px;align-items:center;margin-top:4px}.rc button{min-width:56px;min-height:56px;font-size:24px;flex:0}
+.big{font-size:42px;min-width:56px;text-align:center}
+.rc .plus{flex:1;background:var(--a);color:#0b0f00;border:0;font-size:18px}
+.sug{background:rgba(198,255,0,.08);border:1px solid rgba(198,255,0,.4);color:#e4ff8a;border-radius:12px;padding:9px 11px;font-size:13px;margin:8px 0;line-height:1.4}
+.pr{background:rgba(255,106,0,.1);border:1px solid #ff6a00;color:#ffb27a}
+.mode{display:grid;gap:10px;margin-top:10px}.mode button{min-height:64px;font:400 24px Impact,sans-serif;text-transform:uppercase;letter-spacing:.05em}
+.mode button.on{border-color:var(--a);color:var(--a);box-shadow:0 0 16px rgba(198,255,0,.25)}
+.hide{display:none!important}
+.pb{border-radius:50%;aspect-ratio:1;min-height:0;padding:0;font:400 22px Impact,sans-serif;color:#fff;border:3px solid rgba(255,255,255,.3)}
+.nav{position:fixed;left:0;right:0;bottom:0;margin:auto;max-width:560px;z-index:9;display:flex;gap:4px;padding:8px 8px calc(10px + env(safe-area-inset-bottom));background:rgba(7,9,13,.9);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--l)}
+.tab{flex:1;min-height:48px;padding:8px 1px;font-size:12px;background:0;border:1px solid transparent;color:var(--m)}
+.tab.on{color:var(--a);border-color:var(--a);background:rgba(198,255,0,.12)}
+.nt{font-size:12px;color:var(--m);line-height:1.5;margin-top:10px}
+.ln{display:flex;justify-content:space-between;gap:8px;margin-top:6px;font-size:14px}.ln b{color:var(--a)}
+</style></head><body><div class="w">
+<h1>🏋️ Lift Log</h1><div class="sub" id="sub">Log every set, rep and pound</div>
+<div id="setup" class="hide"></div>
+<div id="app" class="hide"><div id="v"></div></div>
+</div><div class="nav hide" id="nav"></div>
 <script>
-const DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+// PASTE YOUR FIREBASE SETTINGS HERE (see SETUP.md, step 5)
+const FIREBASE_CONFIG={apiKey:"PASTE_API_KEY",authDomain:"PASTE_AUTH_DOMAIN",projectId:"PASTE_PROJECT_ID",appId:"PASTE_APP_ID"};
+const $=i=>document.getElementById(i),KEY="liftlog.v1";
+const esc=t=>String(t??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let S=JSON.parse(localStorage.getItem(KEY)||"null")||{p:null,h:[],f:[],team:[],d:{}};
+if(S.p&&!/^\d{5}$/.test(S.p.id))S.p.id=String(10000+Math.floor(Math.random()*90000));
+const save=()=>localStorage.setItem(KEY,JSON.stringify(S));
+const today=()=>{const d=new Date();return new Date(d-d.getTimezoneOffset()*6e4).toISOString().slice(0,10)};
+const DAYS=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+const POS=["Left tackle","Right tackle","Guard","Center","Defensive tackle","Defensive end","Tight end","Linebacker","Other"];
+const FOC=["Full meet","Squat","Bench","Deadlift"],GOALS=["Max strength","Size","Power & explosiveness","General fitness"];
+// inc = lb to add, tgt=[sets,reps], bw = body-weight ratios [beginner,intermediate,advanced]
+const EX={"Bench Press":{inc:5,t:[3,8],bw:[.35,.5,.75],pl:1},"Overhead Press":{inc:2.5,t:[3,8],bw:[.25,.35,.5]},"Close-Grip Bench Press":{inc:5,t:[3,8],bw:[.3,.45,.65]},
+"Squat":{inc:10,t:[3,5],bw:[.5,.75,1],pl:1},"Deadlift":{inc:10,t:[3,5],bw:[.6,.9,1.25],pl:1},"Romanian Deadlift":{inc:5,t:[3,8],bw:[.4,.6,.85]},
+"Barbell Row":{inc:5,t:[3,8],bw:[.35,.5,.7]},"Pull-Ups":{inc:5,t:[3,8],pu:1},"Face Pulls":{inc:5,t:[3,12],bw:[.1,.15,.2]},
+"Plank":{inc:0,t:[3,1]},"Hip & thoracic mobility":{inc:0,t:[1,1]},"Football position drills":{inc:0,t:[3,1]},"Short acceleration work":{inc:0,t:[4,1]}};
+function plan(){const fb=!!S.p.fb;
+const sat=fb?{title:"Optional football drills",ex:["Football position drills","Short acceleration work"]}:{title:"Optional accessories & mobility",ex:["Face Pulls","Plank","Hip & thoracic mobility"]};
+return {Monday:{title:"Chest, shoulders & triceps",ex:["Bench Press","Overhead Press","Close-Grip Bench Press"]},Wednesday:{title:"Legs",ex:["Squat","Deadlift","Romanian Deadlift"]},
+Friday:{title:"Back",ex:["Barbell Row","Pull-Ups"]},Saturday:sat}}
+const rnd=(x,s)=>Math.round(x/s)*s;
+const tgt=n=>{const e=EX[n];let[s,r]=e.t;if(S.p.pl&&e.pl){s=5;r=5}return[s,r]};
+function last(n){for(const h of S.h){const it=h.items.find(i=>i.name===n);if(it&&it.sets.length)return it.sets}return null}
+function suggest(n){const e=EX[n],lv=["Beginner","Intermediate","Advanced"].indexOf(S.p.level),[ts,tr]=tgt(n),L=last(n);
+if(!e.inc&&!e.bw&&!e.pu)return L?null:{t:"Do it with good form."};
+if(e.pu){if(!L)return{t:"Start with bodyweight. Aim for 5-8 reps each set."};
+const mr=Math.min(...L.map(s=>s.r)),w=Math.max(...L.map(s=>+s.w||0));
+return mr>=12?{w:w+5,t:`You hit ${mr} reps on every set. Add ${w?5:5} lb (weighted) and aim for 8 reps.`}:{w,t:`Aim for ${mr+1} reps each set${w?" at +"+w+" lb":""} (reps first, weight later).`}}
+if(!L){const w=rnd(S.p.bw*e.bw[lv],e.inc===2.5?2.5:5);return{w,t:`First time: start light at about ${w} lb and focus on clean reps.`}}
+const V=L.filter(s=>+s.w>0);if(!V.length)return null;const w=Math.max(...V.map(s=>+s.w)),top=V.filter(s=>+s.w===w);
+const all=V.length>=ts&&V.every(s=>s.r>=tr),close=V.every(s=>s.r>=tr-2);
+if(all)return{w:w+e.inc,t:`You hit every rep. Add ${e.inc} lb: try ${w+e.inc} lb.`};
+if(close)return{w,t:`Close. Stay at ${w} lb and aim for one more rep.`};
+const d=rnd(w*.9,e.inc===2.5?2.5:5);return{w:d,t:`Reps were low. Drop about 10% to ${d} lb and rebuild.`}}
+function prs(){const b={};S.h.forEach(h=>h.items.forEach(i=>i.sets.forEach(s=>{const w=+s.w;if(w>0&&(!b[i.name]||w>b[i.name].w||(w===b[i.name].w&&s.r>b[i.name].r)))b[i.name]={w,r:s.r,d:h.date}})));return b}
+// ---------- codes ----------
+const FBT=["JV1","JV2","Varsity"],WCS=["105","114","123","132","148","165","181","198","220","242","275","275+"],GRADES=[9,10,11,12],LIFTS=Object.keys(EX);
+const modeName=p=>p.fb&&p.pl?"Football + Powerlifting":p.fb?"Football":p.pl?"Powerlifting":"On my own";
+const specText=p=>p.fb||p.pl?[p.fb&&POS[p.fb.p]+" · "+FBT[p.fb.t],p.pl&&WCS[p.pl.w]+" lb · Grade "+p.pl.g].filter(Boolean).join(" | "):p.own;
+if(S.p&&!("fb" in S.p)){const m=S.p.mode;S.p.fb=m==="Football"?{p:Math.max(0,POS.indexOf(S.p.spec)),t:2}:null;S.p.pl=m==="Powerlifting"?{w:5,g:10}:null}
+// Team numbers: Football JV1=101, JV2=102, Varsity=103. Powerlifting = 2 + (grade-8) + weight-class number (2 digits), e.g. grade 10, 165 lb = 2205
+const tkeys=o=>[o.fb?String(101+o.fb.t):null,o.pl?"2"+(o.pl.g-8)+String(o.pl.w).padStart(2,"0"):null];
+const tname=k=>!k?"":k[0]==="1"?"Football · "+FBT[+k-101]:"Powerlifting · "+WCS[+k.slice(2)]+" lb · Grade "+(+k[1]+8);
+const myTeams=()=>tkeys(S.p).filter(Boolean);
+const snap=()=>JSON.parse(JSON.stringify({id:S.p.id,name:S.p.name,fb:S.p.fb,pl:S.p.pl,mode:modeName(S.p),prs:prs(),recent:S.h.slice(0,3),ts:Date.now()}));
+function statCard(o,note){const P=Object.entries(o.prs||{});return`<div class="c"><h3>${esc(o.name)} #${esc(o.id)}</h3><div class="m" style="font-size:12px">${esc(o.mode)} · ${esc(specText(o)||"")}${note?" · "+note:""}</div>
+${P.map(([n,b])=>`<div class="ln"><span>${esc(n)}</span><b>${b.w} lb × ${b.r}</b></div>`).join("")||'<div class="nt">No lifts yet</div>'}
+${(o.recent||[]).map(h=>`<div class="nt"><b>${esc(h.date)} · ${esc(h.title)}</b><br>${h.items.map(i=>esc(i.name)+": "+i.sets.map(s=>s.w+"×"+s.r).join(", ")).join("<br>")}</div>`).join("")}</div>`}
+// ---------- views ----------
+let tab="workout",day=DAYS[(new Date().getDay()+6)%7],lift="",nextMsg=null;
+const TABS=()=>[["workout","Workout"],["plan","Plan"],["history","History"],...((S.p.fb||S.p.pl)?[["team","Team"]]:[["plates","Plates"]]),["friends","Friends"]];
+function render(){
+if(!S.p){$("setup").classList.remove("hide");$("app").classList.add("hide");$("nav").classList.add("hide");return setupUI()}
+$("setup").classList.add("hide");$("app").classList.remove("hide");$("nav").classList.remove("hide");
+$("sub").textContent=`${S.p.name} #${S.p.id} · ${S.p.fb||S.p.pl?specText(S.p):S.p.own}`;
+if(!TABS().some(t=>t[0]===tab))tab="workout";
+$("nav").innerHTML=TABS().map(([k,n])=>`<button class="tab ${tab===k?"on":""}" onclick="tab='${k}';nextMsg=null;render()">${n}</button>`).join("");
+$("v").innerHTML=({workout:vWork,plan:vPlan,history:vHist,team:vTeam,plates:vPlates,friends:vFriends})[tab]();save();paintChat()}
 
-// Workout choices you can put on any day
-const TEMPLATES = {
-  push: {title:"Chest, shoulders & triceps",type:"lift",items:[
-    ["Bench Press","Upper-body pushing strength"],
-    ["Overhead Press","Shoulder strength and stability"],
-    ["Close-Grip Bench Press","Triceps and pressing strength"]]},
-  pull: {title:"Back & pulling strength",type:"lift",items:[
-    ["Barbell Row","Upper-back strength for contact and posture"],
-    ["Pull-Ups","Back and upper-body pulling strength"]]},
-  legs: {title:"Legs & lower-body strength",type:"lift",items:[
-    ["Squat","Leg strength and drive"],
-    ["Deadlift","Hip, back and posterior-chain strength"],
-    ["Romanian Deadlift","Hamstrings and hip strength"]]},
-  upper: {title:"Upper-body strength & arms",type:"lift",items:[
-    ["Incline Dumbbell Press","Upper chest and shoulder strength"],
-    ["Dumbbell Row","Back thickness and pulling strength"],
-    ["Face Pulls","Shoulder health and rear delts"],
-    ["Barbell Curl","Biceps strength"]]},
-  lower: {title:"Lower-body power & hips",type:"lift",items:[
-    ["Hip Thrust","Glute and hip drive"],
-    ["Front Squat","Leg strength and core bracing"],
-    ["Walking Lunges","Single-leg strength and balance"]]},
-  cond: {title:"Optional football conditioning",type:"optional",items:[
-    ["Football position drills","Stance, first-step technique and footwork"],
-    ["Short acceleration work","Brief, quality starts with full recovery"]]},
-  rest: {title:"Rest day",type:"rest",items:[]}
-};
-const TEMPLATE_NAMES = {
-  push:"Chest, shoulders & triceps", pull:"Back & pulling", legs:"Legs & lower body",
-  upper:"Upper body & arms", lower:"Lower-body power & hips", cond:"Football conditioning", rest:"Rest day"
-};
-
-// Default week: workouts Mon-Fri, rest Sat & Sun
-const DEFAULT_WEEK = {
-  Monday:"push", Tuesday:"pull", Wednesday:"legs", Thursday:"upper", Friday:"lower",
-  Saturday:"rest", Sunday:"rest"
-};
-
-let week = Object.assign({}, DEFAULT_WEEK, JSON.parse(localStorage.getItem("linemanWeek")||"{}"));
-let plan = [];
-function buildPlan(){
-  plan = DAYS.map(day => {
-    const t = TEMPLATES[week[day]] || TEMPLATES.rest;
-    return {day, title:t.title, type:t.type, items:t.items};
-  });
-}
-buildPlan();
-
-const $ = id => document.getElementById(id);
-const todayISO = () => {const d=new Date();return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10)};
-
-let profile = JSON.parse(localStorage.getItem("linemanProfile")||"null");
-let entries = {};
-let history = JSON.parse(localStorage.getItem("linemanHistory")||"[]");
-let selectedDay = "Monday";
-
-function loadEntries(){
-  const saved = JSON.parse(localStorage.getItem("linemanDraft")||"{}");
-  entries = saved;
-}
-function saveDraft(){ localStorage.setItem("linemanDraft", JSON.stringify(entries)); }
-function getEntry(name){ return entries[name] || {start:"", sets:[{weight:"",reps:0}]}; }
-function setEntry(name,value){ entries[name]=value; saveDraft(); }
-
-/** Find last logged performance for an exercise across history */
-function getLastPerformance(exerciseName){
-  for(const h of history){
-    const item = h.items.find(e => e.name === exerciseName);
-    if(!item || !item.sets || !item.sets.length) continue;
-    const valid = item.sets
-      .map(s => ({ weight: Number(s.weight), reps: Number(s.reps)||0 }))
-      .filter(s => Number.isFinite(s.weight) && s.weight > 0);
-    if(!valid.length) continue;
-    const best = valid.reduce((a,b) => (b.weight > a.weight || (b.weight===a.weight && b.reps>a.reps)) ? b : a);
-    const topWeight = Math.max(...valid.map(s=>s.weight));
-    const avgReps = valid.reduce((s,x)=>s+x.reps,0) / valid.length;
-    return { topWeight, best, avgReps, date: h.date, day: h.day, sets: valid };
-  }
-  return null;
-}
-
-/* ===== WEIGHT SUGGESTION SETTINGS (locked) =====
-   Only editable here in the code. Use null for automatic values
-   based on level and goal. */
-const SUGGESTION_SETTINGS = {
-  bump: null,      // lb added at minimum reps (auto: 5, or 2.5 for Advanced)
-  bigBump: null,   // lb added at big-bump reps (auto: 10, 5 for Advanced/Max strength/Hypertrophy)
-  minReps: 5,      // reps needed to add weight
-  bigReps: 8,      // reps needed for the big bump
-  round: 2.5       // round suggestions to nearest lb
-};
-
-/** Suggest next starting weight based on last session + your settings */
-function suggestNextWeight(exerciseName){
-  const last = getLastPerformance(exerciseName);
-  if(!last) return null;
-
-  const goal = (profile && profile.goal) || "Strength + muscle";
-  const level = (profile && profile.level) || "Intermediate";
-  const st = SUGGESTION_SETTINGS;
-
-  // Automatic defaults by level/goal; your settings override them
-  let bump = level === "Advanced" ? 2.5 : 5;
-  let bigBump = level === "Advanced" ? 5 : 10;
-  if(goal === "Max strength" || goal === "Size / hypertrophy") bigBump = 5;
-  if(st.bump != null) bump = st.bump;
-  if(st.bigBump != null) bigBump = st.bigBump;
-  const minReps = st.minReps != null ? st.minReps : 5;
-  const bigReps = st.bigReps != null ? st.bigReps : 8;
-  const round = st.round || 2.5;
-  const holdReps = Math.max(1, Math.min(3, minReps - 1));
-
-  const topReps = last.best.reps;
-  const w = last.topWeight;
-  let next = w, reason = "";
-
-  if(topReps >= bigReps){
-    next = w + bigBump;
-    reason = `You hit ${topReps} reps at ${w} lb. Try ~${next} lb next time.`;
-  } else if(topReps >= minReps){
-    next = w + bump;
-    reason = `Solid ${topReps} reps at ${w} lb. Aim for about ${next} lb next session.`;
-  } else if(topReps >= holdReps){
-    reason = `Only ${topReps} reps at ${w} lb. Repeat that weight and try to add reps.`;
-  } else {
-    next = Math.max(0, w - bump);
-    reason = `Tough set (${topReps} reps). Drop to ~${next} lb and rebuild form/reps.`;
-  }
-
-  next = Math.round(next / round) * round;
-  next = Math.round(next * 100) / 100;
-  if(next !== w && /~[\d.]+ lb|about [\d.]+ lb/.test(reason)){
-    reason = reason.replace(/(~|about )[\d.]+ lb/, `$1${next} lb`);
-  }
-
-  return { next, reason, last };
-}
-
-function showSetup(){
-  $("setupView").classList.remove("hidden");
-  $("appView").classList.add("hidden");
-  if(profile){
-    $("setupName").value = profile.name || "";
-    $("setupWeight").value = profile.weight || "";
-    $("setupLevel").value = profile.level || "Intermediate";
-    $("setupGoal").value = profile.goal || "Strength + muscle";
-    $("setupShare").checked = profile.share !== false;
-    document.querySelectorAll('input[name="pos"]').forEach(cb => {
-      cb.checked = (profile.positions || []).includes(cb.value);
-    });
-  }
-}
-
-function showApp(){
-  $("setupView").classList.add("hidden");
-  $("appView").classList.remove("hidden");
-  renderProfile();
-  renderDay();
-}
-
-function renderProfile(){
-  if(!profile) return;
-  $("dispName").textContent = profile.name || "Athlete";
-  $("dispPos").textContent = (profile.positions && profile.positions.length)
-    ? profile.positions.join(" · ")
-    : "—";
-  $("dispWeight").textContent = profile.weight ? profile.weight + " lb" : "—";
-  $("dispLevelGoal").textContent = (profile.level || "—") + " · " + (profile.goal || "—");
-}
-
-$("saveProfile").addEventListener("click", () => {
-  const name = $("setupName").value.trim();
-  const weight = $("setupWeight").value;
-  const level = $("setupLevel").value;
-  const goal = $("setupGoal").value;
-  const positions = [...document.querySelectorAll('input[name="pos"]:checked')].map(c => c.value);
-
-  if(!name){
-    alert("Enter your name so the log knows who the athlete is.");
-    $("setupName").focus();
-    return;
-  }
-  if(!weight || Number(weight) < 80){
-    alert("Enter a realistic body weight in pounds.");
-    $("setupWeight").focus();
-    return;
-  }
-  if(!positions.length){
-    alert("Select at least one football position.");
-    return;
-  }
-
-  profile = { name, weight: Number(weight), level, goal, positions, share: $("setupShare").checked };
-  localStorage.setItem("linemanProfile", JSON.stringify(profile));
-  syncTeam();
-  showApp();
-});
-
-$("editProfileBtn").addEventListener("click", showSetup);
-
-function renderDay(){
-  const d = plan.find(x => x.day === selectedDay);
-  $("dayTitle").textContent = d.day;
-  $("daySubtitle").textContent = d.title;
-  $("todayBadge").textContent = d.day === new Date().toLocaleDateString("en-US",{weekday:"long"}) ? "TODAY" : "";
-  $("daySelect").value = selectedDay;
-
-  const list = $("exerciseList");
-  list.innerHTML = "";
-
-  if(d.type !== "lift" && d.type !== "optional"){
-    list.innerHTML = '<div class="empty">Recovery day. Rest, hydrate, and do gentle mobility if it feels good. No lifting workout scheduled.</div>';
-    return;
-  }
-
-  d.items.forEach(([name, focus]) => {
-    const e = getEntry(name);
-    const suggestion = suggestNextWeight(name);
-
-    // Pre-fill starting weight from suggestion if empty
-    if(suggestion && (!e.start || e.start === "")){
-      e.start = String(suggestion.next);
-      setEntry(name, e);
-    }
-
-    const card = document.createElement("div");
-    card.className = "exercise";
-
-    let suggestHTML = "";
-    if(suggestion){
-      const _pr = computeBest()[name];
-      suggestHTML = (_pr ? `<div class="suggest" style="border-color:var(--hot);color:#ffb27a;background:rgba(255,106,0,.1)">🏆 PR: <strong>${_pr.w} lb × ${_pr.r} rep${_pr.r===1?"":"s"}</strong></div>` : "") + `<div class="suggest">📈 Next target: <strong>${suggestion.next} lb</strong><br>${suggestion.reason}</div>`;
-    } else {
-      suggestHTML = `<div class="suggest">No history yet for this lift. Start with a weight you can control for 5–8 clean reps.</div>`;
-    }
-
-    card.innerHTML = `
-      <h3>${name}</h3>
-      <div class="focus">${focus}</div>
-      ${suggestHTML}
-      <div class="field"><label>Starting weight (lbs)</label>
-        <input type="number" min="0" step="0.5" inputmode="decimal" class="startWeight" placeholder="Enter starting weight">
-      </div>
-      <div class="sets"></div>
-      <button class="secondary full addSet">＋ Add Set</button>`;
-
-    const start = card.querySelector(".startWeight");
-    start.value = e.start;
-    start.addEventListener("input", () => {
-      const x = getEntry(name);
-      x.start = start.value;
-      setEntry(name, x);
-    });
-
-    const setsEl = card.querySelector(".sets");
-    function drawSets(){
-      setsEl.innerHTML = "";
-      getEntry(name).sets.forEach((s, i) => {
-        const box = document.createElement("div");
-        box.className = "set";
-        box.innerHTML = `
-          <div class="settop"><span>Set ${i+1}</span><span class="muted">${s.reps} reps</span></div>
-          <div class="setgrid">
-            <div>
-              <label>Weight for this set (lbs)</label>
-              <input type="number" min="0" step="0.5" inputmode="decimal" class="setWeight" placeholder="Weight">
-            </div>
-            <div>
-              <label>Reps completed</label>
-              <div class="rep-controls">
-                <button class="secondary small minus">−</button>
-                <span class="rep-count">${s.reps}</span>
-                <button class="good small plus">＋ Rep</button>
-              </div>
-            </div>
-          </div>
-          ${i > 0 ? '<button class="danger small removeSet" style="margin-top:9px">Remove set</button>' : ""}`;
-
-        const w = box.querySelector(".setWeight");
-        w.value = s.weight;
-        w.addEventListener("input", () => {
-          const x = getEntry(name);
-          x.sets[i].weight = w.value;
-          setEntry(name, x);
-        });
-        box.querySelector(".plus").addEventListener("click", () => {
-          const x = getEntry(name);
-          x.sets[i].reps++;
-          setEntry(name, x);
-          drawSets();
-        });
-        box.querySelector(".minus").addEventListener("click", () => {
-          const x = getEntry(name);
-          x.sets[i].reps = Math.max(0, x.sets[i].reps - 1);
-          setEntry(name, x);
-          drawSets();
-        });
-        const rm = box.querySelector(".removeSet");
-        if(rm) rm.addEventListener("click", () => {
-          const x = getEntry(name);
-          x.sets.splice(i, 1);
-          setEntry(name, x);
-          drawSets();
-        });
-        setsEl.appendChild(box);
-      });
-    }
-    drawSets();
-
-    card.querySelector(".addSet").addEventListener("click", () => {
-      const x = getEntry(name);
-      x.sets.push({ weight: x.start || "", reps: 0 });
-      setEntry(name, x);
-      drawSets();
-    });
-
-    list.appendChild(card);
-  });
-}
-
-function selectDay(day){
-  selectedDay = day;
-  $("daySelect").value = day;
-  renderDay();
-}
-
-$("daySelect").innerHTML = plan.map(d => `<option>${d.day}</option>`).join("");
-$("daySelect").addEventListener("change", e => selectDay(e.target.value));
-$("workoutDate").value = todayISO();
-
-function showTab(tab){
-  document.querySelectorAll(".tab").forEach(b => b.classList.toggle("active", b.dataset.tab === tab));
-  ["workout","schedule","history","team"].forEach(v => $(v+"View").classList.toggle("hidden", v !== tab));
-  if(tab === "schedule") renderWeek();
-  if(tab === "history") renderHistory();
-  if(tab === "team") openTeam();
-}
-document.querySelectorAll(".tab").forEach(b => b.addEventListener("click", () => showTab(b.dataset.tab)));
-
-function renderWeek(){
-  $("weekList").innerHTML = "";
-  const today = new Date().toLocaleDateString("en-US",{weekday:"long"});
-  plan.forEach(d => {
-    const row = document.createElement("div");
-    row.className = "dayitem" + (d.day === today ? " today" : "");
-    row.style.display = "grid";
-    row.style.gap = "8px";
-    row.innerHTML = `<b>${d.day}${d.day===today?" · Today":""}</b>`;
-    const sel = document.createElement("select");
-    sel.innerHTML = Object.keys(TEMPLATE_NAMES).map(k => `<option value="${k}"${week[d.day]===k?" selected":""}>${TEMPLATE_NAMES[k]}</option>`).join("");
-    sel.addEventListener("change", () => {
-      week[d.day] = sel.value;
-      localStorage.setItem("linemanWeek", JSON.stringify(week));
-      buildPlan();
-      renderDay();
-    });
-    const open = document.createElement("button");
-    open.className = "secondary small";
-    open.textContent = "Open";
-    open.addEventListener("click", () => { selectDay(d.day); showTab("workout"); });
-    row.appendChild(sel);
-    row.appendChild(open);
-    $("weekList").appendChild(row);
-  });
-}
-
-$("resetWeek").addEventListener("click", () => {
-  if(!confirm("Reset the week to the default plan?")) return;
-  week = Object.assign({}, DEFAULT_WEEK);
-  localStorage.setItem("linemanWeek", JSON.stringify(week));
-  buildPlan();
-  renderDay();
-  renderWeek();
-});
-
-$("finishWorkout").addEventListener("click", () => {
-  const d = plan.find(x => x.day === selectedDay);
-  if(d.type === "rest"){
-    alert("Today is a recovery day. No lifting workout to save.");
-    return;
-  }
-  const record = {
-    date: $("workoutDate").value,
-    day: selectedDay,
-    title: d.title,
-    items: d.items.map(([name]) => ({ name, ...JSON.parse(JSON.stringify(getEntry(name))) })),
-    savedAt: new Date().toISOString()
-  };
-  history.unshift(record);
-  localStorage.setItem("linemanHistory", JSON.stringify(history));
-  syncTeam();
-
-  // Clear draft for these exercises so next time starts fresh with new suggestion
-  d.items.forEach(([name]) => { delete entries[name]; });
-  saveDraft();
-
-  alert("Workout saved! Next time you do these lifts you’ll see suggested weights based on this session.");
-  showTab("history");
-});
-
-function renderHistory(){
-  const summary = $("progressSummary");
-  summary.innerHTML = "";
-  const best = {};
-  history.forEach(h => h.items.forEach(e => e.sets.forEach(s => {
-    const n = Number(s.weight);
-    if(Number.isFinite(n) && n > 0) best[e.name] = Math.max(best[e.name]||0, n);
-  })));
-
-  if(Object.keys(best).length){
-    const p = document.createElement("div");
-    p.className = "daylist";
-    Object.entries(best).forEach(([name, w]) => {
-      const sug = suggestNextWeight(name);
-      const el = document.createElement("div");
-      el.className = "dayitem";
-      el.innerHTML = `<b>${name}</b>
-        <small>🏆 PR: ${w} lb × ${(computeBest()[name]||{}).r ?? 0} reps</small>
-        ${sug ? `<small style="color:#f6d27a;display:block;margin-top:4px">Next target ≈ ${sug.next} lb</small>` : ""}`;
-      p.appendChild(el);
-    });
-    summary.appendChild(p);
-  }
-
-  const list = $("historyList");
-  list.innerHTML = "";
-  if(!history.length){
-    list.innerHTML = '<div class="empty">No saved workouts yet. Finish a workout to start your history.</div>';
-    return;
-  }
-  history.forEach(h => {
-    const c = document.createElement("div");
-    c.className = "history-card";
-    const lines = h.items.map(e =>
-      `${e.name}: ${e.sets.map(s => `${s.weight||"—"} lb × ${s.reps}`).join(", ")}`
-    ).join("<br>");
-    c.innerHTML = `<strong>${h.day} · ${h.date}</strong><small>${h.title}</small>
-      <div style="margin-top:9px;line-height:1.7">${lines}</div>`;
-    list.appendChild(c);
-  });
-}
-
-$("exportData").addEventListener("click", () => {
-  const blob = new Blob([JSON.stringify({ profile, history }, null, 2)], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "lineman-workout-history.json";
-  a.click();
-  URL.revokeObjectURL(url);
-});
-
-$("clearData").addEventListener("click", () => {
-  if(confirm("Delete all saved workout history on this device? This cannot be undone.")){
-    history = [];
-    localStorage.removeItem("linemanHistory");
-    syncTeam();
-    renderHistory();
-  }
-});
-
-// ===== TEAM LEADERBOARD (Firebase Firestore) =====
-// Paste your Firebase web app config here (see setup steps). Leave projectId empty to turn the team tab off.
-const FIREBASE_CONFIG = {
-  apiKey: "",
-  authDomain: "",
-  projectId: "",
-  appId: ""
-};
-
-let db = null, teamDocs = [], teamUnsub = null;
-try{
-  if(FIREBASE_CONFIG.projectId && typeof firebase !== "undefined"){
-    firebase.initializeApp(FIREBASE_CONFIG);
-    db = firebase.firestore();
-  }
-}catch(e){ db = null; }
-
-let athleteId = localStorage.getItem("linemanId");
-if(!athleteId){
-  athleteId = "a" + Date.now().toString(36) + Math.random().toString(36).slice(2,10);
-  localStorage.setItem("linemanId", athleteId);
-}
-
-function computeBest(){
-  const best = {};
-  history.forEach(h => h.items.forEach(e => (e.sets||[]).forEach(s => {
-    const w = Number(s.weight), r = Number(s.reps)||0;
-    if(!(w > 0)) return;
-    const cur = best[e.name];
-    if(!cur || w > cur.w || (w === cur.w && r > cur.r)) best[e.name] = {w, r, d: h.date};
-  })));
-  return best;
-}
-
-function syncTeam(){
-  if(!db || !profile) return;
-  const ref = db.collection("athletes").doc(athleteId);
-  if(profile.share === false){ ref.delete().catch(()=>{}); return; }
-  ref.set({
-    name: String(profile.name||"Athlete").slice(0,30),
-    positions: (profile.positions||[]).join(" · ").slice(0,40),
-    best: computeBest(),
-    sessions: history.length,
-    updated: Date.now()
-  }).catch(()=>{});
-}
-
-function openTeam(){
-  const sel = $("teamLift");
-  if(!sel.options.length){
-    const names = [...new Set(Object.values(TEMPLATES).flatMap(t => t.items.map(i => i[0])))];
-    sel.innerHTML = ['<option value="__all">Everyone\'s PRs (all lifts)</option>','<option value="__sessions">Workouts logged</option>']
-      .concat(names.map(n => `<option>${n}</option>`)).join("");
-    sel.value = "__all";
-    sel.addEventListener("change", renderTeam);
-  }
-  if(!db){
-    $("teamStatus").textContent = "Team leaderboard isn't set up yet.";
-    $("teamList").innerHTML = "";
-    return;
-  }
-  if(!teamUnsub){
-    $("teamStatus").textContent = "Loading…";
-    teamUnsub = db.collection("athletes").onSnapshot(snap => {
-      teamDocs = snap.docs.map(d => ({id:d.id, ...d.data()}));
-      renderTeam();
-    }, () => { $("teamStatus").textContent = "Couldn't load the team. Check your connection."; });
-  } else renderTeam();
-}
-
-function renderTeam(){
-  const lift = $("teamLift").value;
-  if(lift === "__all"){
-    const esc2 = t => String(t).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-    $("teamStatus").textContent = `${teamDocs.length} athlete${teamDocs.length===1?"":"s"} on the team. Updates live.`;
-    const box = $("teamList");
-    box.innerHTML = teamDocs.length ? "" : '<div class="empty">No one has shared lifts yet.</div>';
-    [...teamDocs].sort((a,b)=>String(a.name).localeCompare(String(b.name))).forEach(a => {
-      const prs = Object.entries(a.best||{}).map(([n,b]) => `<div style="display:flex;justify-content:space-between;gap:8px;margin-top:6px"><span>${esc2(n)}</span><strong style="color:var(--accent)">${b.w} lb × ${b.r}</strong></div>`).join("");
-      const el = document.createElement("div");
-      el.className = "dayitem" + (a.id === athleteId ? " today" : "");
-      el.innerHTML = `<b>${esc2(a.name)}</b><small>${esc2(a.positions||"")}</small>${prs || '<small style="display:block;margin-top:6px">No lifts logged yet</small>'}`;
-      box.appendChild(el);
-    });
-    return;
-  }
-  const rows = teamDocs.map(a => {
-    if(lift === "__sessions") return {a, score:a.sessions||0, label:`${a.sessions||0} workouts`};
-    const b = a.best && a.best[lift];
-    return b ? {a, score:b.w, label:`${b.w} lb × ${b.r}`} : null;
-  }).filter(Boolean).sort((x,y) => y.score - x.score);
-  $("teamStatus").textContent = `${teamDocs.length} athlete${teamDocs.length===1?"":"s"} on the team. Updates live.`;
-  const list = $("teamList");
-  list.innerHTML = rows.length ? "" : '<div class="empty">No one has logged this lift yet.</div>';
-  const esc = t => String(t).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-  rows.forEach((r, i) => {
-    const el = document.createElement("div");
-    el.className = "dayitem" + (r.a.id === athleteId ? " today" : "");
-    el.innerHTML = `<b>${i+1}. ${esc(r.a.name)}</b><small>${esc(r.a.positions||"")}</small>
-      <small style="color:#f6d27a;display:block;margin-top:4px">${r.label}</small>`;
-    list.appendChild(el);
-  });
-}
-
-// Boot
-loadEntries();
-const today = new Date().toLocaleDateString("en-US",{weekday:"long"});
-if(plan.some(d => d.day === today)) selectedDay = today;
-
-if(profile && profile.name){
-  syncTeam();
-  showApp();
-} else {
-  showSetup();
-}
-</script>
-</body>
-</html>
+let su={fb:0,pl:0,own:0,fp:0,ft:2,pw:5,pg:10,n:"",w:"",s:""};
+function tog(k){keep();if(k==="own"){su.own=su.own?0:1;if(su.own){su.fb=0;su.pl=0}}else{su[k]=su[k]?0:1;if(su[k])su.own=0}setupUI()}
+function setupUI(){const any=su.fb||su.pl||su.own,opt=(a,v,f)=>a.map((x,i)=>`<option value="${f?x:i}" ${v==(f?x:i)?"selected":""}>${x}</option>`).join("");
+$("setup").innerHTML=`<div class="c"><h2>What are you training for?</h2><div class="nt">Pick Football, Powerlifting, or both.</div><div class="mode">${[["fb","Football"],["pl","Powerlifting"],["own","On my own"]].map(([k,n])=>`<button class="${su[k]?"on":""}" onclick="tog('${k}')">${n}</button>`).join("")}</div>
+${any?`<label>Your name (max 12 letters)</label><input id="sn" maxlength="12" value="${esc(su.n)}"><label>Body weight (lb)</label><input id="sw" type="number" inputmode="decimal" value="${su.w}">
+${su.fb?`<label>Football position</label><select id="fp">${opt(POS,su.fp)}</select><label>Football team</label><select id="ft">${opt(FBT,su.ft)}</select>`:""}
+${su.pl?`<label>Powerlifting weight class (lb)</label><select id="pw">${opt(WCS,su.pw)}</select><label>Grade</label><select id="pg">${opt(GRADES,su.pg,1)}</select>`:""}
+${su.own?`<label>What are you training for?</label><input id="ss" placeholder="e.g. get stronger" value="${esc(su.s)}">`:""}
+<label>Goal</label><select id="sg">${GOALS.map(x=>`<option>${x}</option>`).join("")}</select>
+<label>Lifting level</label><select id="sl">${["Beginner","Intermediate","Advanced"].map(x=>`<option>${x}</option>`).join("")}</select>
+<button class="pri" onclick="finishSetup()">Start lifting →</button>`:""}</div>`}
+function keep(){[["n","sn"],["w","sw"],["fp","fp"],["ft","ft"],["pw","pw"],["pg","pg"],["s","ss"]].forEach(([k,i])=>{if($(i))su[k]=$(i).value})}
+async function finishSetup(){keep();const n=su.n.trim();
+if(!/^[A-Za-z0-9]{2,12}$/.test(n)||!(+su.w>=50)||(su.own&&!su.s.trim()))return alert("Use a name with 2-12 letters or numbers (no spaces), a body weight, and what you're training for.");
+const p={name:n,bw:+su.w,goal:$("sg").value,level:$("sl").value,fb:su.fb?{p:+su.fp,t:+su.ft}:null,pl:su.pl?{w:+su.pw,g:+su.pg}:null,own:su.own?su.s.trim():""};
+try{p.id=await claim(p)}catch(e){return alert(e.message==="name"?"That name is already taken. Pick another.":"Could not save: "+(e.code||e.message))}
+p.mode=modeName(p);p.spec=specText(p);S.p=p;try{await pushStats()}catch(e){}render()}
+function editProfile(){const p=S.p;su={fb:p.fb?1:0,pl:p.pl?1:0,own:p.fb||p.pl?0:1,fp:p.fb?p.fb.p:0,ft:p.fb?p.fb.t:2,pw:p.pl?p.pl.w:5,pg:p.pl?p.pl.g:10,n:p.name,w:p.bw,s:p.own||"",id:p.id};S.p=null;render()}
+function vWork(){const d=plan()[day];
+const head=`<div class="c"><h2>${day}</h2><div class="m">${d?d.title:"Rest day"}</div><label>Day</label><select onchange="day=this.value;render()">${DAYS.map(x=>`<option ${x===day?"selected":""}>${x}</option>`).join("")}</select><label>Workout date</label><input type="date" id="wd" value="${today()}"></div>`;
+if(nextMsg)return`<div class="c"><h2>Saved! 💪</h2><div class="m">Try this next time:</div>${nextMsg.map(x=>`<div class="sug"><b>${esc(x[0])}</b><br>${esc(x[1])}</div>`).join("")}<button class="pri" onclick="nextMsg=null;render()">Done</button></div>`;
+if(!d)return head+'<div class="c m">Recovery day. Rest, hydrate and do light mobility if it feels good.</div>';
+const pr=prs();
+return head+d.ex.map(n=>{const g=suggest(n),D=S.d[n]||(S.d[n]={s:"",sets:[{w:"",r:0}]}),[ts,tr]=tgt(n);
+return`<div class="c ex"><h3>${n}</h3><div class="m" style="font-size:12px">Target: ${ts} × ${tr}</div>
+${pr[n]?`<div class="sug pr">🏆 PR: <b>${pr[n].w} lb × ${pr[n].r}</b></div>`:""}${g?`<div class="sug">📈 ${esc(g.t)}</div>`:""}
+<label>Starting weight (lb)</label><input type="number" inputmode="decimal" value="${D.s}" oninput="S.d['${n}'].s=this.value;save()">
+${D.sets.map((s,i)=>`<div class="set"><b class="big" style="font-size:18px;color:var(--a)">Set ${i+1}</b><label>Weight (lb)</label><input type="number" inputmode="decimal" value="${s.w}" oninput="S.d['${n}'].sets[${i}].w=this.value;save()">
+<label>Reps</label><div class="rc"><button onclick="rep('${n}',${i},-1)">−</button><span class="big">${s.r}</span><button class="plus" onclick="rep('${n}',${i},1)">+ Rep</button></div>
+${i?`<button class="dn" style="margin-top:8px" onclick="S.d['${n}'].sets.splice(${i},1);render()">Remove set</button>`:""}</div>`).join("")}
+<button style="width:100%;margin-top:10px" onclick="S.d['${n}'].sets.push({w:S.d['${n}'].s||'',r:0});render()">+ Add set</button></div>`}).join("")+`<button class="pri" onclick="finish()">Save workout</button>`}
+function rep(n,i,x){const s=S.d[n].sets[i];s.r=Math.max(0,s.r+x);render()}
+function finish(){const d=plan()[day],items=d.ex.map(n=>({name:n,sets:S.d[n].sets.filter(s=>s.r>0||+s.w>0).map(s=>({w:s.w||S.d[n].s||0,r:s.r}))})).filter(i=>i.sets.length);
+if(!items.length)return alert("Log at least one set first.");
+S.h.unshift({date:$("wd").value||today(),day,title:d.title,items});d.ex.forEach(n=>delete S.d[n]);
+nextMsg=items.map(i=>{const g=suggest(i.name);return[i.name,g?g.t:"Keep it up."]});render();pushStats().catch(()=>{})}
+function vPlan(){const P=plan();return`<div class="c"><h2>Weekly plan</h2>${DAYS.map(x=>`<div class="set" onclick="day='${x}';tab='workout';render()"><b class="big" style="font-size:20px">${x}</b><div class="m">${P[x]?P[x].title:"Rest day"}</div></div>`).join("")}<div class="nt">Adjust around practices and games. Rest days build strength.</div></div><div class="c"><button style="width:100%" onclick="editProfile()">Edit profile</button></div>`}
+function vHist(){const pr=prs(),names=Object.keys(pr);
+return`<div class="c"><h2>Best lifts &amp; next targets</h2>${names.map(n=>{const g=suggest(n);return`<div class="set"><b>${esc(n)}</b><div class="m">🏆 ${pr[n].w} lb × ${pr[n].r}</div>${g?`<div class="m" style="color:#e4ff8a">Next: ${esc(g.t)}</div>`:""}</div>`}).join("")||'<div class="m">Save a workout to see your bests.</div>'}</div>
+<div class="c"><h2>History</h2>${S.h.map(h=>`<div class="set"><b>${esc(h.day)} · ${esc(h.date)}</b><div class="m">${esc(h.title)}</div><div style="margin-top:6px;line-height:1.6">${h.items.map(i=>esc(i.name)+": "+i.sets.map(s=>s.w+" lb × "+s.r).join(", ")).join("<br>")}</div></div>`).join("")||'<div class="m">No workouts saved yet.</div>'}
+<div class="row" style="margin-top:12px"><button onclick="exp()">Export data</button><button class="dn" onclick="if(confirm('Delete all saved history on your account?')){S.h=[];render();pushStats().catch(()=>{})}">Clear history</button></div></div>`}
+function exp(){const b=new Blob([JSON.stringify(S,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="lift-log-"+today()+".json";a.click()}
+let curT="",FR=[],ST={},REQ={},TM={},subT="",unsubT=null,unsubF=null,unsubC=null,fm="",chat=null,CH=[];
+function vTeam(){const T=myTeams();if(!T.includes(curT))curT=T[0]||"";subTeam(curT);
+const mem=TM[curT]||[],L=[...new Set(mem.flatMap(o=>Object.keys(o.prs||{})))];
+if(!lift||!L.includes(lift))lift=L[0]||"";
+const rows=mem.filter(o=>o.prs&&o.prs[lift]).sort((a,b)=>b.prs[lift].w-a.prs[lift].w);
+return`<div class="c"><h2>Team #${esc(curT)}</h2><div class="m">${esc(tname(curT))}</div>${T.length>1?`<label>Switch team</label><select onchange="curT=this.value;render()">${T.map(k=>`<option value="${k}" ${k===curT?"selected":""}>#${k} · ${esc(tname(k))}</option>`).join("")}</select>`:""}<div class="nt">Your team number comes from what you picked in your profile. Everyone with the same number is on your team.</div><button class="pri" onclick="openChat('t','${curT}','Team #${curT} chat')">Open team chat</button></div>${chatCard("t")}
+<div class="c"><h2>Team PRs</h2>${L.length?`<label>Lift</label><select onchange="lift=this.value;render()">${L.map(x=>`<option ${x===lift?"selected":""}>${x}</option>`).join("")}</select>${rows.map((o,i)=>`<div class="ln"><span>${i+1}. ${esc(o.name)} #${esc(o.id)}${o.id===S.p.id?" (you)":""}</span><b>${o.prs[lift].w} lb × ${o.prs[lift].r}</b></div>`).join("")}`:'<div class="m">No lifts logged on this team yet.</div>'}</div>
+${mem.filter(o=>o.id!==S.p.id).map(o=>statCard(o,"team")).join("")}`}
+function subTeam(t){if(!t||subT===t)return;subT=t;unsubT&&unsubT();unsubT=FS.collection("teams/"+t+"/members").onSnapshot(q=>{TM[t]=q.docs.map(d=>d.data());if(tab==="team")render()},e=>console.log(e))}
+const oth=f=>f.members.find(x=>x!==U.uid),fnm=f=>(f.names||{})[oth(f)]||"Friend";
+function vFriends(){const inc=FR.filter(f=>f.status==="pending"&&f.requester!==U.uid),out=FR.filter(f=>f.status==="pending"&&f.requester===U.uid),fr=FR.filter(f=>f.status==="accepted");fr.forEach(f=>watchStats(oth(f)));
+return`<div class="c"><h2>Friends</h2><div class="m">Your friend code</div><div class="big" style="font-size:64px;text-align:center;color:var(--a)">${esc(S.p.id)}</div><div class="nt">Give friends this 6-digit number. They enter it to send you a request. You choose whether to accept.</div></div>
+<div class="c"><b>Add a friend</b><label>Friend code</label><input id="fc" inputmode="numeric" maxlength="6" placeholder="6-digit code"><button class="pri" onclick="addFriend()">Send request</button>${fm?`<div class="nt" style="color:var(--a)">${esc(fm)}</div>`:""}</div>
+${inc.map(f=>`<div class="c"><b>${esc(fnm(f))}</b> wants to be friends<div class="row" style="margin-top:8px"><button class="pri" style="margin:0" onclick="frAct('${f.id}','a')">Accept</button><button class="dn" onclick="frAct('${f.id}','d')">Decline</button></div></div>`).join("")}
+${out.map(f=>`<div class="c"><b>${esc(fnm(f))}</b><div class="m">Request sent. Waiting for them to accept.</div><button class="dn" style="width:100%;margin-top:8px" onclick="frAct('${f.id}','d')">Cancel request</button></div>`).join("")}
+${fr.map(f=>`${ST[oth(f)]?statCard(ST[oth(f)],"friend"):`<div class="c"><b>${esc(fnm(f))}</b><div class="m">No stats yet.</div></div>`}<div class="row" style="margin-top:8px"><button onclick="openChat('f','${f.id}','Chat with ${esc(fnm(f))}')">Chat</button><button class="dn" onclick="if(confirm('Remove this friend?'))frAct('${f.id}','d')">Remove</button></div>`).join("")}
+${chatCard("f")}<div class="c"><b>Account</b><div class="nt">${esc(U.email)}</div><button style="width:100%;margin-top:8px" onclick="AUTH.signOut()">Sign out</button></div>`}
+function watchStats(u){if(REQ[u])return;REQ[u]=FS.doc("stats/"+u).onSnapshot(d=>{if(d.exists)ST[u]=d.data();if(tab==="friends")render()},()=>{})}
+const pidOf=(a,b)=>a<b?a+"_"+b:b+"_"+a;
+async function addFriend(){const c=$("fc").value.trim();fm="";
+if(!/^\d{6}$/.test(c))fm="Friend codes are 6 numbers.";
+else try{const d=await FS.doc("friendCodes/"+c).get();if(!d.exists)fm="No one has that code.";
+else{const o=d.data(),id=pidOf(U.uid,o.uid);if(o.uid===U.uid)fm="That's your own code.";
+else if((await FS.doc("friendships/"+id).get()).exists)fm="You already have a request or friendship with "+o.name+".";
+else{await FS.doc("friendships/"+id).set({members:[U.uid,o.uid],requester:U.uid,status:"pending",names:{[U.uid]:S.p.name,[o.uid]:o.name}});fm="Request sent to "+o.name+"."}}}catch(e){fm="Could not send: "+(e.code||e.message)}
+render()}
+async function frAct(id,a){try{if(a==="a")await FS.doc("friendships/"+id).update({status:"accepted"});else await FS.doc("friendships/"+id).delete();if(chat&&chat.key===id){unsubC&&unsubC();chat=null}}catch(e){alert("Could not do that: "+(e.code||e.message))}}
+function chatCard(k){return chat&&chat.kind===k?`<div class="c"><b>${esc(chat.title)}</b><div id="chatlog" style="max-height:260px;overflow:auto;margin-top:8px"></div><div class="row" style="margin-top:8px"><input id="cm" maxlength="500" placeholder="Message"><button class="pri" style="margin:0;flex:0 0 90px" onclick="sendChat()">Send</button></div></div>`:""}
+const chatCol=()=>FS.collection(chat.kind==="f"?"friendships/"+chat.key+"/chat":"teams/"+chat.key+"/chat");
+function openChat(kind,key,title){unsubC&&unsubC();chat={kind,key,title};CH=[];
+unsubC=chatCol().orderBy("ts").limitToLast(60).onSnapshot(q=>{CH=q.docs.map(d=>({id:d.id,...d.data()}));paintChat()},e=>{alert("Can't open chat: "+(e.code||e.message))});render()}
+function paintChat(){const l=$("chatlog");if(!l)return;l.innerHTML=CH.map(m=>`<div class="nt" style="margin:6px 0;color:${m.uid===U.uid?"var(--a)":"var(--t)"}"><b>${esc(m.name)}</b> ${esc(m.text)}</div>`).join("")||'<div class="nt">No messages yet.</div>';l.scrollTop=l.scrollHeight}
+async function sendChat(){const i=$("cm"),t=i.value.trim();if(!t||!chat)return;i.value="";
+try{await chatCol().add({uid:U.uid,name:S.p.name,text:t,ts:firebase.firestore.FieldValue.serverTimestamp()})}catch(e){alert("Message not sent: "+(e.code||e.message))}}
+// ---------- account + cloud ----------
+let AUTH,FS,U=null,am="";
+function hideApp(){$("setup").classList.remove("hide");$("app").classList.add("hide");$("nav").classList.add("hide")}
+function authUI(){hideApp();$("setup").innerHTML=`<div class="c"><h2>Sign in</h2><div class="nt">Use your email. You verify it once.</div><label>Email</label><input id="ae" type="email" autocomplete="email"><label>Password (6+ characters)</label><input id="ap" type="password" autocomplete="current-password"><button class="pri" onclick="doAuth('in')">Sign in</button><button style="width:100%;margin-top:8px" onclick="doAuth('up')">Create account</button><button style="width:100%;margin-top:8px" onclick="doAuth('reset')">Forgot password</button>${am?`<div class="nt" style="color:var(--a)">${esc(am)}</div>`:""}</div>`}
+async function doAuth(k){const e=$("ae").value.trim(),p=$("ap").value;am="";
+try{if(k==="reset"){await AUTH.sendPasswordResetEmail(e);am="Password reset email sent."}
+else if(k==="in")await AUTH.signInWithEmailAndPassword(e,p);
+else{const c=await AUTH.createUserWithEmailAndPassword(e,p);await c.user.sendEmailVerification()}}
+catch(x){am=x.code==="auth/email-already-in-use"?"That email already has an account. Sign in instead.":x.code==="auth/invalid-credential"?"Wrong email or password.":(x.code||x.message)}
+if(!U)authUI()}
+function verifyUI(){hideApp();$("setup").innerHTML=`<div class="c"><h2>Verify your email</h2><div class="nt">We sent a link to ${esc(U.email)}. Open it, then tap the button below.</div><button class="pri" onclick="chkVerify()">I verified</button><button style="width:100%;margin-top:8px" onclick="U.sendEmailVerification().then(()=>{am='Sent again.';verifyUI()})">Resend email</button><button class="dn" style="width:100%;margin-top:8px" onclick="AUTH.signOut()">Sign out</button>${am?`<div class="nt" style="color:var(--a)">${esc(am)}</div>`:""}</div>`}
+async function chkVerify(){await U.reload();U=AUTH.currentUser;if(U.emailVerified){await U.getIdToken(true);try{await loadCloud();render()}catch(e){alert(e.code||e.message)}}else{am="Not verified yet.";verifyUI()}}
+async function claim(p){const u=U.uid,low=p.name.toLowerCase(),T=tkeys(p).filter(Boolean);let fc,prev=[];
+await FS.runTransaction(async t=>{
+const nr=FS.doc("names/"+low),nd=await t.get(nr);if(nd.exists&&nd.data().uid!==u)throw new Error("name");
+const ur=FS.doc("users/"+u),ud=await t.get(ur),old=ud.exists?ud.data():{};fc=old.friendCode;prev=old.teams||[];
+if(!fc)for(let k=0;k<8&&!fc;k++){const c=String(100000+Math.floor(Math.random()*900000));if(!(await t.get(FS.doc("friendCodes/"+c))).exists)fc=c}
+if(!fc)throw new Error("code");
+t.set(FS.doc("friendCodes/"+fc),{uid:u,name:p.name});
+if(old.nameLower&&old.nameLower!==low)t.delete(FS.doc("names/"+old.nameLower));
+t.set(nr,{uid:u});t.set(ur,{name:p.name,nameLower:low,bw:p.bw,goal:p.goal,level:p.level,fb:p.fb,pl:p.pl,own:p.own,friendCode:fc,teams:T,email:U.email})});
+S.prevTeams=prev;return fc}
+async function pushStats(){if(!U||!S.p)return;const u=U.uid,o=snap(),T=myTeams(),b=FS.batch();
+b.set(FS.doc("stats/"+u),{...o,teams:T});b.set(FS.doc("logs/"+u),{h:JSON.parse(JSON.stringify(S.h))});
+T.forEach(t=>b.set(FS.doc("teams/"+t+"/members/"+u),o));
+(S.prevTeams||[]).filter(t=>!T.includes(t)).forEach(t=>b.delete(FS.doc("teams/"+t+"/members/"+u)));
+await b.commit();S.prevTeams=T}
+async function loadCloud(){const u=U.uid,[ud,ld]=await Promise.all([FS.doc("users/"+u).get(),FS.doc("logs/"+u).get()]);
+S.h=ld.exists?ld.data().h||[]:[];S.d={};S.f=[];S.team=[];
+if(ud.exists){const o=ud.data();S.p={id:o.friendCode,name:o.name,bw:o.bw,goal:o.goal,level:o.level,fb:o.fb||null,pl:o.pl||null,own:o.own||""};S.p.mode=modeName(S.p);S.p.spec=specText(S.p);S.prevTeams=o.teams||[]}else S.p=null;
+unsubF&&unsubF();unsubF=FS.collection("friendships").where("members","array-contains",u).onSnapshot(q=>{FR=q.docs.map(d=>({id:d.id,...d.data()}));if(tab==="friends")render()},e=>console.log(e))}
+function cleanup(){[unsubF,unsubT,unsubC].forEach(f=>f&&f());Object.values(REQ).forEach(f=>f&&f());unsubF=unsubT=unsubC=null;REQ={};ST={};TM={};FR=[];chat=null;subT="";try{localStorage.removeItem(KEY)}catch(e){}S={p:null,h:[],f:[],team:[],d:{}}}
+function boot(){if(!/^AIza/.test(FIREBASE_CONFIG.apiKey||"")){hideApp();$("setup").innerHTML='<div class="c"><h2>Almost there</h2><div class="nt">Paste your Firebase settings into FIREBASE_CONFIG at the top of this file. See SETUP.md.</div></div>';return}
+firebase.initializeApp(FIREBASE_CONFIG);AUTH=firebase.auth();FS=firebase.firestore();
+AUTH.onAuthStateChanged(async u=>{U=u;if(!u){cleanup();return authUI()}if(!u.emailVerified)return verifyUI();try{await loadCloud();render()}catch(e){alert("Could not load your data: "+(e.code||e.message))}})}
+const PD={45:{t:32,d:450,c:"#d62828"},25:{t:26,d:340,c:"#f2c200"},10:{t:20,d:255,c:"#1f9d55"},5:{t:15,d:205,c:"#111418"},2.5:{t:11,d:165,c:"#111418"}};
+let PL={bar:0,list:[]};
+const addP=p=>{PL.list.push(p);PL.list.sort((a,b)=>b-a);render()};
+function vPlates(){const{bar,list}=PL,sum=list.reduce((a,p)=>a+PD[p].t,0),k=Math.min(1,400/(sum||1));let L="",R="",o=0;
+list.forEach(p=>{const{t,d,c}=PD[p],w=t*k,at=`y="${260-d/2}" width="${w}" height="${d}" rx="10" fill="${c}" stroke="${c=="#111418"?"#8a93a0":"#000"}" stroke-opacity=".6" stroke-width="3"`;L+=`<rect x="${415-o-w}" ${at}/>`;R+=`<rect x="${1785+o}" ${at}/>`;o+=w});
+const bs=bar?`<rect x="0" y="243" width="2200" height="34" rx="6" fill="#aeb6c2"/><rect x="0" y="235" width="415" height="50" rx="6" fill="#9aa3b0"/><rect x="1785" y="235" width="415" height="50" rx="6" fill="#9aa3b0"/><rect x="400" y="215" width="18" height="90" fill="#5d6673"/><rect x="1782" y="215" width="18" height="90" fill="#5d6673"/>`:`<line x1="0" y1="260" x2="2200" y2="260" stroke="#3a4350" stroke-width="4" stroke-dasharray="30 24"/>`;
+return`<div class="c"><h2>Plate calculator</h2><div class="m" style="font-size:13px">Tap plates to load both sides. Starts at 0 with no bar; add the 45 lb bar with the button.</div>
+<div class="big" style="font-size:76px;text-align:center;color:var(--a);margin-top:8px">${bar+2*list.reduce((a,b)=>a+b,0)}</div><div class="sub" style="text-align:center">lb total</div>
+<svg viewBox="0 0 2200 520" width="100%">${bs}${L}${R}</svg>
+<div class="row" style="margin-top:8px">${[45,25,10,5,2.5].map(p=>`<button class="pb" style="background:${PD[p].c};${p==25?"color:#111;":""}${p==2.5?"font-size:16px;":""}" onclick="addP(${p})">${p}</button>`).join("")}</div>
+<div class="nt" style="text-align:center">${bar?"45 lb bar":"No bar"}${list.length?" + each side: "+list.join(" + "):""}</div>
+<div class="row" style="margin-top:8px"><button onclick="PL.bar=PL.bar?0:45;render()">${bar?"Remove bar":"Add 45 lb bar"}</button><button onclick="PL.list.pop();render()">Undo plate</button><button onclick="PL={bar:0,list:[]};render()">Clear all</button></div></div>`}
+boot();
+</script></body></html>
