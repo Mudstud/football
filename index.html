@@ -3,27 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
-<meta name="theme-color" content="#000000">
+<meta name="theme-color" content="#0c090a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Lift Log</title>
 <style>
 :root {
-  --a: #ff4d00;
-  --a-soft: rgba(255,77,0,.14);
-  --a-glow: rgba(255,77,0,.35);
-  --bg: #000000;
-  --surface: #111111;
-  --surface2: #1a1a1a;
-  --surface3: #222222;
-  --stroke: #2a2a2a;
-  --muted: #888888;
-  --text: #ffffff;
-  --text2: #c8c8c8;
-  --danger: #ff5c5c;
-  --danger-bg: #1f0f0f;
-  --ok: #3dff9a;
-  --warn: #ffb020;
+  --a: #9e1b32;
+  --a2: #7a1526;
+  --a-soft: rgba(158,27,50,.18);
+  --a-glow: rgba(158,27,50,.4);
+  --bg: #0c090a;
+  --surface: #161011;
+  --surface2: #1e1517;
+  --surface3: #2a1c1f;
+  --stroke: #3a282c;
+  --muted: #a09094;
+  --text: #f7f2f3;
+  --text2: #d4c8cb;
+  --danger: #ff6b6b;
+  --danger-bg: #2a1214;
+  --ok: #c45c6a;
+  --warn: #e8a04a;
   --r: 20px;
   --r-sm: 14px;
 }
@@ -67,7 +68,7 @@ body {
   width: 40px;
   height: 40px;
   border-radius: 12px;
-  background: linear-gradient(145deg, #ff6a1a, #ff4d00 50%, #cc3a00);
+  background: linear-gradient(145deg, #c42a45, #9e1b32 50%, #6e1222);
   display: grid;
   place-items: center;
   font-size: 20px;
@@ -210,7 +211,7 @@ button {
 }
 button:active { transform: scale(.97); }
 .pri {
-  background: linear-gradient(180deg, #ff6a1a, #ff4d00);
+  background: linear-gradient(180deg, #c42a45, #9e1b32);
   color: #fff;
   font-size: 16px;
   font-weight: 750;
@@ -242,7 +243,7 @@ button:active { transform: scale(.97); }
 }
 .rc .plus {
   flex: 1;
-  background: linear-gradient(180deg, #ff6a1a, #ff4d00);
+  background: linear-gradient(180deg, #c42a45, #9e1b32);
   color: #fff;
   border: 0;
   font-size: 15px;
@@ -253,8 +254,8 @@ button:active { transform: scale(.97); }
 /* ===== CHIPS / SUGGESTIONS ===== */
 .sug {
   background: var(--a-soft);
-  border: 1px solid rgba(255,77,0,.35);
-  color: #ffb48a;
+  border: 1px solid rgba(158,27,50,.35);
+  color: #f0b8c0;
   border-radius: 12px;
   padding: 11px 13px;
   font-size: 13px;
@@ -282,7 +283,7 @@ button:active { transform: scale(.97); }
   border-color: var(--a);
   color: #fff;
   background: var(--a-soft);
-  box-shadow: 0 0 0 1px rgba(255,77,0,.4), inset 0 0 24px rgba(255,77,0,.08);
+  box-shadow: 0 0 0 1px rgba(158,27,50,.4), inset 0 0 24px rgba(158,27,50,.08);
 }
 
 .hide { display: none !important; }
@@ -333,7 +334,7 @@ button:active { transform: scale(.97); }
 }
 .tab.on {
   color: #fff;
-  background: linear-gradient(180deg, #ff6a1a, #ff4d00);
+  background: linear-gradient(180deg, #c42a45, #9e1b32);
   box-shadow: 0 4px 16px var(--a-glow);
 }
 
@@ -411,8 +412,8 @@ a { color: var(--a); font-weight: 650; text-decoration: none; }
   padding: 5px 10px;
   border-radius: 999px;
   background: var(--a-soft);
-  color: #ffb48a;
-  border: 1px solid rgba(255,77,0,.3);
+  color: #f0b8c0;
+  border: 1px solid rgba(158,27,50,.3);
   white-space: nowrap;
 }
 .day-chip .badge.rest {
@@ -468,7 +469,7 @@ a { color: var(--a); font-weight: 650; text-decoration: none; }
 .day-pill.on {
   background: var(--a-soft);
   border-color: var(--a);
-  box-shadow: 0 0 0 1px rgba(255,77,0,.35);
+  box-shadow: 0 0 0 1px rgba(158,27,50,.35);
 }
 .day-pill.on .abbr { color: var(--a); }
 .day-pill.rest-pill { opacity: 0.65; }
@@ -564,8 +565,8 @@ a { color: var(--a); font-weight: 650; text-decoration: none; }
   padding: 3px 8px;
   border-radius: 999px;
   background: var(--a-soft);
-  color: #ffb48a;
-  border: 1px solid rgba(255,77,0,.3);
+  color: #f0b8c0;
+  border: 1px solid rgba(158,27,50,.3);
 }
 .week-cell .tag.rest {
   background: rgba(255,255,255,.06);
@@ -610,7 +611,7 @@ a { color: var(--a); font-weight: 650; text-decoration: none; }
   padding: 20px 12px;
   background: linear-gradient(180deg, var(--a-soft), transparent);
   border-radius: 16px;
-  border: 1px solid rgba(255,77,0,.25);
+  border: 1px solid rgba(158,27,50,.25);
   margin-top: 4px;
 }
 .code-hero .code {
@@ -640,7 +641,7 @@ a { color: var(--a); font-weight: 650; text-decoration: none; }
   width: 44px;
   height: 44px;
   border-radius: 14px;
-  background: linear-gradient(145deg, #ff6a1a, #cc3a00);
+  background: linear-gradient(145deg, #c42a45, #7a1526);
   display: grid;
   place-items: center;
   font-weight: 800;
@@ -917,28 +918,89 @@ function last(n) {
   return null;
 }
 
+function bodyFactor() {
+  // Adjust starting loads from age + height (on top of bodyweight & level)
+  const age = +S.p.age || 16;
+  const ht = +S.p.height || 68; // inches
+  let f = 1;
+  // Younger athletes: slightly lighter start; older teens/adults closer to 1
+  if (age <= 13) f *= 0.75;
+  else if (age <= 15) f *= 0.85;
+  else if (age <= 17) f *= 0.92;
+  else if (age >= 40) f *= 0.9;
+  else if (age >= 30) f *= 0.95;
+  // Height: very short or tall small tweaks (leverage / general size)
+  if (ht < 64) f *= 0.95;
+  else if (ht > 74) f *= 1.03;
+  return f;
+}
+
 function suggest(n) {
   const e = EX[n], lv = ["Beginner","Intermediate","Advanced"].indexOf(S.p.level), [ts,tr] = tgt(n), L = last(n);
-  if (!e.inc && !e.bw && !e.pu) return L ? null : {t:"Do it with good form."};
+  const age = +S.p.age || 0, ht = +S.p.height || 0;
+  if (!e.inc && !e.bw && !e.pu) return L ? null : {t:"Do it with good form.", r: tr, sets: ts};
   if (e.pu) {
-    if (!L) return {t:"Start with bodyweight. Aim for 5-8 reps each set."};
+    if (!L) {
+      const tip = age && age <= 14 ? "Use a band or assisted machine if needed. " : "";
+      return {t: tip + "Start with bodyweight. Aim for " + tr + " reps each set.", w: 0, r: tr, sets: ts};
+    }
     const mr = Math.min(...L.map(s => s.r)), w = Math.max(...L.map(s => +s.w || 0));
     return mr >= 12
-      ? {w:w+5, t:`You hit ${mr} reps on every set. Add ${w?5:5} lb (weighted) and aim for 8 reps.`}
-      : {w, t:`Aim for ${mr+1} reps each set${w?" at +"+w+" lb":""} (reps first, weight later).`};
+      ? {w:w+5, r: tr, sets: ts, t:`You hit ${mr} reps on every set. Add 5 lb (weighted) and aim for ${tr} reps each set.`}
+      : {w, r: Math.min(mr+1, 12), sets: ts, t:`Aim for ${Math.min(mr+1,12)} reps each set${w?" at +"+w+" lb":""} (reps first, weight later).`};
   }
   if (!L) {
-    const w = rnd(S.p.bw * e.bw[lv], e.inc === 2.5 ? 2.5 : 5);
-    return {w, t:`First time: start light at about ${w} lb and focus on clean reps.`};
+    const base = (S.p.bw || 150) * e.bw[Math.max(0, lv)];
+    const w = rnd(base * bodyFactor(), e.inc === 2.5 ? 2.5 : 5);
+    const bits = [];
+    if (age) bits.push(age + " yrs");
+    if (ht) bits.push(Math.floor(ht/12) + "'" + (ht%12) + '"');
+    if (S.p.bw) bits.push(S.p.bw + " lb");
+    const who = bits.length ? ` (${bits.join(", ")})` : "";
+    return {w, r: tr, sets: ts, t:`First time${who}: about ${w} lb × ${tr} reps for ${ts} sets — clean form.`};
   }
   const V = L.filter(s => +s.w > 0);
-  if (!V.length) return null;
-  const w = Math.max(...V.map(s => +s.w)), top = V.filter(s => +s.w === w);
+  if (!V.length) return {r: tr, sets: ts, t: "Log weight next time for better suggestions."};
+  const w = Math.max(...V.map(s => +s.w));
   const all = V.length >= ts && V.every(s => s.r >= tr), close = V.every(s => s.r >= tr-2);
-  if (all) return {w:w+e.inc, t:`You hit every rep. Add ${e.inc} lb: try ${w+e.inc} lb.`};
-  if (close) return {w, t:`Close. Stay at ${w} lb and aim for one more rep.`};
+  const inc = (age && age <= 15 && e.inc >= 5) ? Math.max(2.5, e.inc / 2) : e.inc;
+  if (all) return {w:w+inc, r: tr, sets: ts, t:`Hit every rep last time. Try ${w+inc} lb × ${tr} for ${ts} sets.`};
+  if (close) return {w, r: tr, sets: ts, t:`Close. Stay at ${w} lb × ${tr} reps for ${ts} sets.`};
   const d = rnd(w*.9, e.inc === 2.5 ? 2.5 : 5);
-  return {w:d, t:`Reps were low. Drop about 10% to ${d} lb and rebuild.`};
+  return {w:d, r: tr, sets: ts, t:`Reps were low. Rebuild at ${d} lb × ${tr} for ${ts} sets.`};
+}
+
+/** Per-set plan: weight + reps for each working set (and a light build-up if 3+ sets). */
+function setPlan(n) {
+  const e = EX[n] || {};
+  const [ts, tr] = tgt(n);
+  const g = suggest(n) || {};
+  const workR = g.r != null ? g.r : tr;
+  const workW = g.w;
+  const plan = [];
+  for (let i = 0; i < ts; i++) {
+    let w = workW;
+    let r = workR;
+    let tag = "Work";
+    // Mild ramp on first set when we have a loaded barbell movement
+    if (e.inc && workW != null && workW > 0 && ts >= 3 && i === 0) {
+      w = rnd(workW * 0.9, e.inc === 2.5 ? 2.5 : 5);
+      tag = "Build-up";
+    }
+    let line;
+    if (e.pu) {
+      line = (w && w > 0) ? `${w} lb × ${r} reps` : `Bodyweight × ${r} reps`;
+    } else if (!e.inc && !e.bw) {
+      line = `${r} reps / quality effort`;
+      w = null;
+    } else if (w == null) {
+      line = `${r} reps`;
+    } else {
+      line = `${w} lb × ${r} reps`;
+    }
+    plan.push({ w, r, tag, line });
+  }
+  return plan;
 }
 
 function prs() {
@@ -1276,6 +1338,18 @@ async function finishSetup() {
     alert("Enter your name, a body weight (≥50), and what you're training for.");
     return;
   }
+  if (!(+su.h >= 48) || !(+su.h <= 90)) {
+    alert("Enter height in inches (about 48–90). Example: 5'10\" = 70.");
+    return;
+  }
+  if (!(+su.age >= 10) || !(+su.age <= 80)) {
+    alert("Enter a valid age (10–80).");
+    return;
+  }
+  // Normalize football positions to numbers
+  if (su.fb) {
+    su.fp = (Array.isArray(su.fp) ? su.fp : []).map(Number).filter(x => !isNaN(x));
+  }
   if (su.fb && (!Array.isArray(su.fp) || !su.fp.length)) {
     alert("Pick at least one football position.");
     return;
@@ -1351,6 +1425,8 @@ async function finishSetup() {
     id: code,
     name: n,
     bw: +su.w,
+    height: +su.h,
+    age: +su.age,
     goal: $("sg").value,
     level: $("sl").value,
     fb: su.fb ? {p: (Array.isArray(su.fp) ? su.fp.map(Number) : [+su.fp]).filter(n => !isNaN(n)), t: +su.ft} : null,
@@ -1698,7 +1774,7 @@ async function finish() {
 /* ============================================================
    UI – SETUP
    ============================================================ */
-let su = {fb:0, pl:0, own:0, fp:[], ft:2, pw:5, pg:10, n:"", w:"", s:"", school:"", newSchool:"", city:""};
+let su = {fb:0, pl:0, own:0, fp:[], ft:2, pw:5, pg:10, n:"", w:"", h:"", age:"", s:"", school:"", newSchool:"", city:""};
 let schoolList = []; // [{id, name, city}]
 
 function normCity(c) {
@@ -1746,6 +1822,8 @@ function tog(k) {
 function keep() {
   if ($("sn")) su.n = $("sn").value;
   if ($("sw")) su.w = $("sw").value;
+  if ($("sh")) su.h = $("sh").value;
+  if ($("sage")) su.age = $("sage").value;
   if ($("scity")) su.city = $("scity").value;
   if ($("sschool")) su.school = $("sschool").value;
   if ($("snewschool")) su.newSchool = $("snewschool").value;
@@ -1764,11 +1842,17 @@ function keep() {
 }
 
 function togglePos(i) {
-  // Only update the array — do NOT rebuild the form (keeps name/weight)
+  // Read the checkbox — do not flip again (browser already toggled it)
   i = +i;
   if (!Array.isArray(su.fp)) su.fp = [];
-  if (su.fp.includes(i)) su.fp = su.fp.filter(x => x !== i);
-  else su.fp.push(i);
+  su.fp = su.fp.map(Number).filter(x => !isNaN(x));
+  const el = $("fp" + i);
+  const on = el ? !!el.checked : !su.fp.includes(i);
+  if (on) {
+    if (!su.fp.includes(i)) su.fp.push(i);
+  } else {
+    su.fp = su.fp.filter(x => x !== i);
+  }
 }
 
 function schoolOptionsHtml() {
@@ -1828,6 +1912,8 @@ async function setupUI() {
   // Only full rebuild when switching Football / Powerlifting / Own — not on school pick
   if ($("sn")) su.n = $("sn").value;
   if ($("sw")) su.w = $("sw").value;
+  if ($("sh")) su.h = $("sh").value;
+  if ($("sage")) su.age = $("sage").value;
   if ($("scity")) su.city = $("scity").value;
   if ($("sschool")) su.school = $("sschool").value;
   if ($("snewschool")) su.newSchool = $("snewschool").value;
@@ -1837,10 +1923,11 @@ async function setupUI() {
   const opt = (a, v, f) => a.map((x,i) => `<option value="${f?x:i}" ${v==(f?x:i)?"selected":""}>${x}</option>`).join("");
   if (!Array.isArray(su.fp)) su.fp = typeof su.fp === "number" ? [su.fp] : [];
 
+  const fpSet = (Array.isArray(su.fp) ? su.fp : []).map(Number);
   const posChecks = POS.map((name, i) => `
-    <label style="display:flex;align-items:center;gap:10px;margin:6px 0;text-transform:none;letter-spacing:0;font-size:15px;color:var(--t);font-weight:600">
-      <input type="checkbox" id="fp${i}" ${su.fp.includes(i)?"checked":""}
-        onchange="togglePos(${i})" style="width:22px;height:22px;min-height:0;accent-color:var(--a)">
+    <label style="display:flex;align-items:center;gap:10px;margin:6px 0;text-transform:none;letter-spacing:0;font-size:15px;color:var(--text);font-weight:600;cursor:pointer">
+      <input type="checkbox" id="fp${i}" ${fpSet.includes(i)?"checked":""}
+        onchange="togglePos(${i})" style="width:22px;height:22px;min-height:0;accent-color:var(--a);flex-shrink:0">
       ${esc(name)}
     </label>`).join("");
 
@@ -1857,6 +1944,11 @@ async function setupUI() {
         <input id="sn" maxlength="12" value="${esc(su.n)}" oninput="su.n=this.value">
         <label>Body weight (lb)</label>
         <input id="sw" type="number" inputmode="decimal" value="${esc(String(su.w ?? ""))}" oninput="su.w=this.value">
+        <label>Height (inches)</label>
+        <input id="sh" type="number" inputmode="decimal" placeholder="e.g. 70 for 5'10" value="${esc(String(su.h ?? ""))}" oninput="su.h=this.value">
+        <div class="nt">Total inches (5'10" = 70). Used with age to set starting weights.</div>
+        <label>Age</label>
+        <input id="sage" type="number" inputmode="numeric" placeholder="e.g. 16" value="${esc(String(su.age ?? ""))}" oninput="su.age=this.value">
 
         <label>Your city</label>
         <input id="scity" placeholder="e.g. Austin" value="${esc(su.city)}"
@@ -1912,12 +2004,14 @@ function editProfile() {
     fb: p.fb ? 1 : 0,
     pl: p.pl ? 1 : 0,
     own: p.fb || p.pl ? 0 : 1,
-    fp: positions.slice(),
+    fp: positions.slice().map(Number),
     ft: p.fb ? p.fb.t : 2,
     pw: p.pl ? p.pl.w : 5,
     pg: p.pl ? p.pl.g : 10,
     n: p.name,
     w: p.bw,
+    h: p.height || "",
+    age: p.age || "",
     s: p.own || "",
     school: p.schoolId || "",
     newSchool: "",
@@ -2033,31 +2127,54 @@ function vWork() {
   const pr = prs();
   const exercises = d.ex.map(n => {
     const g = suggest(n);
-    const D = S.d[n] || (S.d[n] = {s:"", sets:[{w:"",r:0}]});
+    const plan = setPlan(n);
     const [ts,tr] = tgt(n);
+    const D = S.d[n] || (S.d[n] = {s:"", sets:[]});
+    // Ensure enough set rows for the plan; prefill empty weight/reps from suggestions
+    while (D.sets.length < plan.length) D.sets.push({w:"", r:0});
+    if (g && g.w != null && g.w !== "" && (D.s === "" || D.s == null)) D.s = String(g.w);
+    plan.forEach((p, i) => {
+      if (!D.sets[i]) D.sets[i] = {w:"", r:0};
+      if ((D.sets[i].w === "" || D.sets[i].w == null) && p.w != null) D.sets[i].w = String(p.w);
+      if ((!D.sets[i].r || D.sets[i].r === 0) && p.r) D.sets[i].r = p.r;
+    });
+    const planBox = `
+      <div class="sug" style="margin-top:10px">
+        <b>Per-set plan</b><br>
+        ${plan.map((p,i) => `Set ${i+1} (${p.tag}): ${esc(p.line)}`).join("<br>")}
+        ${g && g.t ? `<div style="margin-top:6px;opacity:.9">${esc(g.t)}</div>` : ""}
+      </div>`;
     return `
       <div class="c ex">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
           <div>
             <h3>${esc(n)}</h3>
-            <div class="m" style="margin-top:3px">Target ${ts} × ${tr}</div>
+            <div class="m" style="margin-top:3px">${ts} sets × ${tr} reps</div>
           </div>
           ${pr[n] ? `<div class="badge" style="flex-shrink:0">PR ${pr[n].w}×${pr[n].r}</div>` : ""}
         </div>
-        ${g ? `<div class="sug" style="margin-top:10px">${esc(g.t)}</div>` : ""}
+        ${planBox}
         <label>Starting weight (lb)</label>
         <input type="number" inputmode="decimal" value="${D.s}" oninput="S.d['${n}'].s=this.value" placeholder="0">
-        ${D.sets.map((s,i) => `
+        ${D.sets.map((s,i) => {
+          const p = plan[i];
+          const tip = p ? `Suggested: ${p.line}` : "";
+          return `
           <div class="set">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+              <b class="set-num" style="padding:0">Set ${i+1}${p ? " · " + p.tag : ""}</b>
+              ${p ? `<span class="m" style="font-size:12px;color:var(--a)">${esc(p.line)}</span>` : ""}
+            </div>
+            ${tip ? `<div class="nt" style="margin:4px 0 0">Aim for <b>${esc(p.line)}</b></div>` : ""}
             <div class="set-row">
               <div class="set-num">#${i+1}</div>
               <div>
                 <label>Weight</label>
-                <input type="number" inputmode="decimal" value="${s.w}" oninput="S.d['${n}'].sets[${i}].w=this.value" placeholder="lb">
+                <input type="number" inputmode="decimal" value="${s.w}" oninput="S.d['${n}'].sets[${i}].w=this.value" placeholder="${p && p.w != null ? p.w : "lb"}">
               </div>
               <div>
                 <label>Reps</label>
-                <input type="number" inputmode="numeric" value="${s.r||""}" oninput="S.d['${n}'].sets[${i}].r=+this.value||0" placeholder="0">
+                <input type="number" inputmode="numeric" value="${s.r||""}" oninput="S.d['${n}'].sets[${i}].r=+this.value||0" placeholder="${p ? p.r : "0"}">
               </div>
             </div>
             <div class="rc" style="margin-top:10px">
@@ -2066,7 +2183,8 @@ function vWork() {
               <button class="plus" onclick="rep('${n}',${i},1)">+ Rep</button>
             </div>
             ${i ? `<button class="dn" style="width:100%;margin-top:8px" onclick="S.d['${n}'].sets.splice(${i},1);render()">Remove set</button>` : ""}
-          </div>`).join("")}
+          </div>`;
+        }).join("")}
         <button style="width:100%;margin-top:10px" onclick="S.d['${n}'].sets.push({w:S.d['${n}'].s||'',r:0});render()">+ Add set</button>
       </div>`;
   }).join("");
