@@ -1,4 +1,46 @@
-430px;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Lift Log</title>
+<style>
+:root {
+  --a: #ff4d00;
+  --a-soft: rgba(255,77,0,.14);
+  --a-glow: rgba(255,77,0,.35);
+  --bg: #000000;
+  --surface: #111111;
+  --surface2: #1a1a1a;
+  --surface3: #222222;
+  --stroke: #2a2a2a;
+  --muted: #888888;
+  --text: #ffffff;
+  --text2: #c8c8c8;
+  --danger: #ff5c5c;
+  --danger-bg: #1f0f0f;
+  --ok: #3dff9a;
+  --warn: #ffb020;
+  --r: 20px;
+  --r-sm: 14px;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; }
+html { background: var(--bg); overscroll-behavior: none; }
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.4 -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", system-ui, sans-serif;
+  padding: env(safe-area-inset-top) 0 0;
+  overscroll-behavior: none;
+  -webkit-font-smoothing: antialiased;
+}
+.w {
+  max-width: 430px;
   margin: 0 auto;
   padding: 0 16px 120px;
 }
@@ -731,9 +773,7 @@ const EX = {
   "Pull-Ups":{inc:5,t:[3,8],pu:1},
   "Face Pulls":{inc:5,t:[3,12],bw:[.1,.15,.2]},
   "Plank":{inc:0,t:[3,1]},
-  "Hip & thoracic mobility":{inc:0,t:[1,1]},
-  "Football position drills":{inc:0,t:[3,1]},
-  "Short acceleration work":{inc:0,t:[4,1]}
+  "Hip & thoracic mobility":{inc:0,t:[1,1]}
 };
 const LIFTS = Object.keys(EX);
 
@@ -749,10 +789,10 @@ function posList(p) {
 // Schedule maps day name â template key (or missing/null = rest).
 const DEFAULT_SCHEDULE = {
   Monday: "upper",
-  Tuesday: "optional",
-  Wednesday: "lower",
-  Thursday: "back",
-  Friday: "optional"
+  Tuesday: "lower",
+  Wednesday: "back",
+  Thursday: "upper",
+  Friday: "lower"
 };
 
 function getTemplates() {
@@ -762,40 +802,32 @@ function getTemplates() {
   const isOL = positions.some(i => i <= 3); // LT, RT, Guard, Center
   const isDL = positions.some(i => i === 4 || i === 5); // DT, DE
   const isSkill = positions.some(i => i === 6 || i === 7); // TE, LB
-  const optional = fb
-    ? {title:"Optional football drills",ex:["Football position drills","Short acceleration work"]}
-    : {title:"Optional accessories & mobility",ex:["Face Pulls","Plank","Hip & thoracic mobility"]};
-
   if (fb && isOL) {
     return {
       upper: {title:"Upper power (OL)",ex:["Bench Press","Close-Grip Bench Press","Overhead Press"]},
       lower: {title:"Lower power (OL)",ex:["Squat","Deadlift","Romanian Deadlift"]},
-      back: {title:"Back & core (OL)",ex:["Barbell Row","Pull-Ups","Plank"]},
-      optional
+      back: {title:"Back & core (OL)",ex:["Barbell Row","Pull-Ups","Plank"]}
     };
   }
   if (fb && isDL) {
     return {
       upper: {title:"Upper strength (DL)",ex:["Bench Press","Overhead Press","Barbell Row"]},
       lower: {title:"Lower strength (DL)",ex:["Squat","Deadlift","Romanian Deadlift"]},
-      back: {title:"Power & back (DL)",ex:["Close-Grip Bench Press","Pull-Ups","Face Pulls"]},
-      optional
+      back: {title:"Power & back (DL)",ex:["Close-Grip Bench Press","Pull-Ups","Face Pulls"]}
     };
   }
   if (fb && isSkill) {
     return {
       upper: {title:"Upper + explosiveness",ex:["Bench Press","Overhead Press","Pull-Ups"]},
-      lower: {title:"Legs + power",ex:["Squat","Romanian Deadlift","Short acceleration work"]},
-      back: {title:"Back & athleticism",ex:["Barbell Row","Face Pulls","Plank"]},
-      optional
+      lower: {title:"Legs + power",ex:["Squat","Deadlift","Romanian Deadlift"]},
+      back: {title:"Back & athleticism",ex:["Barbell Row","Face Pulls","Plank"]}
     };
   }
   // Default / powerlifting / own
   return {
     upper: {title:"Chest, shoulders & triceps",ex:["Bench Press","Overhead Press","Close-Grip Bench Press"]},
     lower: {title:"Legs",ex:["Squat","Deadlift","Romanian Deadlift"]},
-    back: {title:"Back",ex:["Barbell Row","Pull-Ups"]},
-    optional
+    back: {title:"Back",ex:["Barbell Row","Pull-Ups"]}
   };
 }
 
@@ -836,6 +868,22 @@ function setDaySlot(day, slot) {
 function resetSchedule() {
   if (!S.p) return;
   S.p.schedule = { ...DEFAULT_SCHEDULE };
+  saveProfile();
+  render();
+}
+
+function cycleDaySlot(dayName) {
+  if (!S.p) return;
+  const templates = getTemplates();
+  const keys = ["", ...Object.keys(templates)]; // "" = rest
+  if (!S.p.schedule) S.p.schedule = { ...DEFAULT_SCHEDULE };
+  const firstKey = Object.keys(S.p.schedule)[0];
+  if (firstKey && !DAYS.includes(firstKey)) S.p.schedule = { ...DEFAULT_SCHEDULE };
+  const cur = S.p.schedule[dayName] || "";
+  const idx = keys.indexOf(cur);
+  const next = keys[(idx + 1) % keys.length];
+  if (next) S.p.schedule[dayName] = next;
+  else delete S.p.schedule[dayName];
   saveProfile();
   render();
 }
@@ -930,6 +978,7 @@ let S = {
 let tab = "workout";
 let day = DAYS[(new Date().getDay() + 6) % 7];
 let lift = "";
+let editSchedule = false;
 let nextMsg = null;
 let curTeam = "";
 let chatWith = null;   // friend uid for private chat, or null
@@ -1825,7 +1874,7 @@ function render() {
 
   if (!TABS().some(t => t[0] === tab)) tab = "workout";
   $("nav").innerHTML = TABS().map(([k,n]) =>
-    `<button class="tab ${tab===k?"on":""}" onclick="tab='${k}';nextMsg=null;statusMsg='';if(chatWith)closeFriendChat();else render()">${n}</button>`
+    `<button class="tab ${tab===k?"on":""}" onclick="tab='${k}';nextMsg=null;statusMsg='';editSchedule=false;if(chatWith)closeFriendChat();else render()">${n}</button>`
   ).join("");
 
   $("v").innerHTML = ({
@@ -1946,6 +1995,36 @@ function vPlan() {
     sched = { ...DEFAULT_SCHEDULE };
   }
   const trainCount = DAYS.filter(d => P[d]).length;
+
+  if (editSchedule) {
+    return `
+      <div class="page-hero">
+        <div class="title">Edit schedule</div>
+        <div class="meta">Tap a day to cycle workout Â· rest</div>
+      </div>
+
+      <div class="c">
+        <h2>This week</h2>
+        <div class="week-grid">
+          ${DAYS.map(x => {
+            const slot = sched[x] || "";
+            const title = slot && templates[slot] ? templates[slot].title : "Rest";
+            return `
+              <div class="week-cell" onclick="cycleDaySlot('${x}')" style="border-color:${slot ? "var(--a)" : "var(--stroke)"}">
+                <div>
+                  <div class="wd">${x.slice(0,3)}</div>
+                  <div class="wt">${esc(title)}</div>
+                </div>
+                <div class="tag ${slot ? "" : "rest"}">${slot ? "Train" : "Rest"}</div>
+              </div>`;
+          }).join("")}
+        </div>
+        <div class="nt">Keep tapping a day to switch between Rest and each workout type.</div>
+        <button class="pri" onclick="editSchedule=false;render()">Done</button>
+        <button style="width:100%;margin-top:8px" onclick="resetSchedule()">Reset to MonâFri default</button>
+      </div>`;
+  }
+
   return `
     <div class="page-hero">
       <div class="title">Plan</div>
@@ -1965,26 +2044,7 @@ function vPlan() {
           </div>`).join("")}
       </div>
       <div class="nt">Tap any day to jump into that workout.</div>
-    </div>
-
-    <div class="c">
-      <h2>Edit schedule</h2>
-      <div class="nt" style="margin-top:0;margin-bottom:8px">Default is MonâFri train Â· Sat/Sun rest. Change any day below.</div>
-      ${DAYS.map(d => {
-        const cur = sched[d] || "";
-        return `
-          <label>${d}</label>
-          <select onchange="setDaySlot('${d}', this.value)">
-            <option value="">â Rest â</option>
-            ${Object.keys(templates).map(k => {
-              const t = templates[k];
-              return `<option value="${k}" ${cur === k ? "selected" : ""}>${esc(t.title)}</option>`;
-            }).join("")}
-          </select>
-          ${cur && templates[cur] ? `<div class="m" style="font-size:12px;margin:4px 0 6px">${esc(templates[cur].ex.join(" Â· "))}</div>` : ""}
-        `;
-      }).join("")}
-      <button class="pri" onclick="resetSchedule()">Reset to MonâFri default</button>
+      <button class="pri" onclick="editSchedule=true;render()">Edit schedule</button>
     </div>
 
     <div class="sec-label">Account</div>
