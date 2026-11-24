@@ -705,6 +705,40 @@ a { color: var(--a); font-weight: 650; text-decoration: none; }
   margin: 18px 0 8px;
 }
 
+
+/* Football position chips */
+.pos-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 8px;
+}
+.pos-chip {
+  min-height: 48px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1.5px solid var(--stroke);
+  background: var(--surface2);
+  color: var(--text);
+  font: 650 13px/1.25 -apple-system, system-ui, sans-serif;
+  text-align: left;
+  cursor: pointer;
+}
+.pos-chip.on {
+  border-color: var(--a);
+  background: var(--a-soft);
+  color: #fff;
+  box-shadow: 0 0 0 1px rgba(158,27,50,.45);
+}
+input[type=checkbox] {
+  width: 22px !important;
+  min-height: 22px !important;
+  height: 22px;
+  padding: 0 !important;
+  flex-shrink: 0;
+  accent-color: var(--a);
+}
+
 </style>
 </head>
 <body>
@@ -1842,16 +1876,18 @@ function keep() {
 }
 
 function togglePos(i) {
-  // Read the checkbox — do not flip again (browser already toggled it)
   i = +i;
   if (!Array.isArray(su.fp)) su.fp = [];
   su.fp = su.fp.map(Number).filter(x => !isNaN(x));
-  const el = $("fp" + i);
-  const on = el ? !!el.checked : !su.fp.includes(i);
-  if (on) {
-    if (!su.fp.includes(i)) su.fp.push(i);
-  } else {
-    su.fp = su.fp.filter(x => x !== i);
+  const el = $("fpbtn" + i);
+  const wasOn = el ? el.classList.contains("on") : su.fp.includes(i);
+  if (wasOn) su.fp = su.fp.filter(x => x !== i);
+  else if (!su.fp.includes(i)) su.fp.push(i);
+  if (el) el.classList.toggle("on", !wasOn);
+  const count = $("fpCount");
+  if (count) {
+    const names = su.fp.map(x => POS[x]).filter(Boolean);
+    count.textContent = names.length ? names.join(", ") : "none";
   }
 }
 
@@ -1924,12 +1960,9 @@ async function setupUI() {
   if (!Array.isArray(su.fp)) su.fp = typeof su.fp === "number" ? [su.fp] : [];
 
   const fpSet = (Array.isArray(su.fp) ? su.fp : []).map(Number);
-  const posChecks = POS.map((name, i) => `
-    <label style="display:flex;align-items:center;gap:10px;margin:6px 0;text-transform:none;letter-spacing:0;font-size:15px;color:var(--text);font-weight:600;cursor:pointer">
-      <input type="checkbox" id="fp${i}" ${fpSet.includes(i)?"checked":""}
-        onchange="togglePos(${i})" style="width:22px;height:22px;min-height:0;accent-color:var(--a);flex-shrink:0">
-      ${esc(name)}
-    </label>`).join("");
+  const posChecks = `<div class="pos-grid">` + POS.map((name, i) => `
+    <button type="button" id="fpbtn${i}" class="pos-chip ${fpSet.includes(i)?"on":""}"
+      onclick="event.preventDefault();togglePos(${i})">${esc(name)}</button>`).join("") + `</div>`;
 
   $("setup").innerHTML = `
     <div class="c">
@@ -1969,9 +2002,9 @@ async function setupUI() {
         </div>
 
         ${su.fb ? `
-          <label>Football position(s) — pick all that apply</label>
-          <div class="set" style="margin-top:4px">${posChecks}</div>
-          <div class="nt">Your workout plan changes based on these positions.</div>
+          <label>Football position(s) — tap all that apply</label>
+          ${posChecks}
+          <div class="nt">Selected: <b id="fpCount">${fpSet.length ? fpSet.map(i => POS[i]).filter(Boolean).join(", ") : "none"}</b>. Plan changes based on these.</div>
           <label>Football team</label>
           <select id="ft" onchange="su.ft=this.value">${opt(FBT,su.ft)}</select>
         ` : ""}
