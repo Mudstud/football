@@ -932,21 +932,201 @@ const FORM_IMG = {
 
 /* Simple SVG stick figures for form guides (fallback) */
 function formSVG(type) {
-  const c = "#f0b8c0", s = "#9e1b32", g = "#666";
-  const svgs = {
-    squat: `<svg viewBox="0 0 120 140" width="100%" style="max-width:160px;margin:8px auto;display:block"><circle cx="60" cy="22" r="10" fill="${c}"/><rect x="52" y="32" width="16" height="28" rx="4" fill="${c}"/><line x1="52" y1="38" x2="30" y2="55" stroke="${c}" stroke-width="5" stroke-linecap="round"/><line x1="68" y1="38" x2="90" y2="55" stroke="${c}" stroke-width="5" stroke-linecap="round"/><line x1="56" y1="58" x2="40" y2="100" stroke="${c}" stroke-width="5" stroke-linecap="round"/><line x1="64" y1="58" x2="80" y2="100" stroke="${c}" stroke-width="5" stroke-linecap="round"/><line x1="40" y1="100" x2="28" y2="100" stroke="${c}" stroke-width="4" stroke-linecap="round"/><line x1="80" y1="100" x2="92" y2="100" stroke="${c}" stroke-width="4" stroke-linecap="round"/><line x1="25" y1="48" x2="95" y2="48" stroke="${s}" stroke-width="4" stroke-linecap="round"/><text x="60" y="128" text-anchor="middle" fill="${g}" font-size="11" font-family="system-ui">Bar on back · sit down</text></svg>`,
-    deadlift: `<svg viewBox="0 0 120 140" width="100%" style="max-width:160px;margin:8px auto;display:block"><circle cx="60" cy="28" r="10" fill="${c}"/><rect x="52" y="38" width="16" height="30" rx="4" fill="${c}"/><line x1="52" y1="48" x2="35" y2="70" stroke="${c}" stroke-width="5" stroke-linecap="round"/><line x1="68" y1="48" x2="85" y2="70" stroke="${c}" stroke-width="5" stroke-linecap="round"/><line x1="56" y1="66" x2="48" y2="105" stroke="${c}" stroke-width="5" stroke-linecap="round"/><line x1="64" y1="66" x2="72" y2="105" stroke="${c}" stroke-width="5" stroke-linecap="round"/><line x1="48" y1="105" x2="38" y2="105" stroke="${c}" stroke-width="4" stroke-linecap="round"/><line x1="72" y1="105" x2="82" y2="105" stroke="${c}" stroke-width="4" stroke-linecap="round"/><line x1="30" y1="72" x2="90" y2="72" stroke="${s}" stroke-width="5" stroke-linecap="round"/><text x="60" y="128" text-anchor="middle" fill="${g}" font-size="11" font-family="system-ui">Hinge · bar close · stand</text></svg>`,
-    bench: `<svg viewBox="0 0 140 100" width="100%" style="max-width:180px;margin:8px auto;display:block"><rect x="20" y="55" width="100" height="10" rx="3" fill="#444"/><circle cx="70" cy="35" r="9" fill="${c}"/><rect x="55" y="42" width="30" height="14" rx="3" fill="${c}"/><line x1="55" y1="48" x2="25" y2="40" stroke="${c}" stroke-width="4" stroke-linecap="round"/><line x1="85" y1="48" x2="115" y2="40" stroke="${c}" stroke-width="4" stroke-linecap="round"/><line x1="20" y1="38" x2="120" y2="38" stroke="${s}" stroke-width="4" stroke-linecap="round"/><text x="70" y="88" text-anchor="middle" fill="${g}" font-size="11" font-family="system-ui">Lie flat · press up</text></svg>`,
-    ohp: `<svg viewBox="0 0 120 140" width="100%" style="max-width:160px;margin:8px auto;display:block"><circle cx="60" cy="22" r="10" fill="${c}"/><rect x="52" y="32" width="16" height="30" rx="4" fill="${c}"/><line x1="52" y1="40" x2="40" y2="20" stroke="${c}" stroke-width="5" stroke-linecap="round"/><line x1="68" y1="40" x2="80" y2="20" stroke="${c}" stroke-width="5" stroke-linecap="round"/><line x1="56" y1="60" x2="48" y2="100" stroke="${c}" stroke-width="5" stroke-linecap="round"/><line x1="64" y1="60" x2="72" y2="100" stroke="${c}" stroke-width="5" stroke-linecap="round"/><line x1="48" y1="100" x2="38" y2="100" stroke="${c}" stroke-width="4" stroke-linecap="round"/><line x1="72" y1="100" x2="82" y2="100" stroke="${c}" stroke-width="4" stroke-linecap="round"/><line x1="25" y1="18" x2="95" y2="18" stroke="${s}" stroke-width="4" stroke-linecap="round"/><text x="60" y="128" text-anchor="middle" fill="${g}" font-size="11" font-family="system-ui">Press bar overhead</text></svg>`,
-    row: `<svg viewBox="0 0 120 140" width="100%" style="max-width:160px;margin:8px auto;display:block"><circle cx="60" cy="30" r="10" fill="${c}"/><rect x="48" y="40" width="24" height="20" rx="4" fill="${c}" transform="rotate(-25 60 50)"/><line x1="50" y1="55" x2="30" y2="70" stroke="${c}" stroke-width="5" stroke-linecap="round"/><line x1="70" y1="55" x2="90" y2="70" stroke="${c}" stroke-width="5" stroke-linecap="round"/><line x1="55" y1="60" x2="50" y2="105" stroke="${c}" stroke-width="5" stroke-linecap="round"/><line x1="65" y1="60" x2="70" y2="105" stroke="${c}" stroke-width="5" stroke-linecap="round"/><line x1="25" y1="72" x2="95" y2="72" stroke="${s}" stroke-width="4" stroke-linecap="round"/><text x="60" y="128" text-anchor="middle" fill="${g}" font-size="11" font-family="system-ui">Hinge · pull to torso</text></svg>`,
-    pullup: `<svg viewBox="0 0 120 140" width="100%" style="max-width:160px;margin:8px auto;display:block"><line x1="20" y1="20" x2="100" y2="20" stroke="${s}" stroke-width="5" stroke-linecap="round"/><circle cx="60" cy="50" r="10" fill="${c}"/><rect x="52" y="60" width="16" height="28" rx="4" fill="${c}"/><line x1="52" y1="65" x2="30" y2="25" stroke="${c}" stroke-width="5" stroke-linecap="round"/><line x1="68" y1="65" x2="90" y2="25" stroke="${c}" stroke-width="5" stroke-linecap="round"/><line x1="56" y1="86" x2="50" y2="115" stroke="${c}" stroke-width="5" stroke-linecap="round"/><line x1="64" y1="86" x2="70" y2="115" stroke="${c}" stroke-width="5" stroke-linecap="round"/><text x="60" y="132" text-anchor="middle" fill="${g}" font-size="11" font-family="system-ui">Pull chin over bar</text></svg>`,
-    lunge: `<svg viewBox="0 0 120 140" width="100%" style="max-width:160px;margin:8px auto;display:block"><circle cx="55" cy="22" r="10" fill="${c}"/><rect x="47" y="32" width="16" height="28" rx="4" fill="${c}"/><line x1="47" y1="40" x2="30" y2="55" stroke="${c}" stroke-width="4" stroke-linecap="round"/><line x1="63" y1="40" x2="80" y2="55" stroke="${c}" stroke-width="4" stroke-linecap="round"/><line x1="52" y1="58" x2="35" y2="100" stroke="${c}" stroke-width="5" stroke-linecap="round"/><line x1="60" y1="58" x2="85" y2="90" stroke="${c}" stroke-width="5" stroke-linecap="round"/><line x1="35" y1="100" x2="25" y2="100" stroke="${c}" stroke-width="4" stroke-linecap="round"/><line x1="85" y1="90" x2="95" y2="90" stroke="${c}" stroke-width="4" stroke-linecap="round"/><text x="60" y="128" text-anchor="middle" fill="${g}" font-size="11" font-family="system-ui">Step · drop back knee</text></svg>`,
-    hipthrust: `<svg viewBox="0 0 140 110" width="100%" style="max-width:180px;margin:8px auto;display:block"><rect x="10" y="50" width="40" height="12" rx="3" fill="#444"/><circle cx="70" cy="30" r="9" fill="${c}"/><rect x="55" y="38" width="30" height="14" rx="3" fill="${c}"/><line x1="70" y1="52" x2="70" y2="70" stroke="${c}" stroke-width="5" stroke-linecap="round"/><line x1="55" y1="70" x2="45" y2="95" stroke="${c}" stroke-width="4" stroke-linecap="round"/><line x1="85" y1="70" x2="95" y2="95" stroke="${c}" stroke-width="4" stroke-linecap="round"/><line x1="40" y1="55" x2="100" y2="55" stroke="${s}" stroke-width="5" stroke-linecap="round"/><text x="70" y="105" text-anchor="middle" fill="${g}" font-size="11" font-family="system-ui">Drive hips up · squeeze</text></svg>`,
-    plank: `<svg viewBox="0 0 140 90" width="100%" style="max-width:180px;margin:8px auto;display:block"><circle cx="30" cy="35" r="9" fill="${c}"/><rect x="38" y="30" width="60" height="12" rx="3" fill="${c}"/><line x1="30" y1="44" x2="25" y2="65" stroke="${c}" stroke-width="4" stroke-linecap="round"/><line x1="98" y1="42" x2="110" y2="65" stroke="${c}" stroke-width="4" stroke-linecap="round"/><line x1="20" y1="65" x2="115" y2="65" stroke="#333" stroke-width="2"/><text x="70" y="82" text-anchor="middle" fill="${g}" font-size="11" font-family="system-ui">Straight line · brace core</text></svg>`,
-    curl: `<svg viewBox="0 0 100 140" width="100%" style="max-width:140px;margin:8px auto;display:block"><circle cx="50" cy="22" r="10" fill="${c}"/><rect x="42" y="32" width="16" height="30" rx="4" fill="${c}"/><line x1="42" y1="42" x2="25" y2="30" stroke="${c}" stroke-width="5" stroke-linecap="round"/><line x1="58" y1="42" x2="75" y2="55" stroke="${c}" stroke-width="5" stroke-linecap="round"/><circle cx="75" cy="60" r="6" fill="${s}"/><line x1="46" y1="60" x2="40" y2="100" stroke="${c}" stroke-width="5" stroke-linecap="round"/><line x1="54" y1="60" x2="60" y2="100" stroke="${c}" stroke-width="5" stroke-linecap="round"/><text x="50" y="125" text-anchor="middle" fill="${g}" font-size="11" font-family="system-ui">Curl up · no swing</text></svg>`,
-    generic: `<svg viewBox="0 0 100 100" width="100%" style="max-width:120px;margin:8px auto;display:block"><circle cx="50" cy="25" r="10" fill="${c}"/><rect x="42" y="35" width="16" height="28" rx="4" fill="${c}"/><line x1="42" y1="42" x2="25" y2="55" stroke="${c}" stroke-width="4" stroke-linecap="round"/><line x1="58" y1="42" x2="75" y2="55" stroke="${c}" stroke-width="4" stroke-linecap="round"/><line x1="46" y1="62" x2="40" y2="90" stroke="${c}" stroke-width="4" stroke-linecap="round"/><line x1="54" y1="62" x2="60" y2="90" stroke="${c}" stroke-width="4" stroke-linecap="round"/></svg>`
+  /* legacy single-pose fallback */
+  return formPoster(type);
+}
+
+/** Multi-panel instructional diagram (Setup / Action / Finish) — original art */
+function formPoster(type) {
+  const ink = "#2a1f22";
+  const accent = "#9e1b32";
+  const soft = "#f0b8c0";
+  const muted = "#6b5a5e";
+  const panel = "#faf6f4";
+  const stroke = "#3d2e32";
+
+  // Stick figure helpers (simple geometric athlete)
+  function head(cx, cy, r=8) {
+    return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${stroke}" stroke-width="2.2"/>`;
+  }
+  function body(x1,y1,x2,y2) {
+    return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${stroke}" stroke-width="2.4" stroke-linecap="round"/>`;
+  }
+  function bar(x1,y,x2, thick=3.2) {
+    return `<line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" stroke="${ink}" stroke-width="${thick}" stroke-linecap="round"/>
+      <circle cx="${x1}" cy="${y}" r="5" fill="${ink}"/><circle cx="${x2}" cy="${y}" r="5" fill="${ink}"/>`;
+  }
+  function arrow(x1,y1,x2,y2) {
+    return `<defs><marker id="arr${type}" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="${accent}"/></marker></defs>
+      <line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${accent}" stroke-width="2.5" marker-end="url(#arr${type})"/>`;
+  }
+  function label(x, y, t, anchor="start") {
+    return `<text x="${x}" y="${y}" text-anchor="${anchor}" fill="${muted}" font-size="9.5" font-family="system-ui,sans-serif" font-weight="600">${t}</text>`;
+  }
+  function title(x, y, t) {
+    return `<text x="${x}" y="${y}" text-anchor="middle" fill="${accent}" font-size="11" font-family="system-ui,sans-serif" font-weight="800" letter-spacing="0.06em">${t}</text>`;
+  }
+  function panelBox(x, y, w, h) {
+    return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="10" fill="${panel}" stroke="#e8ddd8" stroke-width="1.5"/>`;
+  }
+
+  // Pose sets: [setup SVG bits, action, finish] inside 100x110 local coords, offset applied later
+  const poses = {
+    deadlift: {
+      titles: ["SET UP", "HINGE / LOWER", "STAND TALL"],
+      draw: (ox, oy, phase) => {
+        // phase 0 stand with bar, 1 hinged, 2 lockout
+        if (phase === 0) {
+          return head(ox+50, oy+22) +
+            body(ox+50, oy+30, ox+50, oy+58) +
+            body(ox+50, oy+38, ox+32, oy+52) + body(ox+50, oy+38, ox+68, oy+52) +
+            body(ox+50, oy+58, ox+40, oy+88) + body(ox+50, oy+58, ox+60, oy+88) +
+            body(ox+40, oy+88, ox+34, oy+88) + body(ox+60, oy+88, ox+66, oy+88) +
+            bar(ox+22, oy+54, ox+78) +
+            label(ox+8, oy+48, "Bar close") +
+            label(ox+70, oy+30, "Chest up");
+        }
+        if (phase === 1) {
+          return head(ox+50, oy+28) +
+            body(ox+50, oy+36, ox+58, oy+58) + // torso lean
+            body(ox+50, oy+40, ox+28, oy+58) + body(ox+50, oy+40, ox+72, oy+58) +
+            body(ox+58, oy+58, ox+42, oy+88) + body(ox+58, oy+58, ox+62, oy+88) +
+            body(ox+42, oy+88, ox+36, oy+88) + body(ox+62, oy+88, ox+68, oy+88) +
+            bar(ox+20, oy+60, ox+80) +
+            `<path d="M${ox+72} ${oy+50} Q${ox+80} ${oy+55} ${ox+78} ${oy+68}" fill="none" stroke="${accent}" stroke-width="2"/>` +
+            label(ox+4, oy+58, "Hips back") +
+            label(ox+62, oy+78, "Soft knees") +
+            label(ox+4, oy+74, "Flat back");
+        }
+        return head(ox+50, oy+18) +
+          body(ox+50, oy+26, ox+50, oy+55) +
+          body(ox+50, oy+34, ox+30, oy+48) + body(ox+50, oy+34, ox+70, oy+48) +
+          body(ox+50, oy+55, ox+40, oy+88) + body(ox+50, oy+55, ox+60, oy+88) +
+          body(ox+40, oy+88, ox+34, oy+88) + body(ox+60, oy+88, ox+66, oy+88) +
+          bar(ox+20, oy+42, ox+80) +
+          label(ox+68, oy+28, "Lock out") +
+          label(ox+4, oy+48, "Squeeze glutes");
+      }
+    },
+    squat: {
+      titles: ["SET UP", "SIT DOWN", "STAND"],
+      draw: (ox, oy, phase) => {
+        if (phase === 0) {
+          return head(ox+50, oy+18) +
+            body(ox+50, oy+26, ox+50, oy+52) +
+            body(ox+50, oy+32, ox+28, oy+28) + body(ox+50, oy+32, ox+72, oy+28) +
+            body(ox+50, oy+52, ox+38, oy+88) + body(ox+50, oy+52, ox+62, oy+88) +
+            body(ox+38, oy+88, ox+30, oy+88) + body(ox+62, oy+88, ox+70, oy+88) +
+            bar(ox+18, oy+28, ox+82) +
+            label(ox+4, oy+42, "Bar on traps") +
+            label(ox+62, oy+70, "Brace core");
+        }
+        if (phase === 1) {
+          return head(ox+50, oy+28) +
+            body(ox+50, oy+36, ox+50, oy+58) +
+            body(ox+50, oy+42, ox+28, oy+38) + body(ox+50, oy+42, ox+72, oy+38) +
+            body(ox+50, oy+58, ox+32, oy+88) + body(ox+50, oy+58, ox+68, oy+88) +
+            body(ox+32, oy+88, ox+24, oy+88) + body(ox+68, oy+88, ox+76, oy+88) +
+            bar(ox+18, oy+38, ox+82) +
+            label(ox+4, oy+54, "Hips back") +
+            label(ox+62, oy+78, "Knees track") +
+            label(ox+4, oy+74, "Depth");
+        }
+        return head(ox+50, oy+18) +
+          body(ox+50, oy+26, ox+50, oy+52) +
+          body(ox+50, oy+32, ox+28, oy+28) + body(ox+50, oy+32, ox+72, oy+28) +
+          body(ox+50, oy+52, ox+38, oy+88) + body(ox+50, oy+52, ox+62, oy+88) +
+          body(ox+38, oy+88, ox+30, oy+88) + body(ox+62, oy+88, ox+70, oy+88) +
+          bar(ox+18, oy+28, ox+82) +
+          label(ox+62, oy+50, "Drive up");
+      }
+    },
+    bench: {
+      titles: ["SET UP", "LOWER", "PRESS"],
+      draw: (ox, oy, phase) => {
+        // lying figure
+        const bench = `<rect x="${ox+18}" y="${oy+58}" width="64" height="8" rx="2" fill="#ddd" stroke="${stroke}" stroke-width="1"/>`;
+        if (phase === 0 || phase === 2) {
+          return bench + head(ox+28, oy+42) +
+            body(ox+36, oy+42, ox+70, oy+42) +
+            body(ox+50, oy+42, ox+38, oy+30) + body(ox+50, oy+42, ox+62, oy+30) +
+            bar(ox+22, oy+28, ox+78) +
+            label(ox+4, oy+72, phase===0?"Shoulders set":"Lock out") +
+            label(ox+55, oy+78, "Feet planted");
+        }
+        return bench + head(ox+28, oy+44) +
+          body(ox+36, oy+44, ox+70, oy+44) +
+          body(ox+50, oy+44, ox+36, oy+40) + body(ox+50, oy+44, ox+64, oy+40) +
+          bar(ox+22, oy+40, ox+78) +
+          label(ox+4, oy+32, "Bar to chest") +
+          label(ox+55, oy+78, "Elbows ~45°");
+      }
+    },
+    ohp: {
+      titles: ["SET UP", "PRESS", "LOCK OUT"],
+      draw: (ox, oy, phase) => {
+        if (phase === 0) {
+          return head(ox+50, oy+22) + body(ox+50, oy+30, ox+50, oy+58) +
+            body(ox+50, oy+38, ox+32, oy+42) + body(ox+50, oy+38, ox+68, oy+42) +
+            body(ox+50, oy+58, ox+40, oy+88) + body(ox+50, oy+58, ox+60, oy+88) +
+            bar(ox+22, oy+42, ox+78) +
+            label(ox+4, oy+52, "Bar at chin") + label(ox+62, oy+32, "Brace");
+        }
+        if (phase === 1) {
+          return head(ox+50, oy+22) + body(ox+50, oy+30, ox+50, oy+58) +
+            body(ox+50, oy+34, ox+36, oy+24) + body(ox+50, oy+34, ox+64, oy+24) +
+            body(ox+50, oy+58, ox+40, oy+88) + body(ox+50, oy+58, ox+60, oy+88) +
+            bar(ox+22, oy+22, ox+78) +
+            label(ox+62, oy+40, "Press up");
+        }
+        return head(ox+50, oy+28) + body(ox+50, oy+36, ox+50, oy+58) +
+          body(ox+50, oy+38, ox+38, oy+14) + body(ox+50, oy+38, ox+62, oy+14) +
+          body(ox+50, oy+58, ox+40, oy+88) + body(ox+50, oy+58, ox+60, oy+88) +
+          bar(ox+22, oy+12, ox+78) +
+          label(ox+62, oy+32, "Head through");
+      }
+    },
+    row: {
+      titles: ["HINGE", "PULL", "LOWER"],
+      draw: (ox, oy, phase) => {
+        return head(ox+50, oy+24) +
+          body(ox+50, oy+32, ox+62, oy+54) +
+          body(ox+50, oy+36, ox+28, oy+(phase===1?48:58)) + body(ox+50, oy+36, ox+72, oy+(phase===1?48:58)) +
+          body(ox+62, oy+54, ox+48, oy+88) + body(ox+62, oy+54, ox+68, oy+88) +
+          bar(ox+18, oy+(phase===1?50:60), ox+82) +
+          label(ox+4, oy+70, phase===0?"Torso ~45°":(phase===1?"To torso":"Control")) +
+          label(ox+60, oy+40, phase===1?"Squeeze":"");
+      }
+    },
+    generic: {
+      titles: ["SET UP", "ACTION", "FINISH"],
+      draw: (ox, oy, phase) => {
+        return head(ox+50, oy+22) + body(ox+50, oy+30, ox+50, oy+58) +
+          body(ox+50, oy+38, ox+32, oy+50) + body(ox+50, oy+38, ox+68, oy+50) +
+          body(ox+50, oy+58, ox+40, oy+88) + body(ox+50, oy+58, ox+60, oy+88) +
+          label(ox+50, oy+100, phase===0?"Ready":(phase===1?"Work":"Done"), "middle");
+      }
+    }
   };
-  return svgs[type] || svgs.generic;
+
+  // Map visual keys
+  const key = {
+    squat:"squat", deadlift:"deadlift", bench:"bench", ohp:"ohp", row:"row",
+    pullup:"row", lunge:"squat", hipthrust:"squat", plank:"generic", curl:"ohp"
+  }[type] || "generic";
+  const p = poses[key] || poses.generic;
+  const W = 320, H = 150;
+  const pw = 100, ph = 120;
+  const gaps = 8;
+  let panels = "";
+  for (let i = 0; i < 3; i++) {
+    const ox = 6 + i * (pw + gaps);
+    const oy = 22;
+    panels += panelBox(ox, oy, pw, ph);
+    panels += title(ox + pw/2, oy + 14, p.titles[i]);
+    panels += p.draw(ox, oy + 4, i);
+  }
+  return `<svg viewBox="0 0 ${W} ${H+10}" width="100%" style="max-width:340px;margin:8px auto;display:block">${panels}</svg>`;
 }
 
 /* Form guides – steps + tip for every lift */
@@ -995,7 +1175,8 @@ const FORM = {
 
 /* Plate calculator – plates for ONE side */
 function platesFor(weight, bar = 45) {
-  const target = Math.max(0, (+weight || 0) - bar);
+  const b = +bar || 45;
+  const target = Math.max(0, (+weight || 0) - b);
   const each = target / 2;
   const available = [45, 25, 10, 5, 2.5];
   const out = [];
@@ -1009,17 +1190,18 @@ function platesFor(weight, bar = 45) {
   return out;
 }
 
-function plateText(weight) {
+function plateText(weight, bar = 45) {
   const w = +weight || 0;
-  if (w < 45) return "Use a lighter bar or dumbbells if under 45 lb.";
-  const side = platesFor(w);
-  if (!side.length) return "Just the 45 lb bar (no plates).";
+  const b = +bar || 45;
+  if (w < b) return `Total is under the ${b} lb bar — use a lighter setup or dumbbells.`;
+  const side = platesFor(w, b);
+  if (!side.length) return `Just the ${b} lb bar (no plates).`;
   const counts = {};
   side.forEach(p => counts[p] = (counts[p] || 0) + 1);
   const parts = Object.entries(counts)
-    .sort((a,b) => b[0] - a[0])
+    .sort((a,b2) => b2[0] - a[0])
     .map(([p,c]) => c > 1 ? `${c}×${p}` : `${p}`);
-  return `45 bar + ${parts.join(" + ")} each side`;
+  return `${b} bar + ${parts.join(" + ")} each side`;
 }
 
 /* Colored plate sizes for visual (matches common gym colors) */
@@ -1032,12 +1214,13 @@ const PLATE_VIS = {
 };
 
 /** Compact SVG of a loaded barbell – both sides mirrored */
-function plateVisual(weight) {
+function plateVisual(weight, bar = 45) {
   const w = +weight || 0;
-  if (w < 45) {
-    return `<div style="text-align:center;padding:12px 0;color:var(--muted);font-size:13px">No 45 lb bar needed</div>`;
+  const b = +bar || 45;
+  if (w < b) {
+    return `<div style="text-align:center;padding:12px 0;color:var(--muted);font-size:13px">Under ${b} lb bar weight</div>`;
   }
-  const side = platesFor(w); // largest first
+  const side = platesFor(w, b); // largest first
   // Layout: left plates | sleeve | bar | sleeve | right plates
   const barH = 10;
   const sleeveW = 8;
@@ -1099,12 +1282,13 @@ function plateVisual(weight) {
 }
 
 /** Chip row of plates per side (e.g. [45] [10] [5]) */
-function plateChips(weight) {
+function plateChips(weight, bar = 45) {
   const w = +weight || 0;
-  if (w < 45) return "";
-  const side = platesFor(w);
+  const b = +bar || 45;
+  if (w < b) return "";
+  const side = platesFor(w, b);
   if (!side.length) {
-    return `<div style="text-align:center;font-size:12px;color:var(--muted);margin-top:4px">No plates — bar only</div>`;
+    return `<div style="text-align:center;font-size:12px;color:var(--muted);margin-top:4px">No plates — ${b} lb bar only</div>`;
   }
   const chips = side.map(p => {
     const pv = PLATE_VIS[p] || { color: "#666", label: String(p) };
@@ -1390,6 +1574,60 @@ let savedSchedule = null; // preserves schedule when editing profile
 let guidedIdx = 0;
 let showForm = null;     // exercise name whose form guide is open
 let setJustDone = false; // after logging a set, only show "what's next"
+let pendingDiff = null;  // { name, setIdx } waiting for difficulty 1–10
+let showWeightSetup = false; // first-run known working weights page
+
+function needsWeight(n) {
+  const e = EX[n];
+  if (!e) return true;
+  // Pure bodyweight / timed / mobility — no load field
+  if (!e.inc && !e.bw && !e.pl && !e.pu) return false;
+  return true;
+}
+
+function knownW(n) {
+  if (S.p && S.p.knownWeights && S.p.knownWeights[n] != null && S.p.knownWeights[n] !== "")
+    return String(S.p.knownWeights[n]);
+  return "";
+}
+
+function getBar(n) {
+  if (S.d[n] && S.d[n].bar) return +S.d[n].bar;
+  return 45;
+}
+
+function setBar(n, bar) {
+  if (!S.d[n]) S.d[n] = { s: "", sets: [{ w: "", r: 0 }], bar: +bar };
+  S.d[n].bar = +bar;
+  const w = S.d[n].s || (S.d[n].sets && S.d[n].sets.length ? S.d[n].sets[S.d[n].sets.length - 1].w : 0);
+  updatePlatesLive(n, w);
+  // Refresh bar toggle buttons without full re-render if present
+  const b45 = $("barBtn45");
+  const b15 = $("barBtn15");
+  if (b45 && b15) {
+    const on = "border-color:var(--a);background:var(--a-soft);color:#fff";
+    const off = "";
+    b45.style.cssText = (bar == 45 ? on : off) + ";min-height:40px;flex:1";
+    b15.style.cssText = (bar == 15 ? on : off) + ";min-height:40px;flex:1";
+  }
+}
+
+function updatePlatesLive(n, val) {
+  // Update plate card without full page re-render (keeps keyboard focus)
+  const w = val;
+  const bar = getBar(n);
+  const textEl = $("plateTextLive");
+  const visEl = $("plateVisLive");
+  const chipEl = $("plateChipLive");
+  if (textEl) textEl.textContent = plateText(w, bar);
+  if (visEl) visEl.innerHTML = plateVisual(w, bar);
+  if (chipEl) chipEl.innerHTML = plateChips(w, bar);
+  if (S.d[n]) {
+    S.d[n].s = val;
+    if (S.d[n].sets && S.d[n].sets.length)
+      S.d[n].sets[S.d[n].sets.length - 1].w = val;
+  }
+}
 
 function setStatus(msg, type = "info") {
   statusMsg = msg;
@@ -1767,8 +2005,10 @@ async function finishSetup() {
   };
   S.p.mode = modeName(S.p);
   S.p.spec = specText(S.p);
+  S.p.knownWeights = null; // will collect on next screen
   S.code = code;
   savedSchedule = null;
+  showWeightSetup = true;
 
   if (cloudOk && db && !localMode) {
     try {
@@ -2063,7 +2303,11 @@ async function finish() {
     name: n,
     sets: (S.d[n] || {sets:[]}).sets
       .filter(s => s.r > 0 || +s.w > 0)
-      .map(s => ({w: s.w || S.d[n].s || 0, r: s.r}))
+      .map(s => {
+        const row = { w: needsWeight(n) ? (s.w || S.d[n].s || 0) : 0, r: s.r };
+        if (s.diff) row.diff = s.diff;
+        return row;
+      })
   })).filter(i => i.sets.length);
 
   if (!items.length) {
@@ -2379,6 +2623,16 @@ function render() {
     setupUI();
     return;
   }
+  // First-run: collect known working weights
+  if (showWeightSetup || S.p.knownWeights === null) {
+    showWeightSetup = true;
+    $("setup").classList.add("hide");
+    $("app").classList.remove("hide");
+    $("nav").classList.add("hide");
+    $("sub").textContent = "Working weights";
+    $("v").innerHTML = vWeightSetup();
+    return;
+  }
   $("setup").classList.add("hide");
   $("app").classList.remove("hide");
   $("nav").classList.remove("hide");
@@ -2403,6 +2657,59 @@ function resetGuided() {
   guidedIdx = 0;
   setJustDone = false;
   showForm = null;
+  pendingDiff = null;
+}
+
+const MAIN_LIFTS_SETUP = [
+  "Squat","Front Squat","Deadlift","Romanian Deadlift","Bench Press",
+  "Incline Bench Press","Overhead Press","Barbell Row","Pull-Ups","Hip Thrust"
+];
+
+function vWeightSetup() {
+  const rows = MAIN_LIFTS_SETUP.map(n => {
+    const g = suggest(n);
+    const sug = g && g.w != null ? g.w : "";
+    const cur = knownW(n) || sug || "";
+    return `
+      <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--stroke)">
+        <div style="flex:1;font-weight:700;font-size:14px">${esc(n)}</div>
+        <input type="number" inputmode="decimal" id="kw_${n.replace(/\s+/g,'_')}"
+          value="${esc(String(cur))}" placeholder="${sug ? sug : 'skip'}"
+          style="width:100px;min-height:44px;text-align:center"
+          oninput="if(!S.p.knownWeights)S.p.knownWeights={};S.p.knownWeights['${n}']=this.value">
+        <span style="font-size:12px;color:var(--muted);width:28px">lb</span>
+      </div>`;
+  }).join("");
+  return `
+    <div class="page-hero">
+      <div class="title">Your working weights</div>
+      <div class="meta">Enter what you usually lift — or skip any you don’t know</div>
+    </div>
+    <div class="c">
+      <div class="nt" style="margin-top:0">These become your starting weights. You can change them anytime in a workout.</div>
+      ${rows}
+      <button class="pri" onclick="saveKnownWeights()">Save & start lifting →</button>
+      <button style="width:100%;margin-top:10px" onclick="skipKnownWeights()">Skip for now</button>
+    </div>`;
+}
+
+function saveKnownWeights() {
+  if (!S.p.knownWeights) S.p.knownWeights = {};
+  MAIN_LIFTS_SETUP.forEach(n => {
+    const el = $("kw_" + n.replace(/\s+/g, "_"));
+    if (el && el.value !== "") S.p.knownWeights[n] = el.value;
+  });
+  showWeightSetup = false;
+  saveProfile();
+  setStatus("Weights saved. You’re ready to train.", "ok");
+  render();
+}
+
+function skipKnownWeights() {
+  if (!S.p.knownWeights) S.p.knownWeights = {};
+  showWeightSetup = false;
+  saveProfile();
+  render();
 }
 
 function advanceAfterSet(n) {
@@ -2412,6 +2719,19 @@ function advanceAfterSet(n) {
   if (!(last.r > 0 || +last.w > 0)) {
     last.r = Math.max(1, last.r || 0);
   }
+  // Ask difficulty before moving on
+  pendingDiff = { name: n, setIdx: D.sets.length - 1 };
+  setJustDone = false;
+  render();
+}
+
+function rateDifficulty(score) {
+  if (!pendingDiff) return;
+  const { name, setIdx } = pendingDiff;
+  if (S.d[name] && S.d[name].sets[setIdx]) {
+    S.d[name].sets[setIdx].diff = score;
+  }
+  pendingDiff = null;
   setJustDone = true;
   render();
 }
@@ -2497,20 +2817,45 @@ function vWork() {
   const planSets = setPlan(n);
   const [ts, tr] = tgt(n);
   const D = S.d[n] || (S.d[n] = {s:"", sets:[]});
-  // Prefill from plan / suggestion
+  const weighted = needsWeight(n);
+  // Prefill weight from known weights → suggestion; always prefill target reps
   while (D.sets.length < 1) D.sets.push({w:"", r:0});
-  if (g && g.w != null && g.w !== "" && (D.s === "" || D.s == null)) D.s = String(g.w);
-  if ((D.sets[0].w === "" || D.sets[0].w == null) && D.s) D.sets[0].w = D.s;
+  if (weighted) {
+    const kw = knownW(n);
+    if ((D.s === "" || D.s == null) && kw) D.s = kw;
+    else if ((D.s === "" || D.s == null) && g && g.w != null && g.w !== "") D.s = String(g.w);
+    if ((D.sets[0].w === "" || D.sets[0].w == null) && D.s) D.sets[0].w = D.s;
+  }
   if ((!D.sets[0].r || D.sets[0].r === 0) && planSets[0] && planSets[0].r) D.sets[0].r = planSets[0].r;
+  else if ((!D.sets[0].r || D.sets[0].r === 0) && tr) D.sets[0].r = tr;
 
   const pr = prs();
   const e = EX[n] || {};
-  const isPlate = !!e.pl;
+  const isPlate = weighted && !!e.pl;
   const startW = D.s || (g && g.w) || "";
   const form = FORM[n];
   const setCount = D.sets.filter(s => s.r > 0 || +s.w > 0).length;
   const currentSetIdx = Math.max(0, D.sets.length - 1);
   const currentSet = D.sets[currentSetIdx];
+
+  // ===== DIFFICULTY (after each set) =====
+  if (pendingDiff && pendingDiff.name === n) {
+    return `
+      <div class="page-hero">
+        <div class="title">How hard was that?</div>
+        <div class="meta">${esc(n)} · set ${pendingDiff.setIdx + 1}</div>
+      </div>
+      <div class="c">
+        <div class="nt" style="margin-top:0">1 = very easy · 10 = max effort</div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:12px">
+          ${[1,2,3,4,5,6,7,8,9,10].map(i => `
+            <button onclick="rateDifficulty(${i})"
+              style="min-height:52px;font-size:18px;font-weight:800;border-radius:14px;${i>=8?"background:var(--a-soft);border-color:var(--a);color:#fff":""}">${i}</button>
+          `).join("")}
+        </div>
+        <button style="width:100%;margin-top:14px" onclick="rateDifficulty(0)">Skip</button>
+      </div>`;
+  }
 
   // ===== SET JUST DONE – only show what's next =====
   if (setJustDone) {
@@ -2524,15 +2869,16 @@ function vWork() {
     } else {
       nextText = `Last exercise finished. Save the workout when you're ready.`;
     }
+    const lastDiff = D.sets[currentSetIdx] && D.sets[currentSetIdx].diff;
     return `
       <div class="page-hero">
         <div class="title">Set logged</div>
-        <div class="meta">${esc(n)} · set ${setCount}</div>
+        <div class="meta">${esc(n)} · set ${setCount}${lastDiff ? " · difficulty " + lastDiff + "/10" : ""}</div>
       </div>
       <div class="c">
         <div class="sug" style="margin:0;font-size:15px">${esc(nextText)}</div>
         ${moreSets ? `
-          <button class="pri" onclick="setJustDone=false;S.d['${n}'].sets.push({w:S.d['${n}'].s||'',r:0});render()">Next set →</button>
+          <button class="pri" onclick="setJustDone=false;S.d['${n}'].sets.push({w:S.d['${n}'].s||'',r:${tr||0}});render()">Next set →</button>
         ` : isLastEx ? `
           <button class="pri" onclick="setJustDone=false;guidedIdx=${d.ex.length};render()">Finish workout →</button>
         ` : `
@@ -2544,23 +2890,29 @@ function vWork() {
 
   // ===== MAIN GUIDED VIEW – only current exercise =====
   const loadW = startW || currentSet.w || 0;
+  const barW = getBar(n);
+  if (S.d[n] && !S.d[n].bar) S.d[n].bar = 45;
   const plateBlock = isPlate ? `
     <div class="c" style="background:var(--a-soft);border-color:rgba(158,27,50,.4);margin-top:10px">
       <div style="font-size:11px;font-weight:750;letter-spacing:.08em;text-transform:uppercase;color:#f0b8c0">Load the bar</div>
-      <div style="font-size:18px;font-weight:800;margin-top:6px;letter-spacing:-0.02em;text-align:center">${esc(plateText(loadW))}</div>
-      ${plateVisual(loadW)}
-      ${plateChips(loadW)}
-      <div class="nt" style="margin-top:8px;text-align:center">Change the start weight below and the plates update.</div>
+      <div class="row" style="margin-top:10px;gap:8px">
+        <button type="button" id="barBtn45" onclick="setBar('${n}',45)"
+          style="min-height:40px;flex:1;${barW===45?"border-color:var(--a);background:var(--a-soft);color:#fff":""}">45 lb bar</button>
+        <button type="button" id="barBtn15" onclick="setBar('${n}',15)"
+          style="min-height:40px;flex:1;${barW===15?"border-color:var(--a);background:var(--a-soft);color:#fff":""}">15 lb bar</button>
+      </div>
+      <div id="plateTextLive" style="font-size:18px;font-weight:800;margin-top:10px;letter-spacing:-0.02em;text-align:center">${esc(plateText(loadW, barW))}</div>
+      <div id="plateVisLive">${plateVisual(loadW, barW)}</div>
+      <div id="plateChipLive">${plateChips(loadW, barW)}</div>
+      <div class="nt" style="margin-top:8px;text-align:center">Pick bar weight · type total · plates update live</div>
     </div>` : "";
 
   const formImgPath = FORM_IMG[n];
-  const formImgHtml = formImgPath
+  const formPhoto = formImgPath
     ? `<img src="${IMG_BASE}${formImgPath}" alt="${esc(n)} form"
-        style="width:100%;max-width:280px;margin:10px auto;display:block;border-radius:12px;background:#1a1214;border:1px solid rgba(255,255,255,.08)"
-        onerror="this.style.display='none';this.nextElementSibling&&(this.nextElementSibling.style.display='block')">
-       <div style="display:none">${formSVG(form.visual || "generic")}</div>`
-    : formSVG(form.visual || "generic");
-  // Labeled cue cards (setup / action / finish) — original instructional layout
+        style="width:100%;max-width:260px;margin:10px auto 0;display:block;border-radius:12px;background:#1a1214;border:1px solid rgba(255,255,255,.08)"
+        onerror="this.style.display='none'">`
+    : "";
   const cues = form.steps || [];
   const third = Math.ceil(cues.length / 3) || 1;
   const setupCues = cues.slice(0, third);
@@ -2573,13 +2925,14 @@ function vWork() {
     </div>` : "";
   const formBlock = showForm === n && form ? `
     <div class="c" style="margin-top:10px;border-color:rgba(100,150,255,.35);background:rgba(100,150,255,.08)">
-      <div style="font-size:11px;font-weight:750;letter-spacing:.08em;text-transform:uppercase;color:#a0bfff">How to do it</div>
-      ${formImgHtml}
-      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px">
+      <div style="font-size:11px;font-weight:750;letter-spacing:.08em;text-transform:uppercase;color:#a0bfff">How to do it · ${esc(n)}</div>
+      ${formPoster(form.visual || "generic")}
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">
         ${cueCard("Setup", setupCues)}
         ${cueCard("Action", actionCues)}
         ${cueCard("Finish", finishCues)}
       </div>
+      ${formPhoto}
       <div class="nt" style="margin-top:10px;color:#a0bfff">${esc(form.tip)}</div>
       <button style="width:100%;margin-top:12px" onclick="showForm=null;render()">Close guide</button>
     </div>` : "";
@@ -2605,40 +2958,50 @@ function vWork() {
 
       ${g && g.t ? `<div class="tip" style="margin-top:12px">${esc(g.t)}</div>` : ""}
 
-      <label>Start weight (lb) — change anytime</label>
-      <input type="number" inputmode="decimal" value="${esc(String(D.s))}"
-        oninput="S.d['${n}'].s=this.value;if(S.d['${n}'].sets.length)S.d['${n}'].sets[S.d['${n}'].sets.length-1].w=this.value;render()"
-        placeholder="Enter weight">
+      ${weighted ? `
+        <label>Start weight (lb) — change anytime</label>
+        <input type="number" inputmode="decimal" id="startWInput" value="${esc(String(D.s))}"
+          oninput="updatePlatesLive('${n}', this.value)"
+          onblur="updatePlatesLive('${n}', this.value)"
+          placeholder="Enter weight">
+      ` : `
+        <div class="tip" style="margin-top:12px">Bodyweight / no load — just log your reps (or hold time as reps).</div>
+      `}
 
       ${plateBlock}
       ${formBlock}
 
-      <div class="sec-label" style="margin-top:16px">Current set · #${currentSetIdx + 1}</div>
+      <div class="sec-label" style="margin-top:16px">Current set · #${currentSetIdx + 1} · target ${tr} reps</div>
       <div class="set" style="margin-top:4px">
-        <div class="set-row">
+        <div class="set-row" style="grid-template-columns:${weighted ? "44px 1fr 1fr" : "44px 1fr"}">
           <div class="set-num">#${currentSetIdx + 1}</div>
+          ${weighted ? `
           <div>
             <label>Weight</label>
-            <input type="number" inputmode="decimal" value="${esc(String(currentSet.w))}"
-              oninput="S.d['${n}'].sets[${currentSetIdx}].w=this.value;render()" placeholder="lb">
-          </div>
+            <input type="number" inputmode="decimal" id="setWInput" value="${esc(String(currentSet.w))}"
+              oninput="S.d['${n}'].sets[${currentSetIdx}].w=this.value;updatePlatesLive('${n}', this.value)"
+              onblur="S.d['${n}'].sets[${currentSetIdx}].w=this.value;updatePlatesLive('${n}', this.value)"
+              placeholder="lb">
+          </div>` : ""}
           <div>
             <label>Reps</label>
-            <input type="number" inputmode="numeric" value="${currentSet.r || ""}"
-              oninput="S.d['${n}'].sets[${currentSetIdx}].r=+this.value||0" placeholder="0">
+            <input type="number" inputmode="numeric" id="setRInput" value="${currentSet.r || ""}"
+              oninput="S.d['${n}'].sets[${currentSetIdx}].r=+this.value||0"
+              placeholder="${tr || 0}">
           </div>
         </div>
         <div class="rc" style="margin-top:10px">
-          <button onclick="rep('${n}',${currentSetIdx},-1)">−</button>
-          <span class="big" style="font-size:28px">${currentSet.r}</span>
-          <button class="plus" onclick="rep('${n}',${currentSetIdx},1)">+ Rep</button>
+          <button type="button" onclick="S.d['${n}'].sets[${currentSetIdx}].r=Math.max(0,(S.d['${n}'].sets[${currentSetIdx}].r||0)-1);var el=$('setRInput');if(el)el.value=S.d['${n}'].sets[${currentSetIdx}].r;var b=document.getElementById('repBig');if(b)b.textContent=S.d['${n}'].sets[${currentSetIdx}].r">−</button>
+          <span class="big" id="repBig" style="font-size:28px">${currentSet.r}</span>
+          <button type="button" class="plus" onclick="S.d['${n}'].sets[${currentSetIdx}].r=(S.d['${n}'].sets[${currentSetIdx}].r||0)+1;var el=$('setRInput');if(el)el.value=S.d['${n}'].sets[${currentSetIdx}].r;var b=document.getElementById('repBig');if(b)b.textContent=S.d['${n}'].sets[${currentSetIdx}].r">+ Rep</button>
         </div>
       </div>
 
       <button class="pri" onclick="advanceAfterSet('${n}')">Set done →</button>
+      <div class="nt" style="text-align:center">After each set you’ll rate difficulty 1–10</div>
 
       ${setCount > 0 ? `
-        <div class="nt" style="margin-top:12px">Logged so far: ${D.sets.filter(s=>s.r>0||+s.w>0).map((s,i)=>`#${i+1} ${s.w||0}×${s.r}`).join(" · ")}</div>
+        <div class="nt" style="margin-top:12px">Logged so far: ${D.sets.filter(s=>s.r>0||+s.w>0).map((s,i)=>`#${i+1} ${weighted?(s.w||0)+'×':''}${s.r}${s.diff?' · D'+s.diff:''}`).join(" · ")}</div>
       ` : ""}
     </div>
 
